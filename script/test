@@ -17,5 +17,5 @@ class FunTest < TLDR
   end
 end
 
-plan = TLDR.plan [__FILE__]
+plan = TLDR.plan
 plan.run!

@@ -41,7 +41,7 @@ class TLDR
     end
   end
 
-  def self.plan file_list
+  def self.plan
     tests = TLDR.subclasses.flat_map { |subklass|
       subklass.instance_methods.grep(/^test_/).map { |method|
         Test.new subklass, method
