@@ -1,0 +1,21 @@
+#!/usr/bin/env ruby
+$LOAD_PATH.unshift File.expand_path("../lib", __dir__)
+
+require "tldr"
+
+class FunTest < TLDR
+  def test_passes
+    assert true
+  end
+
+  def test_false
+    assert false
+  end
+
+  def test_hello
+    raise "💥"
+  end
+end
+
+plan = TLDR.plan [__FILE__]
+plan.run!
