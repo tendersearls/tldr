@@ -17,5 +17,4 @@ class FunTest < TLDR
   end
 end
 
-plan = TLDR.plan
-plan.run!
+TLDR.run!(TLDR.plan)

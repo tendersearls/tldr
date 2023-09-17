@@ -13,33 +13,9 @@ class TLDR
 
   include Assertions
 
-  class Plan
-    def initialize tests
-      @tests = tests
-    end
-
-    def run!
-      Thread.new {
-        sleep 1.8
-        puts "Too Long Didn't Run"
-        exit!
-      }
-      @tests.shuffle.each(&:run!)
-      puts
-    end
-  end
-
-  Test = Struct.new :klass, :method do
-    def run!
-      instance = klass.new
-      instance.send(method)
-      print "💯"
-    rescue Failure
-      print "🙏"
-    rescue
-      print "😬"
-    end
-  end
+  Plan = Struct.new :tests
+  Test = Struct.new :klass, :method
+  TestResult = Struct.new :test, :error
 
   def self.plan
     tests = TLDR.subclasses.flat_map { |subklass|
@@ -48,5 +24,36 @@ class TLDR
       }
     }
     Plan.new tests
+  end
+
+  def self.run! plan
+    Thread.new {
+      sleep 1.8
+      puts "Too Long Didn't Run"
+      exit!
+    }
+
+    results = plan.tests.shuffle.map { |test|
+      begin
+        instance = test.klass.new
+        instance.send(test.method)
+        $stdout.print "💯"
+      rescue Failure => e
+        $stderr.print "🙏"
+      rescue => e
+        $stderr.print "😬"
+      end
+      TestResult.new test, e
+    }
+
+    exit_code = if results.any? { |result| !result.error.nil? && !result.error.is_a?(Failure) }
+      2
+    elsif results.any? { |result| result.error.is_a?(Failure) }
+      1
+    else
+      0
+    end
+
+    exit exit_code
   end
 end
