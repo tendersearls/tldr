@@ -40,14 +40,8 @@ module TLDRunner
   end
 
   def self.run(file, config)
-    config[:paths] = [File.expand_path("fixture/#{file}", __dir__)]
-
     stdout, stderr, status = Open3.capture3 <<~CMD
-      ruby -e '
-        $LOAD_PATH.unshift("#{File.expand_path("../lib", __dir__)}");
-        require "tldr"
-        TLDR.report(TLDR.run(TLDR.plan(TLDR::Config.new(#{config.inspect}))))
-      '
+      bundle exec tldr #{File.expand_path("fixture/#{file}", __dir__)} #{"--seed #{config[:seed]}" if config.key?(:seed)}
     CMD
 
     Result.new(
