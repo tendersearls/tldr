@@ -3,6 +3,9 @@ class TLDR
     TestResult = Struct.new :test, :error
 
     def run plan
+      $stdout.sync = true
+      $stderr.sync = true
+
       Thread.new {
         sleep 1.8
         puts "Too Long Didn't Run"
