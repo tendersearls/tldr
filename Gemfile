@@ -4,4 +4,5 @@ gemspec
 
 gem "rake"
 gem "minitest"
+gem "m"
 gem "standard"
