@@ -7,11 +7,7 @@ class TLDR
       require_tests(config.paths)
 
       print_config config
-      Plan.new gather_tests.tap { |tests|
-        puts "debug CI"
-        pp tests.map(&:method)
-        pp Random.new(config.seed).rand
-      }.shuffle(random: Random.new(config.seed))
+      Plan.new gather_tests.shuffle(random: Random.new(config.seed))
     end
 
     private
@@ -25,7 +21,7 @@ class TLDR
 
     def gather_tests
       TLDR.subclasses.flat_map { |subklass|
-        subklass.instance_methods.grep(/^test_/).map { |method|
+        subklass.instance_methods.grep(/^test_/).sort.map { |method|
           Test.new subklass, method
         }
       }
