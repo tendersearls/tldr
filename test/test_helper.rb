@@ -44,7 +44,7 @@ module TLDRunner
       ruby -e '
         $LOAD_PATH.unshift("#{File.expand_path("../lib", __dir__)}");
         require "tldr"; require "#{File.expand_path("fixture/#{file}", __dir__)}";
-        TLDR.run!(TLDR.plan)
+        TLDR.report(TLDR.run(TLDR.plan))
       '
     CMD
 

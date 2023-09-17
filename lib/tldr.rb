@@ -26,14 +26,14 @@ class TLDR
     Plan.new tests
   end
 
-  def self.run! plan
+  def self.run plan
     Thread.new {
       sleep 1.8
       puts "Too Long Didn't Run"
       exit!
     }
 
-    results = plan.tests.shuffle.map { |test|
+    plan.tests.shuffle.map { |test|
       begin
         instance = test.klass.new
         instance.send(test.method)
@@ -45,7 +45,9 @@ class TLDR
       end
       TestResult.new test, e
     }
+  end
 
+  def self.report results
     exit_code = if results.any? { |result| !result.error.nil? && !result.error.is_a?(Failure) }
       2
     elsif results.any? { |result| result.error.is_a?(Failure) }

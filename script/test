@@ -17,4 +17,4 @@ class FunTest < TLDR
   end
 end
 
-TLDR.run!(TLDR.plan)
+TLDR.report(TLDR.run(TLDR.plan))
