@@ -16,4 +16,12 @@ class ExitCodeTest < Minitest::Test
     assert_equal 1, result.exit_code
     assert_equal "", result.stdout
   end
+
+  def test_skip
+    result = TLDRunner.should_succeed("skip.rb")
+
+    assert_equal "", result.stderr
+    assert_equal 0, result.exit_code
+    assert_equal "🫥", result.stdout
+  end
 end

@@ -9,7 +9,10 @@ class TLDR
           Test.new subklass, method
         }
       }
-      Plan.new tests
+
+      random = config.seed.nil? ? Random.new : Random.new(config.seed)
+
+      Plan.new tests.shuffle(random:)
     end
   end
 end

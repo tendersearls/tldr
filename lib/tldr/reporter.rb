@@ -1,15 +1,24 @@
 class TLDR
   class Reporter
     def report results
-      exit_code = if results.any? { |result| !result.error.nil? && !result.error.is_a?(Assertions::Failure) }
+      exit exit_code results
+    end
+
+    private
+
+    def exit_code results
+      errors = results.map { |result|
+        next if result.error.is_a?(SkipTest)
+        result.error
+      }.compact
+
+      if errors.any? { |error| !error.is_a?(Assertions::Failure) }
         2
-      elsif results.any? { |result| result.error.is_a?(Assertions::Failure) }
+      elsif errors.any?
         1
       else
         0
       end
-
-      exit exit_code
     end
   end
 end

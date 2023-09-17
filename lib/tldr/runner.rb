@@ -9,11 +9,13 @@ class TLDR
         exit!
       }
 
-      plan.tests.shuffle.map { |test|
+      plan.tests.map { |test|
         begin
           instance = test.klass.new
           instance.send(test.method)
           $stdout.print "💯"
+        rescue SkipTest => e
+          $stdout.print "🫥"
         rescue Assertions::Failure => e
           $stderr.print "🙏"
         rescue => e
