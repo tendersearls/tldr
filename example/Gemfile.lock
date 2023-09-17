@@ -1,0 +1,17 @@
+PATH
+  remote: ..
+  specs:
+    tldr (0.0.1)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+
+PLATFORMS
+  arm64-darwin-22
+
+DEPENDENCIES
+  tldr!
+
+BUNDLED WITH
+   2.4.17
