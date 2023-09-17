@@ -6,7 +6,8 @@ class SeedTest < Minitest::Test
 
     assert_equal "", result.stderr
     assert_equal 0, result.exit_code
-    assert_equal "💯🫥", result.stdout
+    assert_includes result.stdout, "--seed 1"
+    assert_includes result.stdout, "🫥💯"
   end
 
   def test_order_2
@@ -14,6 +15,7 @@ class SeedTest < Minitest::Test
 
     assert_equal "", result.stderr
     assert_equal 0, result.exit_code
-    assert_equal "🫥💯", result.stdout
+    assert_includes result.stdout, "--seed 2"
+    assert_includes result.stdout, "💯🫥"
   end
 end

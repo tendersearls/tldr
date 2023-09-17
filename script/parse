@@ -1,0 +1,6 @@
+#!/usr/bin/env ruby
+$LOAD_PATH.unshift File.expand_path("../lib", __dir__)
+
+require "tldr"
+
+pp TLDR::ArgvParser.new.parse(ARGV).to_h

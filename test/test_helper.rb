@@ -40,10 +40,12 @@ module TLDRunner
   end
 
   def self.run(file, config)
+    config[:paths] = [File.expand_path("fixture/#{file}", __dir__)]
+
     stdout, stderr, status = Open3.capture3 <<~CMD
       ruby -e '
         $LOAD_PATH.unshift("#{File.expand_path("../lib", __dir__)}");
-        require "tldr"; require "#{File.expand_path("fixture/#{file}", __dir__)}";
+        require "tldr"
         TLDR.report(TLDR.run(TLDR.plan(TLDR::Config.new(#{config.inspect}))))
       '
     CMD
