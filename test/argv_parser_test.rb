@@ -1,6 +1,6 @@
 require "test_helper"
 
-class CLITest < Minitest::Test
+class ArgvParserTest < Minitest::Test
   def test_parsing_argv
     result = TLDR::ArgvParser.new.parse ["bar.rb", "--seed", "1", "foo.rb:3"]
 
