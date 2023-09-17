@@ -6,20 +6,20 @@ class ExitCodeTest < Minitest::Test
 
     assert_equal "", result.stderr
     assert_equal 0, result.exit_code
-    assert_includes result.stdout, "💯"
+    assert_includes result.stdout, "😁"
   end
 
   def test_failure
     result = TLDRunner.should_fail("fail.rb")
 
-    assert_equal "🙏", result.stderr
+    assert_equal "😡", result.stderr
     assert_equal 1, result.exit_code
   end
 
   def test_error
     result = TLDRunner.should_fail("error.rb")
 
-    assert_equal "😬", result.stderr
+    assert_equal "🤬", result.stderr
     assert_equal 2, result.exit_code
   end
 

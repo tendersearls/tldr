@@ -15,6 +15,11 @@ class FunTest < TLDR
   def test_hello
     raise "💥"
   end
+
+  def test_slow
+    skip
+    sleep 2
+  end
 end
 
 TLDR.report(TLDR.run(TLDR.plan(TLDR::Config.new(paths: []))))

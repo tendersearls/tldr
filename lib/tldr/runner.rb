@@ -8,7 +8,8 @@ class TLDR
 
       Thread.new {
         sleep 1.8
-        puts "Too Long Didn't Run"
+        $stderr.print "🥵"
+        puts "\n\ntoo long; didn't run"
         exit!
       }
 
@@ -16,13 +17,13 @@ class TLDR
         begin
           instance = test.klass.new
           instance.send(test.method)
-          $stdout.print "💯"
+          $stdout.print "😁"
         rescue SkipTest => e
           $stdout.print "🫥"
         rescue Assertions::Failure => e
-          $stderr.print "🙏"
+          $stderr.print "😡"
         rescue => e
-          $stderr.print "😬"
+          $stderr.print "🤬"
         end
         TestResult.new test, e
       }

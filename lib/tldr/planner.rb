@@ -4,6 +4,7 @@ class TLDR
     Plan = Struct.new :tests
 
     def plan config
+      require_test_helper(config)
       require_tests(config.paths)
 
       print_config config
@@ -11,6 +12,11 @@ class TLDR
     end
 
     private
+
+    def require_test_helper(config)
+      return if config.skip_test_helper || !File.exist?("test/test_helper.rb")
+      require File.expand_path("test/test_helper.rb", Dir.pwd)
+    end
 
     def require_tests(paths)
       paths.each do |path|

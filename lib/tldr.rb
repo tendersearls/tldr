@@ -9,14 +9,6 @@ require_relative "tldr/skippable"
 class TLDR
   class Error < StandardError; end
 
-  Config = Struct.new :paths, :seed, keyword_init: true do
-    def initialize(*args)
-      super
-      self.seed ||= rand(10_000)
-      self.paths ||= Dir["test/**/*_test.rb"]
-    end
-  end
-
   include Assertions
   include Skippable
 
