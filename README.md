@@ -64,3 +64,8 @@ Usage: tldr [options] path1 path2 ...
         --workers WORKERS            Number of parallel workers (Default: 24, the number of CPU cores)
     -v, --verbose                    Print stack traces for errors
 ```
+
+## Acknowledgements
+
+Thanks to [George Sheppard](https://github.com/fuzzmonkey) for freeing up the
+[tldr gem name](https://rubygems.org/gems/tldr)!
