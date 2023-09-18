@@ -16,7 +16,11 @@ class TLDR
           config.reporter = Kernel.const_get(reporter).new
         end
 
-        opts.on("--skip-test-helper", "Don't load test/test_helper.rb") do |skip_test_helper|
+        opts.on("--helper", String, "Path to a test helper to load before any tests (Default: \"test/helper.rb\")") do |helper|
+          config.helper = helper
+        end
+
+        opts.on("--skip-test-helper", "Don't try loading a test helper before the tests") do |skip_test_helper|
           config.skip_test_helper = skip_test_helper
         end
 

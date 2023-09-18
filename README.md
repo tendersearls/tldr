@@ -25,8 +25,8 @@ class MyTest < TLDR
 end
 ```
 
-Stick your tests in `test/*_test.rb` files and they'll be found automatically.
-Same goes for a `test/test_helper.rb` file, which will be loaded prior to your
+Stick your tests in `test/**/*_test.rb` files and they'll be found automatically.
+Same goes for a `test/helper.rb` file, which will be loaded prior to your
 tests by the CLI if it exists.
 
 Then just run the CLI:

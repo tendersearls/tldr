@@ -14,8 +14,8 @@ class TLDR
     private
 
     def require_test_helper(config)
-      return if config.skip_test_helper || !File.exist?("test/test_helper.rb")
-      require File.expand_path("test/test_helper.rb", Dir.pwd)
+      return if config.skip_test_helper || !File.exist?(config.helper)
+      require File.expand_path(config.helper, Dir.pwd)
     end
 
     def require_tests(paths)
