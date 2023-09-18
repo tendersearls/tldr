@@ -19,7 +19,9 @@ class TLDR
       plan.tests.map { |test|
         begin
           instance = test.klass.new
+          instance.setup if instance.respond_to? :setup
           instance.send(test.method)
+          instance.teardown if instance.respond_to? :teardown
         rescue SkipTest, Assertions::Failure, StandardError => e
         end
         TestResult.new(test, e).tap do |result|
