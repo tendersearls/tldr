@@ -35,7 +35,7 @@ class TLDR
 
     private
 
-    def parallelize(tests, workers, &blk)
+    def parallelize tests, workers, &blk
       return tests.map(&blk) if tests.size < 2 || workers < 2
 
       group_size = (tests.size.to_f / workers).ceil
