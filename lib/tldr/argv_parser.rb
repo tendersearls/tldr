@@ -12,6 +12,10 @@ class TLDR
           config.seed = seed
         end
 
+        opts.on("-r", "--reporter REPORTER", String, "Custom reporter class (Default: \"TLDR::Reporters::Default\")") do |reporter|
+          config.reporter = Kernel.const_get(reporter).new
+        end
+
         opts.on("--skip-test-helper", "Don't load test/test_helper.rb") do |skip_test_helper|
           config.skip_test_helper = skip_test_helper
         end

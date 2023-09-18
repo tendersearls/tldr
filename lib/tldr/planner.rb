@@ -6,8 +6,9 @@ class TLDR
       require_test_helper(config)
       require_tests(config.paths)
 
-      print "#{config.to_full_args}\n\n"
-      Plan.new gather_tests.shuffle(random: Random.new(config.seed))
+      Plan.new(gather_tests.shuffle(random: Random.new(config.seed))).tap do |tests|
+        config.reporter.before_suite config, tests
+      end
     end
 
     private

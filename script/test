@@ -23,4 +23,4 @@ class FunTest < TLDR
 end
 
 config = TLDR::Config.new(paths: [])
-TLDR.report(config, TLDR.run(TLDR.plan(config)))
+TLDR.report(config, TLDR.run(config, TLDR.plan(config)))

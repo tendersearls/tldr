@@ -13,26 +13,26 @@ class TLDR
     def emoji
       case type
       when :success then "😁"
-      when :failure then "😡"
       when :skip then "🫥"
+      when :failure then "😡"
       when :error then "🤬"
       end
     end
 
-    def io
-      (success? || skip?) ? $stdout : $stderr
+    def passing?
+      success? || skip?
     end
 
     def success?
       type == :success
     end
 
-    def failure?
-      type == :failure
-    end
-
     def skip?
       type == :skip
+    end
+
+    def failure?
+      type == :failure
     end
 
     def error?

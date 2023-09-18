@@ -1,5 +1,6 @@
 require_relative "tldr/version"
 require_relative "tldr/value"
+require_relative "tldr/reporters"
 require_relative "tldr/argv_parser"
 require_relative "tldr/planner"
 require_relative "tldr/runner"
@@ -15,15 +16,15 @@ class TLDR
 
   def self.cli argv
     config = ArgvParser.new.parse(argv)
-    report(config, run(plan(config)))
+    report(config, run(config, plan(config)))
   end
 
-  def self.plan config = Config.new
+  def self.plan config
     Planner.new.plan config
   end
 
-  def self.run plan
-    Runner.new.run plan
+  def self.run config, plan
+    Runner.new.run config, plan
   end
 
   def self.report config, results

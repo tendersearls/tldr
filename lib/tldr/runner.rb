@@ -2,7 +2,7 @@ require "irb"
 
 class TLDR
   class Runner
-    def run plan
+    def run config, plan
       $stdout.sync = true
       $stderr.sync = true
 
@@ -15,8 +15,7 @@ class TLDR
           sleep 1
         end
 
-        $stderr.print "🥵"
-        puts "\n\ntoo long; didn't run"
+        config.reporter.after_tldr
         exit! 3
       }
 
@@ -27,7 +26,7 @@ class TLDR
         rescue SkipTest, Assertions::Failure, StandardError => e
         end
         TestResult.new(test, e).tap do |result|
-          result.io.print result.emoji
+          config.reporter.after_test result
         end
       }.tap do
         time_bomb.kill
