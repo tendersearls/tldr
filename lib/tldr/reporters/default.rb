@@ -2,6 +2,9 @@ class TLDR
   module Reporters
     class Default < Base
       def initialize(out = $stdout, err = $stderr)
+        out.sync = true
+        err.sync = true
+
         @out = out
         @err = err
       end
@@ -11,8 +14,7 @@ class TLDR
       end
 
       def after_tldr
-        $stderr.print "🥵"
-        puts "\n\ntoo long; didn't run"
+        @err.print "🥵\n\ntoo long; didn't run"
       end
 
       def after_test result

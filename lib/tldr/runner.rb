@@ -3,9 +3,6 @@ require "irb"
 class TLDR
   class Runner
     def run config, plan
-      $stdout.sync = true
-      $stderr.sync = true
-
       time_bomb = Thread.new {
         sleep 1.8
 
