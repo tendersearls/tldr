@@ -4,6 +4,10 @@ require "open3"
 
 require "minitest/autorun"
 
+class Minitest::Test
+  make_my_diffs_pretty!
+end
+
 module TLDRunner
   Result = Struct.new(:stdout, :stderr, :exit_code, :success?, keyword_init: true)
 

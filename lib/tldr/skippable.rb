@@ -2,7 +2,7 @@ class TLDR
   class SkipTest < StandardError; end
 
   module Skippable
-    def skip message = nil
+    def skip message = ""
       raise SkipTest, message
     end
   end

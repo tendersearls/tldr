@@ -1,13 +1,12 @@
+require "pathname"
+
 class TLDR
   class Planner
-    Test = Struct.new :klass, :method
-    Plan = Struct.new :tests
-
     def plan config
       require_test_helper(config)
       require_tests(config.paths)
 
-      print_config config
+      print "#{config.to_full_args}\n\n"
       Plan.new gather_tests.shuffle(random: Random.new(config.seed))
     end
 
@@ -28,13 +27,10 @@ class TLDR
     def gather_tests
       TLDR.subclasses.flat_map { |subklass|
         subklass.instance_methods.grep(/^test_/).sort.map { |method|
-          Test.new subklass, method
+          file, line = subklass.instance_method(method).source_location
+          Test.new subklass, method, file, line
         }
       }
-    end
-
-    def print_config config
-      print "--seed #{config.seed}\n\n"
     end
   end
 end

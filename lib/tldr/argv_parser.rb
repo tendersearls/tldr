@@ -1,15 +1,6 @@
 require "optparse"
 
 class TLDR
-  Config = Struct.new :paths, :seed, :skip_test_helper, keyword_init: true do
-    def initialize(*args)
-      super
-      self.paths ||= Dir["test/**/*_test.rb"]
-      self.seed ||= rand(10_000)
-      self.skip_test_helper = false if skip_test_helper.nil?
-    end
-  end
-
   class ArgvParser
     def parse(args)
       config = Config.new
@@ -23,6 +14,10 @@ class TLDR
 
         opts.on("--skip-test-helper", "Don't load test/test_helper.rb") do |skip_test_helper|
           config.skip_test_helper = skip_test_helper
+        end
+
+        opts.on("-v", "--verbose", "Print stack traces for errors") do |verbose|
+          config.verbose = verbose
         end
       end.parse!(args)
 

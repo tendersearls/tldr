@@ -1,4 +1,5 @@
 require_relative "tldr/version"
+require_relative "tldr/value"
 require_relative "tldr/argv_parser"
 require_relative "tldr/planner"
 require_relative "tldr/runner"
@@ -13,7 +14,8 @@ class TLDR
   include Skippable
 
   def self.cli argv
-    report(run(plan(ArgvParser.new.parse(argv))))
+    config = ArgvParser.new.parse(argv)
+    report(config, run(plan(config)))
   end
 
   def self.plan config = Config.new
@@ -24,7 +26,7 @@ class TLDR
     Runner.new.run plan
   end
 
-  def self.report results
-    Reporter.new.report results
+  def self.report config, results
+    Reporter.new.report config, results
   end
 end
