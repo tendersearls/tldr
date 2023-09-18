@@ -7,7 +7,7 @@ class TLDR
       def after_test test_result
       end
 
-      def after_tldr tldr_config, planned_tests, test_results
+      def after_tldr tldr_config, planned_tests, wip_tests, test_results
       end
 
       def after_suite tldr_config, test_results

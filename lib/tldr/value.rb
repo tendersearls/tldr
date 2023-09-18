@@ -1,5 +1,6 @@
 require "tldr/value/config"
 require "tldr/value/plan"
 require "tldr/value/test"
+require "tldr/value/wip_test"
 require "tldr/value/test_result"
 require "tldr/value/location"
