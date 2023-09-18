@@ -16,7 +16,11 @@ class TLDR
           config.reporter = Kernel.const_get(reporter).new
         end
 
-        opts.on("--helper", String, "Path to a test helper to load before any tests (Default: \"test/helper.rb\")") do |helper|
+        opts.on("-l", "--load-path PATH", Array, "Add one or more paths to the $LOAD_PATH (Default: [\"test\"])") do |load_paths|
+          config.load_paths = load_paths
+        end
+
+        opts.on("--helper HELPER", String, "Path to a test helper to load before any tests (Default: \"test/helper.rb\")") do |helper|
           config.helper = helper
         end
 

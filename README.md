@@ -46,8 +46,12 @@ $ bundle exec tldr test/this/one/in/particular.rb
 Here are the CLI options:
 
 ```
-$ be tldr --help
+$ tldr --help
 Usage: tldr [options] path1 path2 ...
     -s, --seed SEED                  Seed for randomization
-        --skip-test-helper           Don't require test/test_helper.rb
+    -r, --reporter REPORTER          Custom reporter class (Default: "TLDR::Reporters::Default")
+    -l, --load-path PATH             Add one or more paths to the $LOAD_PATH (Default: ["test"])
+        --helper HELPER              Path to a test helper to load before any tests (Default: "test/helper.rb")
+        --skip-test-helper           Don't try loading a test helper before the tests
+    -v, --verbose                    Print stack traces for errors
 ```

@@ -1,5 +1,5 @@
 class TLDR
-  Config = Struct.new :paths, :seed, :skip_test_helper, :verbose, :reporter, :helper, keyword_init: true do
+  Config = Struct.new :paths, :seed, :skip_test_helper, :verbose, :reporter, :helper, :load_paths, keyword_init: true do
     def initialize(*args)
       super
       self.paths ||= Dir["test/**/*_test.rb"]
@@ -8,6 +8,7 @@ class TLDR
       self.verbose = false if verbose.nil?
       self.reporter ||= Reporters::Default.new
       self.helper ||= "test/helper.rb"
+      self.load_paths ||= ["test"]
     end
 
     def to_full_args
