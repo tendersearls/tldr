@@ -28,6 +28,10 @@ class TLDR
           config.skip_test_helper = skip_test_helper
         end
 
+        opts.on("--workers WORKERS", Integer, "Number of parallel workers (Default: #{Concurrent.processor_count}, the number of CPU cores)") do |workers|
+          config.workers = workers
+        end
+
         opts.on("-v", "--verbose", "Print stack traces for errors") do |verbose|
           config.verbose = verbose
         end

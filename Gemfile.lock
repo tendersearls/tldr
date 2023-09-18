@@ -2,12 +2,14 @@ PATH
   remote: .
   specs:
     tldr (0.0.1)
+      concurrent-ruby (~> 1.2)
 
 GEM
   remote: https://rubygems.org/
   specs:
     ast (2.4.2)
     base64 (0.1.1)
+    concurrent-ruby (1.2.2)
     json (2.6.3)
     language_server-protocol (3.17.0.3)
     lint_roller (1.1.0)

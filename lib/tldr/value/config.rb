@@ -1,5 +1,7 @@
+require "concurrent"
+
 class TLDR
-  Config = Struct.new :paths, :seed, :skip_test_helper, :verbose, :reporter, :helper, :load_paths, keyword_init: true do
+  Config = Struct.new :paths, :seed, :skip_test_helper, :verbose, :reporter, :helper, :load_paths, :workers, keyword_init: true do
     def initialize(*args)
       super
       self.paths ||= []
@@ -14,6 +16,7 @@ class TLDR
       self.reporter ||= Reporters::Default.new
       self.helper ||= "test/helper.rb"
       self.load_paths = ["test"] if load_paths.empty?
+      self.workers ||= Concurrent.processor_count
     end
 
     def to_full_args

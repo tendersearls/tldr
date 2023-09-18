@@ -1,4 +1,5 @@
 require "irb"
+require "concurrent"
 
 class TLDR
   class Runner
@@ -16,7 +17,7 @@ class TLDR
         exit! 3
       }
 
-      plan.tests.map { |test|
+      parallelize(plan.tests, config.workers) { |test|
         begin
           instance = test.klass.new
           instance.setup if instance.respond_to? :setup
@@ -30,6 +31,19 @@ class TLDR
       }.tap do
         time_bomb.kill
       end
+    end
+
+    private
+
+    def parallelize(tests, workers, &blk)
+      return tests.map(&blk) if tests.size < 2 || workers < 2
+
+      group_size = (tests.size.to_f / workers).ceil
+      tests.each_slice(group_size).map { |group|
+        Concurrent::Promises.future {
+          group.map(&blk)
+        }
+      }.flat_map(&:value)
     end
   end
 end

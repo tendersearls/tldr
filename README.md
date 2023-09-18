@@ -61,5 +61,6 @@ Usage: tldr [options] path1 path2 ...
     -l, --load-path PATH             Add one or more paths to the $LOAD_PATH (Default: ["test"])
         --helper HELPER              Path to a test helper to load before any tests (Default: "test/helper.rb")
         --skip-test-helper           Don't try loading a test helper before the tests
+        --workers WORKERS            Number of parallel workers (Default: 24, the number of CPU cores)
     -v, --verbose                    Print stack traces for errors
 ```
