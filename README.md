@@ -41,6 +41,14 @@ You can, of course, also just run a specific test file or glob:
 $ bundle exec tldr test/this/one/in/particular.rb
 ```
 
+### Minitest compatibility
+
+Tests you write with tldr are designed to be mostly-compatible with
+[Minitest](https://github.com/minitest/minitest) tests. Some notes:
+
+* `setup` and `teardown` hook methods should work as you expect
+* `assert`, `assert_equals` are implemented similarly
+
 ### Options
 
 Here are the CLI options:
