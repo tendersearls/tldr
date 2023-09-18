@@ -16,18 +16,13 @@ class TLDR
 
   def self.cli argv
     config = ArgvParser.new.parse(argv)
-    report(config, run(config, plan(config)))
+    run(config)
   end
 
-  def self.plan config
-    Planner.new.plan config
-  end
-
-  def self.run config, plan
-    Runner.new.run config, plan
-  end
-
-  def self.report config, results
-    Reporter.new.report config, results
+  def self.run config
+    config.set_defaults!
+    Reporter.new.report(config,
+      Runner.new.run(config,
+        Planner.new.plan(config)))
   end
 end

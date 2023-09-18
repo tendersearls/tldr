@@ -39,8 +39,6 @@ class TLDR
 
       config.paths = args if args.any?
 
-      config.set_defaults!
-
       config
     end
   end
