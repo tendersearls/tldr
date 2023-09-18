@@ -33,11 +33,17 @@ class TLDR
     end
 
     def gather_tests
-      TLDR.subclasses.flat_map { |subklass|
+      gather_descendants(TLDR).flat_map { |subklass|
         subklass.instance_methods.grep(/^test_/).sort.map { |method|
           file, line = subklass.instance_method(method).source_location
           Test.new subklass, method, file, line
         }
+      }
+    end
+
+    def gather_descendants root_klass
+      root_klass.subclasses + root_klass.subclasses.flat_map { |subklass|
+        gather_descendants subklass
       }
     end
   end
