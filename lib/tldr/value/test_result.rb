@@ -1,7 +1,7 @@
 class TLDR
   TLDR_LIB_REGEX = /lib\/tldr/
 
-  TestResult = Struct.new :test, :error do
+  TestResult = Struct.new :test, :error, :runtime do
     attr_reader :type, :error_location
 
     def initialize(*args)

@@ -4,10 +4,10 @@ class TLDR
       def before_suite tldr_config, tests
       end
 
-      def after_tldr
+      def after_test test_result
       end
 
-      def after_test test_result
+      def after_tldr tldr_config, planned_tests, test_results
       end
 
       def after_suite tldr_config, test_results
