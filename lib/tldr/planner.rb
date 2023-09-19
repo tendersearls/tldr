@@ -7,9 +7,7 @@ class TLDR
       require_test_helper config
       require_tests config.paths
 
-      line_filters = parse_line_filters config.paths
-      tests = gather_tests
-        .reject { |test| filter_out_by_line? test, line_filters }
+      tests = filter_by_line(gather_tests, config.paths)
         .shuffle(random: Random.new(config.seed))
       Plan.new(tests).tap do |tests|
         config.reporter.before_suite config, tests
@@ -52,6 +50,22 @@ class TLDR
     def gather_descendants root_klass
       root_klass.subclasses + root_klass.subclasses.flat_map { |subklass|
         gather_descendants subklass
+      }
+    end
+
+    def filter_by_line tests, paths
+      line_filters = parse_line_filters paths
+      return tests if line_filters.empty?
+
+      tests.select { |test|
+        next if (filtered_lines = line_filters[test.file]).empty?
+        test_method = test.klass.instance_method(test.method)
+        next if filtered_lines.all? { |line| line < test_method.source_location[1] }
+
+        ast = RubyVM::AbstractSyntaxTree.of(test_method)
+        filtered_lines.any? { |line|
+          line.between? ast.first_lineno, ast.last_lineno
+        }
       }
     end
 
