@@ -31,19 +31,19 @@ class TLDR
       def after_tldr tldr_config, planned_tests, wip_tests, test_results
         @tldr_tripped.make_true
         stop_time = Process.clock_gettime Process::CLOCK_MONOTONIC, :microsecond
-        @err.print <<~MSG
-          🥵
-
-          too long; didn't run!
-
-          🏃 Completed #{test_results.size} of #{planned_tests.size} tests (#{((test_results.size.to_f / planned_tests.size) * 100).round}%) before running out of time.
-
-          🙅 These #{wip_tests.size} tests were cancelled in progress:
-          #{wip_tests.map { |wip_test| "  #{time_diff(wip_test.start_time, stop_time)}ms - #{describe(wip_test.test)}" }.join("\n")}
-
-          🐢 Your #{[10, test_results.size].min} slowest completed tests:
-          #{test_results.sort_by(&:runtime).last(10).reverse.map { |result| "  #{result.runtime}ms - #{describe(result.test)}" }.join("\n")}
-        MSG
+        @err.print [
+          "🥵",
+          "too long; didn't run!",
+          "🏃 Completed #{test_results.size} of #{planned_tests.size} tests (#{((test_results.size.to_f / planned_tests.size) * 100).round}%) before running out of time.",
+          (<<~WIP.chomp if wip_tests.any?),
+            🙅 These #{wip_tests.size} tests were cancelled in progress:
+            #{wip_tests.map { |wip_test| "  #{time_diff(wip_test.start_time, stop_time)}ms - #{describe(wip_test.test)}" }.join("\n")}
+          WIP
+          (<<~SLOW.chomp if test_results.any?)
+            🐢 Your #{[10, test_results.size].min} slowest completed tests:
+            #{test_results.sort_by(&:runtime).last(10).reverse.map { |result| "  #{result.runtime}ms - #{describe(result.test)}" }.join("\n")}
+          SLOW
+        ].compact.join("\n\n")
 
         after_suite tldr_config, test_results
       end
