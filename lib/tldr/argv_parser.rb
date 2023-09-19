@@ -6,7 +6,7 @@ class TLDR
       config = Config.new
 
       OptionParser.new do |opts|
-        opts.banner = "Usage: tldr [options] path1 path2 ..."
+        opts.banner = "Usage: tldr [options] some_tests/**/*.rb some/path.rb:13 ..."
 
         opts.on("-s", "--seed SEED", Integer, "Seed for randomization") do |seed|
           config.seed = seed

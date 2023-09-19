@@ -49,19 +49,33 @@ Tests you write with tldr are designed to be mostly-compatible with
 * `setup` and `teardown` hook methods should work as you expect
 * `assert`, `assert_equals` are implemented similarly
 
+### Running by line numbers
+
+When running the `tldr` CLI command, you can select texts using your shell's
+glob expansion, list multiple paths, and even specify one or more line numbers
+of tests to run at a given path.
+
+For example, to run only the first and third test in
+[line_numbers.rb](/test/fixture/line_number.rb), any line numbers we filter will
+select only the tests whose source covers those lines:
+
+```
+$ bundle exec tldr test/fixture/line_number.rb:3:10
+```
+
 ### Options
 
 Here are the CLI options:
 
 ```
 $ tldr --help
-Usage: tldr [options] path1 path2 ...
+Usage: tldr [options] some_tests/**/*.rb some/path.rb:13 ...
     -s, --seed SEED                  Seed for randomization
     -r, --reporter REPORTER          Custom reporter class (Default: "TLDR::Reporters::Default")
     -l, --load-path PATH             Add one or more paths to the $LOAD_PATH (Default: ["test"])
         --helper HELPER              Path to a test helper to load before any tests (Default: "test/helper.rb")
         --skip-test-helper           Don't try loading a test helper before the tests
-        --workers WORKERS            Number of parallel workers (Default: 24, the number of CPU cores)
+        --workers WORKERS            Number of parallel workers (Default: 8, the number of CPU cores)
     -v, --verbose                    Print stack traces for errors
 ```
 

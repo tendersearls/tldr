@@ -7,7 +7,11 @@ class TLDR
       require_test_helper config
       require_tests config.paths
 
-      Plan.new(gather_tests.shuffle(random: Random.new(config.seed))).tap do |tests|
+      line_filters = parse_line_filters config.paths
+      tests = gather_tests
+        .reject { |test| filter_out_by_line? test, line_filters }
+        .shuffle(random: Random.new(config.seed))
+      Plan.new(tests).tap do |tests|
         config.reporter.before_suite config, tests
       end
     end
@@ -26,10 +30,14 @@ class TLDR
     end
 
     def require_tests paths
-      paths.each do |path|
-        path = File.absolute_path?(path) ? path : File.expand_path(path, Dir.pwd)
+      absolute_paths = paths.map { |arg| absolutify_path(arg) }.uniq
+      absolute_paths.each do |path|
         require path
       end
+    end
+
+    def absolutify_path path
+      File.expand_path(path.gsub(/:.*$/, ""), Dir.pwd)
     end
 
     def gather_tests
@@ -45,6 +53,28 @@ class TLDR
       root_klass.subclasses + root_klass.subclasses.flat_map { |subklass|
         gather_descendants subklass
       }
+    end
+
+    def parse_line_filters paths
+      filter_patterns = paths.select { |path| path.match?(/:\d+$/) }
+
+      Hash.new { |h, key| h[key] = [] }.tap do |line_filters|
+        filter_patterns.flat_map { |pattern|
+          file_path = absolutify_path pattern
+          line_numbers = pattern.scan(/:(\d+)/).flatten.map(&:to_i)
+
+          line_filters[file_path] = (line_filters[file_path] | line_numbers.map(&:to_i)).sort
+        }
+      end
+    end
+
+    def filter_out_by_line? test, line_filters
+      unless (filtered_lines = line_filters[test.file]).empty?
+        ast = RubyVM::AbstractSyntaxTree.of(test.klass.instance_method(test.method))
+        filtered_lines.none? { |line|
+          line.between? ast.first_lineno, ast.last_lineno
+        }
+      end
     end
   end
 end

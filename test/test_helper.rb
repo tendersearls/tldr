@@ -43,9 +43,11 @@ module TLDRunner
     end
   end
 
-  def self.run(file, config)
+  def self.run(files, config)
+    files = Array(files).map { |file| File.expand_path("fixture/#{file}", __dir__) }
+
     stdout, stderr, status = Open3.capture3 <<~CMD
-      bundle exec tldr #{File.expand_path("fixture/#{file}", __dir__)} #{"--seed #{config[:seed]}" if config.key?(:seed)} #{"--workers #{config[:workers]}" if config.key?(:workers)}
+      bundle exec tldr #{files.join(" ")} #{"--seed #{config[:seed]}" if config.key?(:seed)} #{"--workers #{config[:workers]}" if config.key?(:workers)}
     CMD
 
     Result.new(
