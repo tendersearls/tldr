@@ -11,8 +11,11 @@ class ArgvParserTest < Minitest::Test
       "--skip-test-helper",
       "--helper", "spec/spec_helper.rb",
       "-l", "lib",
+      "-l", "vendor,spec",
       "--workers", "99",
-      "--load-path", "app"
+      "--name", "foo",
+      "--load-path", "app",
+      "-n", "bar,baz"
     ]
 
     assert_equal ["bar.rb", "foo.rb:3"], result.paths
@@ -21,8 +24,9 @@ class ArgvParserTest < Minitest::Test
     assert result.verbose
     assert_kind_of TLDR::Reporters::Base, result.reporter
     assert_equal "spec/spec_helper.rb", result.helper
-    assert_equal ["lib", "app"], result.load_paths
+    assert_equal ["lib", "vendor", "spec", "app"], result.load_paths
     assert_equal 99, result.workers
+    assert_equal ["foo", "bar", "baz"], result.names
   end
 
   def test_defaults
@@ -37,5 +41,6 @@ class ArgvParserTest < Minitest::Test
     assert_equal "test/helper.rb", result.helper
     assert_equal ["test"], result.load_paths
     assert_equal Concurrent.processor_count, result.workers
+    assert_equal [], result.names
   end
 end

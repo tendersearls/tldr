@@ -7,8 +7,13 @@ class TLDR
       require_test_helper config
       require_tests config.paths
 
-      tests = filter_by_line(gather_tests, config.paths)
-        .shuffle(random: Random.new(config.seed))
+      tests = shuffle(
+        filter_by_line(
+          filter_by_name(gather_tests, config.names),
+          config.paths
+        ),
+        config.seed
+      )
       Plan.new(tests).tap do |tests|
         config.reporter.before_suite config, tests
       end
@@ -53,6 +58,28 @@ class TLDR
       }
     end
 
+    def shuffle tests, seed
+      tests.shuffle(random: Random.new(seed))
+    end
+
+    def filter_by_name tests, names
+      return tests if names.empty?
+
+      name_filters = names.map { |name|
+        if name.is_a?(String) && name =~ /^\/(.*)\/$/
+          Regexp.new $1
+        else
+          name
+        end
+      }
+
+      tests.select { |test|
+        name_filters.any? { |filter|
+          filter === test.method.to_s || filter === "#{test.klass}##{test.method}"
+        }
+      }
+    end
+
     def filter_by_line tests, paths
       line_filters = parse_line_filters paths
       return tests if line_filters.empty?
@@ -78,15 +105,6 @@ class TLDR
           line_numbers = pattern.scan(/:(\d+)/).flatten.map(&:to_i)
 
           line_filters[file_path] = (line_filters[file_path] | line_numbers.map(&:to_i)).sort
-        }
-      end
-    end
-
-    def filter_out_by_line? test, line_filters
-      unless (filtered_lines = line_filters[test.file]).empty?
-        ast = RubyVM::AbstractSyntaxTree.of(test.klass.instance_method(test.method))
-        filtered_lines.none? { |line|
-          line.between? ast.first_lineno, ast.last_lineno
         }
       end
     end

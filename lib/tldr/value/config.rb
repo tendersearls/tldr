@@ -1,11 +1,12 @@
 require "concurrent"
 
 class TLDR
-  Config = Struct.new :paths, :seed, :skip_test_helper, :verbose, :reporter, :helper, :load_paths, :workers, keyword_init: true do
+  Config = Struct.new :paths, :seed, :skip_test_helper, :verbose, :reporter, :helper, :load_paths, :workers, :names, keyword_init: true do
     def initialize(*args)
       super
       self.paths ||= []
       self.load_paths ||= []
+      self.names ||= []
     end
 
     def set_defaults!

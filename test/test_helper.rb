@@ -11,11 +11,11 @@ end
 module TLDRunner
   Result = Struct.new(:stdout, :stderr, :exit_code, :success?, keyword_init: true)
 
-  def self.should_succeed(file, **config)
-    run(file, config).tap do |result|
+  def self.should_succeed files, options = nil
+    run(files, options).tap do |result|
       if !result.success?
         raise <<~MSG
-          Ran #{file} and expected success, but exited code #{result.exit_code}
+          Ran #{files.inspect} and expected success, but exited code #{result.exit_code}
 
           stdout:
           #{result.stdout}
@@ -27,11 +27,11 @@ module TLDRunner
     end
   end
 
-  def self.should_fail(file, **config)
-    run(file, config).tap do |result|
+  def self.should_fail files, options = nil
+    run(files, options).tap do |result|
       if result.success?
         raise <<~MSG
-          Ran #{file} and expected failure, but exited code #{result.exit_code}
+          Ran #{files.inspect} and expected failure, but exited code #{result.exit_code}
 
           stdout:
           #{result.stdout}
@@ -43,11 +43,11 @@ module TLDRunner
     end
   end
 
-  def self.run(files, config)
+  def self.run files, options
     files = Array(files).map { |file| File.expand_path("fixture/#{file}", __dir__) }
 
     stdout, stderr, status = Open3.capture3 <<~CMD
-      bundle exec tldr #{files.join(" ")} #{"--seed #{config[:seed]}" if config.key?(:seed)} #{"--workers #{config[:workers]}" if config.key?(:workers)}
+      bundle exec tldr #{files.join(" ")} #{options}
     CMD
 
     Result.new(

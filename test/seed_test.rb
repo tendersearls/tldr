@@ -2,7 +2,7 @@ require "test_helper"
 
 class SeedTest < Minitest::Test
   def test_order_1
-    result = TLDRunner.should_succeed("seed.rb", seed: 1)
+    result = TLDRunner.should_succeed "seed.rb", "--seed 1"
 
     assert_includes result.stderr, <<~MSG
       1) Skip:
@@ -17,7 +17,7 @@ class SeedTest < Minitest::Test
   end
 
   def test_order_2
-    result = TLDRunner.should_succeed("seed.rb", seed: 2)
+    result = TLDRunner.should_succeed "seed.rb", "--seed 2"
 
     assert_includes result.stderr, <<~MSG
       1) Skip:
