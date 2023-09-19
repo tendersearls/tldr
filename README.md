@@ -51,7 +51,7 @@ Tests you write with tldr are designed to be mostly-compatible with
 
 ### Running by line numbers
 
-When running the `tldr` CLI command, you can select texts using your shell's
+When running the `tldr` CLI command, you can select tests using your shell's
 glob expansion, list multiple paths, and even specify one or more line numbers
 of tests to run at a given path.
 
