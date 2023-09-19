@@ -16,7 +16,7 @@ class ExitCodeTest < Minitest::Test
     assert_includes result.stderr, <<~MSG
       1) Failure:
       FailTest#test_fails [test/fixture/fail.rb:3]:
-      Expected false to be truthy.
+      Expected false to be truthy
 
       Re-run this test:
         bundle exec tldr test/fixture/fail.rb:2

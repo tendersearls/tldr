@@ -27,5 +27,6 @@ Gem::Specification.new do |spec|
   spec.executables = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
+  spec.add_dependency "super_diff", "~> 0.10"
   spec.add_dependency "concurrent-ruby", "~> 1.2"
 end
