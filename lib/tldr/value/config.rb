@@ -9,16 +9,35 @@ class TLDR
       self.names ||= []
     end
 
+    def self.build_defaults
+      {
+        paths: Dir["test/**/*_test.rb", "test/**/test_*.rb"],
+        seed: rand(10_000),
+        skip_test_helper: false,
+        verbose: false,
+        reporter: Reporters::Default.new,
+        helper: "test/helper.rb",
+        load_paths: ["test"],
+        workers: Concurrent.processor_count,
+        names: [],
+        fail_fast: false
+      }
+    end
+
     def set_defaults!
-      self.paths = Dir["test/**/*_test.rb", "test/**/test_*.rb"] if paths.empty?
-      self.seed ||= rand(10_000)
-      self.skip_test_helper = false if skip_test_helper.nil?
-      self.verbose = false if verbose.nil?
-      self.reporter ||= Reporters::Default.new
-      self.helper ||= "test/helper.rb"
-      self.load_paths = ["test"] if load_paths.empty?
-      self.workers ||= Concurrent.processor_count
-      self.fail_fast = false if fail_fast.nil?
+      defaults = Config.build_defaults
+
+      [:paths, :load_paths, :names].each do |key|
+        self[key] = defaults[key] if self[key].empty?
+      end
+
+      [:skip_test_helper, :verbose, :fail_fast].each do |key|
+        self[key] = defaults[key] if self[key].nil?
+      end
+
+      [:seed, :reporter, :helper, :workers].each do |key|
+        self[key] ||= defaults[key]
+      end
     end
 
     def to_full_args
