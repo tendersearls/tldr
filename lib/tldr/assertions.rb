@@ -53,9 +53,9 @@ class TLDR
       end
     end
 
-    def assert_equal expected, actual, message = nil
-      message = Assertions.msg(message) { Assertions.diff expected, actual }
-      assert expected == actual, message
+    def refute test, message = nil
+      message ||= Assertions.msg(message) { "Expected #{Assertions.h(test)} to not be truthy" }
+      assert !test, message
     end
 
     def assert_empty obj, message = nil
@@ -67,6 +67,24 @@ class TLDR
       assert obj.empty?, message
     end
 
+    def refute_empty obj, message = nil
+      message = Assertions.msg(message) { "Expected #{Assertions.h(obj)} to not be empty" }
+      assert_respond_to obj, :empty?
+      refute obj.empty?, message
+    end
+
+    def assert_equal expected, actual, message = nil
+      message = Assertions.msg(message) { Assertions.diff expected, actual }
+      assert expected == actual, message
+    end
+
+    def refute_equal expected, actual, message = nil
+      message = Assertions.msg(message) {
+        "Expected #{Assertions.h(actual)} to not be equal to #{Assertions.h(expected)}"
+      }
+      refute expected == actual, message
+    end
+
     def assert_in_delta expected, actual, delta, message = nil
       difference = (expected - actual).abs
       message = Assertions.msg(message) {
@@ -75,8 +93,20 @@ class TLDR
       assert delta >= difference, message
     end
 
+    def refute_in_delta expected, actual, delta = 0.001, message = nil
+      difference = (expected - actual).abs
+      message = Assertions.msg(message) {
+        "Expected |#{expected} - #{actual}| (#{difference}) to not be within #{delta}"
+      }
+      refute delta >= difference, message
+    end
+
     def assert_in_epsilon expected, actual, epsilon = 0.001, message = nil
       assert_in_delta expected, actual, [expected.abs, actual.abs].min * epsilon, message
+    end
+
+    def refute_in_epsilon expected, actual, epsilon = 0.001, msg = nil
+      refute_in_delta expected, actual, expected * epsilon, msg
     end
 
     def assert_include? expected, actual, message = nil
@@ -87,6 +117,14 @@ class TLDR
       assert actual.include?(expected), message
     end
 
+    def refute_include? expected, actual, message = nil
+      message = Assertions.msg(message) {
+        "Expected #{Assertions.h(actual)} to not include #{Assertions.h(expected)}"
+      }
+      assert_respond_to actual, :include?
+      refute actual.include?(expected), message
+    end
+
     def assert_instance_of expected, actual, message = nil
       message = Assertions.msg(message) {
         "Expected #{Assertions.h(actual)} to be an instance of #{expected}, not #{actual.class}"
@@ -94,11 +132,25 @@ class TLDR
       assert actual.instance_of?(expected), message
     end
 
+    def refute_instance_of expected, actual, message = nil
+      message = Assertions.msg(message) {
+        "Expected #{Assertions.h(actual)} to not be an instance of #{expected}"
+      }
+      refute actual.instance_of?(expected), message
+    end
+
     def assert_kind_of expected, actual, message = nil
       message = Assertions.msg(message) {
         "Expected #{Assertions.h(actual)} to be a kind of #{expected}, not #{actual.class}"
       }
-      assert actual.is_a?(expected), message
+      assert actual.kind_of?(expected), message # standard:disable Style/ClassCheck
+    end
+
+    def refute_kind_of expected, actual, message = nil
+      message = Assertions.msg(message) {
+        "Expected #{Assertions.h(actual)} to not be a kind of #{expected}"
+      }
+      refute actual.kind_of?(expected), message # standard:disable Style/ClassCheck
     end
 
     def assert_match matcher, actual, message = nil
@@ -109,12 +161,28 @@ class TLDR
       assert matcher =~ actual, message
     end
 
+    def refute_match matcher, actual, message = nil
+      message = Assertions.msg(message) {
+        "Expected #{Assertions.h(actual)} to not match #{Assertions.h(matcher)}"
+      }
+      assert_respond_to matcher, :=~
+      refute matcher =~ actual, message
+    end
+
     def assert_nil obj, message = nil
       message = Assertions.msg(message) {
         "Expected #{Assertions.h(obj)} to be nil"
       }
 
       assert obj.nil?, message
+    end
+
+    def refute_nil obj, message = nil
+      message = Assertions.msg(message) {
+        "Expected #{Assertions.h(obj)} to not be nil"
+      }
+
+      refute obj.nil?, message
     end
 
     def assert_operator left_operand, operator, right_operand, message = nil
@@ -124,8 +192,15 @@ class TLDR
       assert left_operand.__send__(operator, right_operand), message
     end
 
+    def refute_operator left_operand, operator, right_operand, message = nil
+      message = Assertions.msg(message) {
+        "Expected #{Assertions.h(left_operand)} to not be #{operator} #{Assertions.h(right_operand)}"
+      }
+      refute left_operand.__send__(operator, right_operand), message
+    end
+
     def assert_output expected_stdout, expected_stderr, message = nil, &block
-      assert_block "assert_output requires a block to capture output." unless block
+      assert_block "assert_output requires a block to capture output" unless block
 
       actual_stdout, actual_stderr = Assertions.capture_io(&block)
 
@@ -150,13 +225,31 @@ class TLDR
       assert File.exist?(path), message
     end
 
+    def refute_path_exists path, message = nil
+      message = Assertions.msg(message) {
+        "Expected #{Assertions.h(path)} to not exist"
+      }
+
+      refute File.exist?(path), message
+    end
+
     def assert_pattern message = nil
-      assert false, "assert_pattern requires a block to capture errors." unless block_given?
+      assert false, "assert_pattern requires a block to capture errors" unless block_given?
 
       begin
         yield
       rescue NoMatchingPatternError => e
         assert false, Assertions.msg(message) { "Expected pattern match: #{e.message}" }
+      end
+    end
+
+    def refute_pattern message = nil
+      assert false, "assert_pattern requires a block to capture errors" unless block_given?
+
+      begin
+        yield
+        refute true, Assertions.msg(message) { "Expected pattern not to match, but NoMatchingPatternError was raised" }
+      rescue NoMatchingPatternError
       end
     end
 
@@ -168,8 +261,16 @@ class TLDR
       assert obj.send(method), message
     end
 
+    def refute_predicate obj, method, message = nil
+      message = Assertions.msg(message) {
+        "Expected #{Assertions.h(obj)} to not be #{method}"
+      }
+
+      refute obj.send(method), message
+    end
+
     def assert_raises *exp
-      assert false, "assert_raises requires a block to capture errors." unless block_given?
+      assert false, "assert_raises requires a block to capture errors" unless block_given?
 
       message = exp.pop if String === exp.last
       exp << StandardError if exp.empty?
@@ -197,7 +298,7 @@ class TLDR
 
       exp = exp.first if exp.size == 1
 
-      assert false, "#{message}#{Assertions.h(exp)} expected but nothing was raised."
+      assert false, "#{message}#{Assertions.h(exp)} expected but nothing was raised"
     end
 
     def assert_respond_to obj, method, message = nil
@@ -206,6 +307,14 @@ class TLDR
       }
 
       assert obj.respond_to?(method), message
+    end
+
+    def refute_respond_to obj, method, message = nil
+      message = Assertions.msg(message) {
+        "Expected #{Assertions.h(obj)} (#{obj.class}) to not respond to #{Assertions.h(method)}"
+      }
+
+      refute obj.respond_to?(method), message
     end
 
     def assert_same expected, actual, message = nil
@@ -217,6 +326,13 @@ class TLDR
         MSG
       }
       assert expected.equal?(actual), message
+    end
+
+    def refute_same expected, actual, message = nil
+      message = Assertions.msg(message) {
+        "Expected #{Assertions.h(expected)} (oid=#{expected.object_id}) to not be the same as #{Assertions.h(actual)} (oid=#{actual.object_id})"
+      }
+      refute expected.equal?(actual), message
     end
 
     def assert_silent

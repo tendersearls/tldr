@@ -20,6 +20,10 @@ class TLDR
         assert_include? expected, actual, message
       end
 
+      def refute_includes actual, expected, message = nil
+        refute_include? expected, actual, message
+      end
+
       def assert_send receiver_method_args, message = nil
         warn "DEPRECATED: assert_send. From #{TLDR.filter_backtrace(caller).first}"
         receiver, method, *args = receiver_method_args
