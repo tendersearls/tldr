@@ -62,8 +62,9 @@ class TLDR
         wrap_in_horizontal_rule do
           @err.print [
             "Failing fast after #{describe(last_result.test, last_result.relevant_location)} #{last_result.error? ? "errored" : "failed"}.",
-            ("#{plural wip_tests.size, "test was", "tests were"} cancelled in progress." if wip_tests.any?),
-            ("#{plural unrun_tests.size, "test was", "tests were"} not run at all." if unrun_tests.any?)
+            ("🤐 #{plural wip_tests.size, "test was", "tests were"} cancelled in progress." if wip_tests.any?),
+            ("🙈 #{plural unrun_tests.size, "test was", "tests were"} not run at all." if unrun_tests.any?),
+            describe_tests_that_didnt_finish(tldr_config, planned_tests, test_results)
           ].compact.join("\n\n")
         end
 
@@ -133,16 +134,25 @@ class TLDR
       end
 
       def describe_tests_that_didnt_finish config, planned_tests, test_results
-        tests = planned_tests - test_results.map(&:test)
-        return if tests.empty?
+        unrun = planned_tests - test_results.map(&:test)
+        return if unrun.empty?
 
-        test_locators = tests.group_by(&:file).map { |_, tests|
-          "#{tests.first.location.relative}:#{tests.map(&:line).sort.join(":")}"
-        }.uniq
+        unrun_locators = consolidate unrun
+        failed = test_results.select(&:failing?).map(&:test)
+        failed_locators = consolidate failed
+        suggested_locators = unrun_locators + [
+          ("--comment \"Also include #{plural failed.size, "test"} that failed:\"" if failed.any?)
+        ] + failed_locators
         <<~MSG
-          🤘 Run the #{plural tests.size, "test"} that didn't finish:
-            #{tldr_command} #{config.to_full_args exclude: [:paths]} #{test_locators.join(" \\\n    ")}
+          🤘 Run the #{plural unrun.size, "test"} that didn't finish:
+            #{tldr_command} #{config.to_full_args exclude: [:paths]} #{suggested_locators.join(" \\\n    ")}
         MSG
+      end
+
+      def consolidate tests
+        tests.group_by(&:file).map { |_, tests|
+          "\"#{tests.first.location.relative}:#{tests.map(&:line).sort.join(":")}\""
+        }.uniq
       end
 
       def tldr_command

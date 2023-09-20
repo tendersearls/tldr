@@ -43,6 +43,10 @@ class TLDR
         opts.on("-v", CONFLAGS[:verbose], "Print stack traces for errors") do |verbose|
           config.verbose = verbose
         end
+
+        opts.on("--comment COMMENT", String, "No-op comment, used internally to allow multi-line execution instructions with comments") do
+          # See "--comment" in lib/tldr/reporters/default.rb for an example of how this is used internally
+        end
       end.parse!(args)
 
       config.paths = args if args.any?
