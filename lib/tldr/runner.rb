@@ -14,15 +14,18 @@ class TLDR
 
       time_bomb = Thread.new {
         sleep 1.8
+        explode = proc do
+          config.reporter.after_tldr config, plan.tests, @wip.dup, @results.dup
+          exit! 3
+        end
 
         # Don't hard-kill the runner if user is debugging, it'll
         # screw up their terminal slash be a bad time
-        while IRB.CurrentContext
-          sleep 1
+        if IRB.CurrentContext
+          IRB.conf[:AT_EXIT] << explode
+        else
+          explode.call
         end
-
-        config.reporter.after_tldr config, plan.tests, @wip.dup, @results.dup
-        exit! 3
       }
 
       parallelize(plan.tests, config.workers) { |test|
