@@ -20,11 +20,7 @@ class TLDR
       end
 
       def after_test result
-        if result.passing?
-          @out.print result.emoji
-        else
-          @err.print result.emoji
-        end
+        @out.print result.emoji
       end
 
       def time_diff start, stop = Process.clock_gettime(Process::CLOCK_MONOTONIC, :microsecond)
@@ -34,7 +30,7 @@ class TLDR
       def after_tldr tldr_config, planned_tests, wip_tests, test_results
         stop_time = Process.clock_gettime Process::CLOCK_MONOTONIC, :microsecond
 
-        @err.print "🥵"
+        @out.print "🥵"
         @err.print "\n\n"
         wrap_in_horizontal_rule do
           @err.print [

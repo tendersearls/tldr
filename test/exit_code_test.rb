@@ -12,7 +12,7 @@ class ExitCodeTest < Minitest::Test
   def test_failure
     result = TLDRunner.should_fail "fail.rb"
 
-    assert_includes result.stderr, "😡"
+    assert_includes result.stdout, "😡"
     assert_includes result.stderr, <<~MSG
       1) Failure:
       FailTest#test_fails [test/fixture/fail.rb:3]:
@@ -27,7 +27,7 @@ class ExitCodeTest < Minitest::Test
   def test_error
     result = TLDRunner.should_fail "error.rb"
 
-    assert_includes result.stderr, "🤬"
+    assert_includes result.stdout, "🤬"
     assert_includes result.stderr, <<~MSG
       1) Error:
       ErrorTest#test_errors [test/fixture/error.rb:3]:

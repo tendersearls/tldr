@@ -29,7 +29,7 @@ class LineNumberTest < Minitest::Test
     result = TLDRunner.should_fail "line_number.rb:3:11"
 
     assert_includes result.stdout, "😁"
-    assert_includes result.stderr, "😡"
+    assert_includes result.stdout, "😡"
     refute_includes result.stdout, "🫥"
   end
 
@@ -38,7 +38,7 @@ class LineNumberTest < Minitest::Test
 
     assert_includes result.stdout, "😁"
     assert_includes result.stdout, "🫥"
-    assert_includes result.stderr, "😡"
+    assert_includes result.stdout, "😡"
   end
 
   def test_line_number_three_methods_over_two_patterns
@@ -46,7 +46,7 @@ class LineNumberTest < Minitest::Test
 
     assert_includes result.stdout, "😁"
     assert_includes result.stdout, "🫥"
-    assert_includes result.stderr, "😡"
+    assert_includes result.stdout, "😡"
   end
 
   def test_line_number_nonsense
