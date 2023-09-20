@@ -12,8 +12,6 @@ require "super_diff"
 
 class TLDR
   module Assertions
-    class Failure < Exception; end # standard:disable Lint/InheritException
-
     def self.h obj
       obj.pretty_inspect.chomp
     end
@@ -102,12 +100,12 @@ class TLDR
       assert actual.is_a?(expected), message
     end
 
-    def assert_match? expected, actual, message = nil
+    def assert_match matcher, actual, message = nil
       message = Assertions.msg(message) {
-        "Expected #{Assertions.h(actual)} to match #{Assertions.h(expected)}"
+        "Expected #{Assertions.h(actual)} to match #{Assertions.h(matcher)}"
       }
-      assert_respond_to actual, :match?
-      assert actual.match?(expected), message
+      assert_respond_to matcher, :=~
+      assert matcher =~ actual, message
     end
 
     def assert_nil obj, message = nil
@@ -131,13 +129,13 @@ class TLDR
       actual_stdout, actual_stderr = Assertions.capture_io(&block)
 
       if Regexp === expected_stderr
-        assert_match? expected_stderr, actual_stderr, "In stderr"
+        assert_match expected_stderr, actual_stderr, "In stderr"
       elsif !expected_stderr.nil?
         assert_equal expected_stderr, actual_stderr, "In stderr"
       end
 
       if Regexp === expected_stdout
-        assert_match? expected_stdout, actual_stdout, "In stdout"
+        assert_match expected_stdout, actual_stdout, "In stdout"
       elsif !expected_stdout.nil?
         assert_equal expected_stdout, actual_stdout, "In stdout"
       end
@@ -177,7 +175,7 @@ class TLDR
 
       begin
         yield
-      rescue Failure, SkipTest
+      rescue Failure, Skip
         raise
       rescue *exp => e
         return e
@@ -190,7 +188,7 @@ class TLDR
             "Class: <#{e.class}>",
             "Message: <#{e.message.inspect}>",
             "---Backtrace---",
-            e.backtrace.join("\n"),
+            TLDR.filter_backtrace(e.backtrace).join("\n"),
             "---------------"
           ].compact.join "\n"
         }
@@ -207,6 +205,42 @@ class TLDR
       }
 
       assert obj.respond_to?(method), message
+    end
+
+    def assert_same expected, actual, message = nil
+      message = Assertions.msg(message) {
+        <<~MSG
+          Expected objects to be the same, but weren't
+          Expected: #{Assertions.h(expected)} (oid=#{expected.object_id})
+          Actual: #{Assertions.h(actual)} (oid=#{actual.object_id})
+        MSG
+      }
+      assert expected.equal?(actual), message
+    end
+
+    def assert_silent
+      assert_output "", "" do
+        yield
+      end
+    end
+
+    def assert_throws expected, message = nil
+      punchline = nil
+      caught = true
+      value = catch(expected) do
+        begin
+          yield
+        rescue ArgumentError => e
+          raise e unless e.message.include?("uncaught throw")
+          punchline = ", not #{e.message.split(" ").last}"
+        end
+        caught = false
+      end
+
+      assert caught, Assertions.msg(message) {
+        "Expected #{Assertions.h(expected)} to have been thrown#{punchline}"
+      }
+      value
     end
   end
 end

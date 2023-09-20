@@ -1,5 +1,4 @@
 require "test_helper"
-require "tldr/assertions/minitest"
 
 class AssertionsTest < Minitest::Test
   class Asserty
@@ -85,13 +84,13 @@ class AssertionsTest < Minitest::Test
     end
   end
 
-  def test_assert_match?
-    @subject.assert_match?(/foo/, "food")
+  def test_assert_match
+    @subject.assert_match(/foo/, "food")
     should_fail "Expected \"drink\" to match /foo/" do
-      @subject.assert_match?(/foo/, "drink")
+      @subject.assert_match(/foo/, "drink")
     end
-    should_fail(/Expected #<Object:0x.*> \(Object\) to respond to :match?/) do
-      @subject.assert_match? "stuff", Object.new
+    should_fail(/Expected #<Object:0x.*> \(Object\) to respond to :=~/) do
+      @subject.assert_match Object.new, "stuff"
     end
   end
 
@@ -162,7 +161,7 @@ class AssertionsTest < Minitest::Test
   def test_assert_raises
     @subject.assert_raises(ArgumentError) { raise ArgumentError }
     @subject.assert_raises(IOError, ArgumentError) { raise ArgumentError }
-    nested_e = assert_raises TLDR::Assertions::Failure do
+    nested_e = assert_raises TLDR::Failure do
       @subject.assert_raises {
         @subject.assert_empty [1]
       }
@@ -180,9 +179,9 @@ class AssertionsTest < Minitest::Test
     should_fail msg do
       @subject.assert_raises(TypeError) { raise IOError, "lol" }
     end
-    assert_raises(TLDR::SkipTest) {
+    assert_raises(TLDR::Skip) {
       @subject.assert_raises {
-        raise TLDR::SkipTest
+        raise TLDR::Skip
       }
     }
     msg2 = <<~MSG
@@ -207,14 +206,77 @@ class AssertionsTest < Minitest::Test
     end
   end
 
+  def test_assert_same
+    obj1 = Object.new
+    obj2 = Object.new
+    @subject.assert_same obj1, obj1
+    e = should_fail do
+      @subject.assert_same obj1, obj2
+    end
+    assert_includes e.message, "Expected objects to be the same, but weren't"
+    assert_match(/Expected: #<Object:0x.*> \(oid=#{obj1.object_id}\)/, e.message)
+    assert_match(/Actual: #<Object:0x.*> \(oid=#{obj2.object_id}\)/, e.message)
+  end
+
+  def test_assert_silent
+    @subject.assert_silent {}
+    msg = <<~MSG.chomp
+      In stdout
+      Differing strings.
+
+      Expected: ""
+        Actual: "foo\\n"
+    MSG
+    should_fail msg do
+      @subject.assert_silent {
+        puts "foo"
+      }
+    end
+  end
+
+  def test_assert_throws
+    @subject.assert_throws :foo do
+      throw :foo
+    end
+    should_fail "Expected :bar to have been thrown, not :baz" do
+      @subject.assert_throws :bar do
+        throw :baz
+      end
+    end
+  end
+
   def test_doesnt_call_message_procs_on_success
     @subject.assert_nil nil, proc { raise "Shouldn't be called" }
   end
 
+  # Compatibility only
+  require "tldr/assertions/minitest"
+
+  def test_assert_includes
+    @subject.assert_includes "food", "foo"
+    should_fail "Expected \"drink\" to include \"foo\"" do
+      @subject.assert_includes "drink", "foo"
+    end
+    should_fail(/Expected #<Object:0x.*> \(Object\) to respond to :include?/) do
+      @subject.assert_includes Object.new, "stuff"
+    end
+  end
+
+  def test_assert_send
+    assert_output "", /DEPRECATED: assert_send. From .*assertions_test.rb:.*/ do
+      @subject.assert_send [1, :<, 2]
+    end
+    assert_output "", /DEPRECATED: assert_send. From .*assertions_test.rb:.*/ do
+      should_fail "Expected 1.>(*[2]) to return true" do
+        @subject.assert_send [1, :>, 2]
+      end
+    end
+  end
+
   private
 
-  def should_fail(message)
-    e = assert_raises(TLDR::Assertions::Failure) {
+  def should_fail(message = nil)
+    e = assert_raises(TLDR::Failure) {
       yield
     }
 
@@ -222,8 +284,10 @@ class AssertionsTest < Minitest::Test
       assert_includes e.message, message
     elsif message.is_a?(Regexp)
       assert_match message, e.message
-    else
+    elsif !message.nil?
       fail "Unknown message type: #{message.inspect}"
     end
+
+    e
   end
 end

@@ -75,7 +75,7 @@ class TLDR
             Re-run this test:
               #{"bundle exec " if defined?(Bundler)}tldr #{result.test.location.relative} #{config.to_single_args}
           RERUN
-          (result.error.backtrace.join("\n") if config.verbose)
+          (TLDR.filter_backtrace(result.error.backtrace).join("\n") if config.verbose)
         ].compact.reject(&:empty?).join("\n").strip
       end
 

@@ -1,4 +1,5 @@
 require_relative "tldr/version"
+require_relative "tldr/error"
 require_relative "tldr/value"
 require_relative "tldr/reporters"
 require_relative "tldr/argv_parser"
@@ -9,8 +10,6 @@ require_relative "tldr/assertions"
 require_relative "tldr/skippable"
 
 class TLDR
-  class Error < StandardError; end
-
   include Assertions
   include Skippable
 

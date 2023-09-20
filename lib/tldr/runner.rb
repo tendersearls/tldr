@@ -35,7 +35,7 @@ class TLDR
           instance.setup if instance.respond_to? :setup
           instance.send(test.method)
           instance.teardown if instance.respond_to? :teardown
-        rescue SkipTest, Assertions::Failure, StandardError => e
+        rescue Skip, Failure, StandardError => e
         end
         TestResult.new(test, e, runtime).tap do |result|
           @results << result

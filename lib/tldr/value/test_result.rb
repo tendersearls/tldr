@@ -1,6 +1,4 @@
 class TLDR
-  TLDR_LIB_REGEX = /lib\/tldr/
-
   TestResult = Struct.new :test, :error, :runtime do
     attr_reader :type, :error_location
 
@@ -48,9 +46,9 @@ class TLDR
     def determine_type
       if error.nil?
         :success
-      elsif error.is_a?(Assertions::Failure)
+      elsif error.is_a?(Failure)
         :failure
-      elsif error.is_a?(SkipTest)
+      elsif error.is_a?(Skip)
         :skip
       else
         :error
@@ -60,7 +58,7 @@ class TLDR
     def determine_error_location
       return if error.nil?
 
-      raised_at = error.backtrace.find { |bt| bt !~ TLDR_LIB_REGEX }
+      raised_at = TLDR.filter_backtrace(error.backtrace).first
       if (raise_matches = raised_at.match(/^(.*):(\d+):in .*$/))
         Location.new(raise_matches[1], raise_matches[2].to_i)
       end
