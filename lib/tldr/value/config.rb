@@ -1,7 +1,21 @@
 require "concurrent"
 
 class TLDR
-  Config = Struct.new :paths, :seed, :skip_test_helper, :verbose, :reporter, :helper, :load_paths, :workers, :names, :fail_fast, keyword_init: true do
+  CONFLAGS = {
+    seed: "--seed",
+    skip_test_helper: "--skip-test-helper",
+    verbose: "--verbose",
+    reporter: "--reporter",
+    helper: "--helper",
+    load_paths: "--load-path",
+    workers: "--workers",
+    names: "--name",
+    fail_fast: "--fail-fast"
+  }.freeze
+
+  Config = Struct.new :paths, :seed, :skip_test_helper, :verbose, :reporter,
+    :helper, :load_paths, :workers, :names, :fail_fast,
+    keyword_init: true do
     def initialize(*args)
       super
       self.paths ||= []
