@@ -15,18 +15,20 @@
 
 class TLDR
   module Assertions
-    def assert_includes actual, expected, message = nil
-      assert_include? expected, actual, message
-    end
+    module MinitestCompatibility
+      def assert_includes actual, expected, message = nil
+        assert_include? expected, actual, message
+      end
 
-    def assert_send receiver_method_args, message = nil
-      warn "DEPRECATED: assert_send. From #{TLDR.filter_backtrace(caller).first}"
-      receiver, method, *args = receiver_method_args
-      message = Assertions.msg(message) {
-        "Expected #{Assertions.h(receiver)}.#{method}(*#{Assertions.h(args)}) to return true"
-      }
+      def assert_send receiver_method_args, message = nil
+        warn "DEPRECATED: assert_send. From #{TLDR.filter_backtrace(caller).first}"
+        receiver, method, *args = receiver_method_args
+        message = Assertions.msg(message) {
+          "Expected #{Assertions.h(receiver)}.#{method}(*#{Assertions.h(args)}) to return true"
+        }
 
-      assert receiver.__send__(method, *args), message
+        assert receiver.__send__(method, *args), message
+      end
     end
   end
 end

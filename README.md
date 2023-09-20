@@ -47,7 +47,12 @@ Tests you write with tldr are designed to be mostly-compatible with
 [Minitest](https://github.com/minitest/minitest) tests. Some notes:
 
 * `setup` and `teardown` hook methods should work as you expect
-* `assert`, `assert_equals` are implemented similarly
+* All of Minitest's assertions (e.g. `assert`, `assert_equals` are implemented
+in tldr, with these caveats:
+  * To retain the `expected, actual` argument ordering, `assert_include?(element, container)` is provided instead of `assert_includes(container, element)`
+  * If you want to maximize compatibility and mix in `assert_includes` and the
+  deprecated `assert_send`, just `include
+  TLDR::Assertions::MinitestCompatibility` into your test class
 
 ### Running by line numbers
 

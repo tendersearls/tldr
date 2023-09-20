@@ -1,16 +1,39 @@
 require "test_helper"
 
-class AssertionsTest < Minitest::Test
+class AssertionTestCase < Minitest::Test
+  def setup
+    SuperDiff.configure do |config|
+      config.color_enabled = false
+    end
+  end
+
+  protected
+
+  def should_fail(message = nil)
+    e = assert_raises(TLDR::Failure) {
+      yield
+    }
+
+    if message.is_a?(String)
+      assert_includes e.message, message
+    elsif message.is_a?(Regexp)
+      assert_match message, e.message
+    elsif !message.nil?
+      fail "Unknown message type: #{message.inspect}"
+    end
+
+    e
+  end
+end
+
+class AssertionsTest < AssertionTestCase
   class Asserty
     include TLDR::Assertions
   end
 
   def setup
+    super
     @subject = Asserty.new
-
-    SuperDiff.configure do |config|
-      config.color_enabled = false
-    end
   end
 
   def test_assert
@@ -245,12 +268,26 @@ class AssertionsTest < Minitest::Test
     end
   end
 
+  def test_doesnt_define_minitest_compatibility_methods_by_default
+    refute_respond_to @subject, :assert_includes
+    refute_respond_to @subject, :assert_send
+  end
+
   def test_doesnt_call_message_procs_on_success
     @subject.assert_nil nil, proc { raise "Shouldn't be called" }
   end
+end
 
-  # Compatibility only
-  require "tldr/assertions/minitest"
+class MinitestCompatibilityTest < AssertionTestCase
+  class Compatty
+    include TLDR::Assertions
+    include TLDR::Assertions::MinitestCompatibility
+  end
+
+  def setup
+    super
+    @subject = Compatty.new
+  end
 
   def test_assert_includes
     @subject.assert_includes "food", "foo"
@@ -271,23 +308,5 @@ class AssertionsTest < Minitest::Test
         @subject.assert_send [1, :>, 2]
       end
     end
-  end
-
-  private
-
-  def should_fail(message = nil)
-    e = assert_raises(TLDR::Failure) {
-      yield
-    }
-
-    if message.is_a?(String)
-      assert_includes e.message, message
-    elsif message.is_a?(Regexp)
-      assert_match message, e.message
-    elsif !message.nil?
-      fail "Unknown message type: #{message.inspect}"
-    end
-
-    e
   end
 end

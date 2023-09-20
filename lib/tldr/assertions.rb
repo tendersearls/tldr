@@ -9,6 +9,7 @@
 
 require "pp"
 require "super_diff"
+require_relative "assertions/minitest_compatibility"
 
 class TLDR
   module Assertions
