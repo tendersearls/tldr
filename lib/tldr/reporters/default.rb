@@ -12,7 +12,7 @@ class TLDR
       def before_suite tldr_config, tests
         @suite_start_time = Process.clock_gettime Process::CLOCK_MONOTONIC, :microsecond
         @out.print <<~MSG
-          Options: #{"bundle exec " if defined?(Bundler)}tldr #{tldr_config.to_full_args}
+          Options: #{tldr_command} #{tldr_config.to_full_args}
 
           🏃 Running:
 
@@ -41,13 +41,14 @@ class TLDR
             "too long; didn't run!",
             "🏃 Completed #{test_results.size} of #{planned_tests.size} tests (#{((test_results.size.to_f / planned_tests.size) * 100).round}%) before running out of time.",
             (<<~WIP.chomp if wip_tests.any?),
-              🙅 These #{plural wip_tests.size, "test was", "tests were"} cancelled in progress:
+              🙅 #{plural wip_tests.size, "test was", "tests were"} cancelled in progress:
               #{wip_tests.map { |wip_test| "  #{time_diff(wip_test.start_time, stop_time)}ms - #{describe(wip_test.test)}" }.join("\n")}
             WIP
-            (<<~SLOW.chomp if test_results.any?)
+            (<<~SLOW.chomp if test_results.any?),
               🐢 Your #{[10, test_results.size].min} slowest completed tests:
               #{test_results.sort_by(&:runtime).last(10).reverse.map { |result| "  #{result.runtime}ms - #{describe(result.test)}" }.join("\n")}
             SLOW
+            describe_tests_that_didnt_finish(tldr_config, planned_tests, test_results)
           ].compact.join("\n\n")
         end
 
@@ -110,7 +111,7 @@ class TLDR
           <<~RERUN.chomp,
 
             Re-run this test:
-              #{"bundle exec " if defined?(Bundler)}tldr #{config.to_single_path_args(result.test.location.relative)}
+              #{tldr_command} #{config.to_single_path_args(result.test.location.relative)}
           RERUN
           (TLDR.filter_backtrace(result.error.backtrace).join("\n") if config.verbose)
         ].compact.reject(&:empty?).join("\n").strip
@@ -129,6 +130,20 @@ class TLDR
         @err.print "#{rule}\n\n"
         yield
         @err.print "\n\n#{rule}"
+      end
+
+      def describe_tests_that_didnt_finish config, planned_tests, test_results
+        tests = planned_tests - test_results.map(&:test)
+        return if tests.empty?
+
+        <<~MSG
+          🤘 Run the #{plural tests.size, "test"} that didn't finish:
+            #{tldr_command} #{config.to_full_args exclude: [:paths]} #{tests.map { |test| test.location.relative }.uniq.join(" \\\n    ")}
+        MSG
+      end
+
+      def tldr_command
+        "#{"bundle exec " if defined?(Bundler)}tldr"
       end
     end
   end

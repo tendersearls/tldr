@@ -55,8 +55,8 @@ class TLDR
       end
     end
 
-    def to_full_args
-      to_cli_argv.join(" ")
+    def to_full_args(exclude: [])
+      to_cli_argv(CONFLAGS.keys - exclude).join(" ")
     end
 
     def to_single_path_args(path)
