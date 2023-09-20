@@ -48,7 +48,7 @@ class TLDR
           config.verbose = verbose
         end
 
-        opts.on("--comment COMMENT", String, "No-op comment, used internally to allow multi-line execution instructions with comments") do
+        opts.on("--comment COMMENT", String, "No-op comment, used internally for multi-line execution instructions") do
           # See "--comment" in lib/tldr/reporters/default.rb for an example of how this is used internally
         end
       end.parse!(args)

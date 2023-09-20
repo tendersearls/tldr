@@ -79,11 +79,13 @@ Usage: tldr [options] some_tests/**/*.rb some/path.rb:13 ...
         --helper HELPER              Path to a test helper to load before any tests (Default: "test/helper.rb")
     -n, --name PATTERN               One or more names or /pattern/ of tests to run (like: foo_test, /foo_.*/, Foo#foo_test)
     -s, --seed SEED                  Seed for randomization
+        --workers WORKERS            Number of parallel workers (Default: 8, the number of CPU cores)
         --skip-test-helper           Don't try loading a test helper before the tests
     -l, --load-path PATH             Add one or more paths to the $LOAD_PATH (Default: ["test"])
     -r, --reporter REPORTER          Custom reporter class (Default: "TLDR::Reporters::Default")
-        --workers WORKERS            Number of parallel workers (Default: 8, the number of CPU cores)
+        --no-emoji                   Disable emoji in the output
     -v, --verbose                    Print stack traces for errors
+        --comment COMMENT            No-op comment, used internally for multi-line execution instructions
 ```
 
 ## Acknowledgements
