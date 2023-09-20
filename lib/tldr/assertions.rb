@@ -1,10 +1,10 @@
 # While all the methods in this file were written for TLDR, they were designed
-# to maximize compatibility with minitest's assertions here:
+# to maximize compatibility with minitest's assertions API and messages here:
 #
 #   https://github.com/minitest/minitest/blob/master/lib/minitest/assertions.rb
 #
 # As a result, many implementations are extremely similar to those found in
-# minitest. Any such implementatins are Copyright © Ryan Davis, seattle.rb and
+# minitest. Any such implementations are Copyright © Ryan Davis, seattle.rb and
 # distributed under the MIT License
 
 require "pp"
@@ -27,6 +27,20 @@ class TLDR
 
     def self.diff expected, actual
       SuperDiff::EqualityMatchers::Main.call(expected:, actual:)
+    end
+
+    def self.capture_io
+      captured_stdout, captured_stderr = StringIO.new, StringIO.new
+
+      original_stdout, original_stderr = $stdout, $stderr
+      $stdout, $stderr = captured_stdout, captured_stderr
+
+      yield
+
+      [captured_stdout.string, captured_stderr.string]
+    ensure
+      $stdout = original_stdout
+      $stderr = original_stderr
     end
 
     def assert bool, message = nil
@@ -111,11 +125,80 @@ class TLDR
       assert left_operand.__send__(operator, right_operand), message
     end
 
-    def assert_output std_out, std_err, message = nil
+    def assert_output expected_stdout, expected_stderr, message = nil, &block
+      assert_block "assert_output requires a block to capture output." unless block
+
+      actual_stdout, actual_stderr = Assertions.capture_io(&block)
+
+      if Regexp === expected_stderr
+        assert_match? expected_stderr, actual_stderr, "In stderr"
+      elsif !expected_stderr.nil?
+        assert_equal expected_stderr, actual_stderr, "In stderr"
+      end
+
+      if Regexp === expected_stdout
+        assert_match? expected_stdout, actual_stdout, "In stdout"
+      elsif !expected_stdout.nil?
+        assert_equal expected_stdout, actual_stdout, "In stdout"
+      end
+    end
+
+    def assert_path_exists path, message = nil
       message = Assertions.msg(message) {
-        "Expected #{Assertions.h(left_operand)} to be #{operator} #{Assertions.h(right_operand)}"
+        "Expected #{Assertions.h(path)} to exist"
       }
-      assert left_operand.__send__(operator, right_operand), message
+
+      assert File.exist?(path), message
+    end
+
+    def assert_pattern message = nil
+      assert false, "assert_pattern requires a block to capture errors." unless block_given?
+
+      begin
+        yield
+      rescue NoMatchingPatternError => e
+        assert false, Assertions.msg(message) { "Expected pattern match: #{e.message}" }
+      end
+    end
+
+    def assert_predicate obj, method, message = nil
+      message = Assertions.msg(message) {
+        "Expected #{Assertions.h(obj)} to be #{method}"
+      }
+
+      assert obj.send(method), message
+    end
+
+    def assert_raises *exp
+      assert false, "assert_raises requires a block to capture errors." unless block_given?
+
+      message = exp.pop if String === exp.last
+      exp << StandardError if exp.empty?
+
+      begin
+        yield
+      rescue Failure, SkipTest
+        raise
+      rescue *exp => e
+        return e
+      rescue SignalException, SystemExit
+        raise
+      rescue Exception => e # standard:disable Lint/RescueException
+        assert false, Assertions.msg(message) {
+          [
+            "#{Assertions.h(exp)} exception expected, not",
+            "Class: <#{e.class}>",
+            "Message: <#{e.message.inspect}>",
+            "---Backtrace---",
+            e.backtrace.join("\n"),
+            "---------------"
+          ].compact.join "\n"
+        }
+      end
+
+      exp = exp.first if exp.size == 1
+
+      assert false, "#{message}#{Assertions.h(exp)} expected but nothing was raised."
     end
 
     def assert_respond_to obj, method, message = nil

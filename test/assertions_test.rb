@@ -112,6 +112,91 @@ class AssertionsTest < Minitest::Test
     end
   end
 
+  def test_assert_output
+    @subject.assert_output "foo\n", "bar\n" do
+      puts "foo"
+      warn "bar"
+    end
+    @subject.assert_output(/fo/, /ar/) do
+      puts "foo"
+      warn "bar"
+    end
+    should_fail(/Expected: "qux\\n"/) do
+      @subject.assert_output "baz\n", "qux\n" do
+        puts "foo"
+        warn "bar"
+      end
+    end
+    should_fail(/Expected: "baz\\n"/) do
+      @subject.assert_output "baz\n", "bar\n" do
+        puts "foo"
+        warn "bar"
+      end
+    end
+  end
+
+  def test_assert_path_exists
+    @subject.assert_path_exists "./tldr.gemspec"
+    should_fail "Expected \"./lolnope\" to exist" do
+      @subject.assert_path_exists "./lolnope"
+    end
+  end
+
+  def test_assert_pattern
+    @subject.assert_pattern { [1, 2, 3] => [Integer, Integer, Integer] }
+    should_fail "Expected pattern match: [1, \"two\", 3]: Integer === \"two\" does not return true" do
+      @subject.assert_pattern { [1, "two", 3] => [Integer, Integer, Integer] }
+    end
+    should_fail "Custom\nExpected pattern match: [1, \"two\", 3]: Integer === \"two\" does not return true" do
+      @subject.assert_pattern("Custom") { [1, "two", 3] => [Integer, Integer, Integer] }
+    end
+  end
+
+  def test_assert_predicate
+    @subject.assert_predicate 1, :odd?
+    should_fail "Expected 2 to be odd?" do
+      @subject.assert_predicate 2, :odd?
+    end
+  end
+
+  def test_assert_raises
+    @subject.assert_raises(ArgumentError) { raise ArgumentError }
+    @subject.assert_raises(IOError, ArgumentError) { raise ArgumentError }
+    nested_e = assert_raises TLDR::Assertions::Failure do
+      @subject.assert_raises {
+        @subject.assert_empty [1]
+      }
+    end
+    assert_equal "Expected [1] to be empty", nested_e.message
+    should_fail "StandardError expected but nothing was raised." do
+      @subject.assert_raises {}
+    end
+    msg = <<~MSG
+      [TypeError] exception expected, not
+      Class: <IOError>
+      Message: <"lol">
+      ---Backtrace---
+    MSG
+    should_fail msg do
+      @subject.assert_raises(TypeError) { raise IOError, "lol" }
+    end
+    assert_raises(TLDR::SkipTest) {
+      @subject.assert_raises {
+        raise TLDR::SkipTest
+      }
+    }
+    msg2 = <<~MSG
+      Should've been different
+      [IOError, ArgumentError] exception expected, not
+      Class: <TypeError>
+      Message: <"TypeError">
+      ---Backtrace---
+    MSG
+    should_fail msg2 do
+      @subject.assert_raises(IOError, ArgumentError, "Should've been different") { raise TypeError }
+    end
+  end
+
   def test_assert_respond_to
     @subject.assert_respond_to "foo", :length
     should_fail "Expected \"foo\" (String) to respond to :pizza" do
