@@ -33,7 +33,7 @@ class TLDR
         end
 
         opts.on("-r", "#{CONFLAGS[:reporter]} REPORTER", String, "Custom reporter class (Default: \"TLDR::Reporters::Default\")") do |reporter|
-          config.reporter = Kernel.const_get(reporter).new
+          config.reporter = Kernel.const_get(reporter)
         end
 
         opts.on("#{CONFLAGS[:workers]} WORKERS", Integer, "Number of parallel workers (Default: #{Concurrent.processor_count}, the number of CPU cores)") do |workers|

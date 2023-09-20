@@ -30,7 +30,7 @@ class TLDR
         seed: rand(10_000),
         skip_test_helper: false,
         verbose: false,
-        reporter: Reporters::Default.new,
+        reporter: Reporters::Default,
         helper: "test/helper.rb",
         load_paths: ["test"],
         workers: Concurrent.processor_count,
@@ -80,8 +80,8 @@ class TLDR
           self[key].map { |value| [flag, bad_escape(value)] }
         elsif self[key].is_a?(TrueClass) || self[key].is_a?(FalseClass)
           flag if self[key]
-        elsif self[key].is_a?(Reporters::Base)
-          [flag, self[key].class.name] unless self[key].is_a?(Reporters::Default)
+        elsif self[key].is_a?(Class)
+          [flag, self[key].name]
         elsif !self[key].nil?
           [flag, bad_escape(self[key])]
         end

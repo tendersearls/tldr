@@ -1,6 +1,15 @@
 class TLDR
   module Reporters
     class Base
+      def initialize(config, out = $stdout, err = $stderr)
+        out.sync = true
+        err.sync = true
+
+        @config = config
+        @out = out
+        @err = err
+      end
+
       # Will be called before any tests are run
       def before_suite tldr_config, tests
       end

@@ -13,7 +13,7 @@ class ConfigTest < Minitest::Test
       seed: 42,
       skip_test_helper: true,
       verbose: true,
-      reporter: TLDR::Reporters::Base.new,
+      reporter: TLDR::Reporters::Base,
       helper: "test_helper.rb",
       load_paths: ["app", "lib"],
       workers: 3,

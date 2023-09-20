@@ -14,9 +14,7 @@ class TLDR
         ),
         config.seed
       )
-      Plan.new(tests).tap do |tests|
-        config.reporter.before_suite config, tests
-      end
+      Plan.new(tests)
     end
 
     private

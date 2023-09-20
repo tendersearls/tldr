@@ -12,12 +12,14 @@ class TLDR
     def run config, plan
       @wip.clear
       @results.clear
+      reporter = config.reporter.new config
+      reporter.before_suite plan.tests
 
       time_bomb = Thread.new {
         explode = proc do
           next if @run_aborted.true?
           @run_aborted.make_true
-          config.reporter.after_tldr config, plan.tests, @wip.dup, @results.dup
+          reporter.after_tldr plan.tests, @wip.dup, @results.dup
           exit! 3
         end
 
@@ -41,15 +43,15 @@ class TLDR
           next if @run_aborted.true?
           @results << result
           @wip.delete wip_test
-          config.reporter.after_test result
-          fail_fast config, plan, result if result.failing? && config.fail_fast
+          reporter.after_test result
+          fail_fast reporter, plan, result if result.failing? && config.fail_fast
         end
       }.tap do
         time_bomb.kill
       end
 
       unless @run_aborted.true?
-        config.reporter.after_suite config, results
+        reporter.after_suite results
         exit exit_code results
       end
     end
@@ -66,11 +68,11 @@ class TLDR
       }.flat_map(&:value)
     end
 
-    def fail_fast config, plan, fast_failed_result
+    def fail_fast reporter, plan, fast_failed_result
       unless @run_aborted.true?
         @run_aborted.make_true
         abort = proc do
-          config.reporter.after_fail_fast config, plan.tests, @wip.dup, @results.dup, fast_failed_result
+          reporter.after_fail_fast plan.tests, @wip.dup, @results.dup, fast_failed_result
           exit! exit_code([fast_failed_result])
         end
         wait_for_irb_to_exit(&abort)

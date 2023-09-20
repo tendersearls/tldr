@@ -22,7 +22,7 @@ class ArgvParserTest < Minitest::Test
     assert_equal 42, result.seed
     assert result.skip_test_helper
     assert result.verbose
-    assert_kind_of TLDR::Reporters::Base, result.reporter
+    assert_equal TLDR::Reporters::Base, result.reporter
     assert_equal "spec/spec_helper.rb", result.helper
     assert_equal ["lib", "vendor", "spec", "app"], result.load_paths
     assert_equal 99, result.workers
@@ -37,7 +37,7 @@ class ArgvParserTest < Minitest::Test
     assert_includes 0..10_000, result.seed
     refute result.skip_test_helper
     refute result.verbose
-    assert_kind_of TLDR::Reporters::Default, result.reporter
+    assert_equal TLDR::Reporters::Default, result.reporter
     assert_equal "test/helper.rb", result.helper
     assert_equal ["test"], result.load_paths
     assert_equal Concurrent.processor_count, result.workers
