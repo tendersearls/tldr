@@ -99,7 +99,7 @@ class TLDR
 
       def summarize config, results
         results.reject { |result| result.error.nil? }
-          .sort_by { |result| result.test.location.relative }
+          .sort_by { |result| result.test.location.locator }
           .map { |result| summarize_result config, result }
       end
 
@@ -111,14 +111,14 @@ class TLDR
           <<~RERUN.chomp,
 
             Re-run this test:
-              #{tldr_command} #{config.to_single_path_args(result.test.location.relative)}
+              #{tldr_command} #{config.to_single_path_args(result.test.location.locator)}
           RERUN
           (TLDR.filter_backtrace(result.error.backtrace).join("\n") if config.verbose)
         ].compact.reject(&:empty?).join("\n").strip
       end
 
       def describe test, location = test.location
-        "#{test.klass}##{test.method} [#{location.relative}]"
+        "#{test.klass}##{test.method} [#{location.locator}]"
       end
 
       def plural count, singular, plural = "#{singular}s"
@@ -136,9 +136,12 @@ class TLDR
         tests = planned_tests - test_results.map(&:test)
         return if tests.empty?
 
+        test_locators = tests.group_by(&:file).map { |_, tests|
+          "#{tests.first.location.relative}:#{tests.map(&:line).sort.join(":")}"
+        }.uniq
         <<~MSG
           🤘 Run the #{plural tests.size, "test"} that didn't finish:
-            #{tldr_command} #{config.to_full_args exclude: [:paths]} #{tests.map { |test| test.location.relative }.uniq.join(" \\\n    ")}
+            #{tldr_command} #{config.to_full_args exclude: [:paths]} #{test_locators.join(" \\\n    ")}
         MSG
       end
 

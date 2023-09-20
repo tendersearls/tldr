@@ -27,6 +27,14 @@ class Slow < TLDR
     raise "💥"
   end
 
+  def test_seven
+    zzz
+  end
+
+  def test_eight
+    zzz
+  end
+
   private
 
   def zzz
