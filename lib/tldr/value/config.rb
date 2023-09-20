@@ -10,7 +10,8 @@ class TLDR
     load_paths: "--load-path",
     workers: "--workers",
     names: "--name",
-    fail_fast: "--fail-fast"
+    fail_fast: "--fail-fast",
+    paths: nil
   }.freeze
 
   Config = Struct.new :paths, :seed, :skip_test_helper, :verbose, :reporter,
@@ -55,16 +56,44 @@ class TLDR
     end
 
     def to_full_args
-      [
-        "--seed #{seed}",
-        ("--skip-test-helper" if skip_test_helper)
-      ].join(" ")
+      to_cli_argv.join(" ")
     end
 
-    def to_single_args
-      [
-        ("--skip-test-helper" if skip_test_helper)
-      ].join(" ")
+    def to_single_path_args(path)
+      argv = to_cli_argv(CONFLAGS.keys - [
+        :seed, :workers, :names, :fail_fast, :paths
+      ])
+
+      (argv + [bad_escape(path)]).join(" ")
+    end
+
+    private
+
+    def to_cli_argv(options = CONFLAGS.keys)
+      defaults = Config.build_defaults
+      options.map { |key|
+        flag = CONFLAGS[key]
+
+        if defaults[key] == self[key]
+          next
+        elsif self[key].is_a?(Array)
+          self[key].map { |value| [flag, bad_escape(value)] }
+        elsif self[key].is_a?(TrueClass) || self[key].is_a?(FalseClass)
+          flag if self[key]
+        elsif self[key].is_a?(Reporters::Base)
+          [flag, self[key].class.name] unless self[key].is_a?(Reporters::Default)
+        elsif !self[key].nil?
+          [flag, bad_escape(self[key])]
+        end
+      }.flatten.compact
+    end
+
+    def bad_escape val
+      if val.nil? || val.is_a?(Integer)
+        val
+      else
+        "\"#{val}\""
+      end
     end
   end
 end

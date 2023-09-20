@@ -82,7 +82,7 @@ class TLDR
           <<~RERUN.chomp,
 
             Re-run this test:
-              #{"bundle exec " if defined?(Bundler)}tldr #{result.test.location.relative} #{config.to_single_args}
+              #{"bundle exec " if defined?(Bundler)}tldr #{config.to_single_path_args(result.test.location.relative)}
           RERUN
           (TLDR.filter_backtrace(result.error.backtrace).join("\n") if config.verbose)
         ].compact.reject(&:empty?).join("\n").strip

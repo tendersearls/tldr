@@ -9,7 +9,7 @@ class SeedTest < Minitest::Test
       SeedTest#test_skip [test/fixture/seed.rb:7]:
 
       Re-run this test:
-        bundle exec tldr test/fixture/seed.rb:6
+        bundle exec tldr "test/fixture/seed.rb:6"
     MSG
     assert_equal 0, result.exit_code
     assert_includes result.stdout, "--seed 1"
@@ -24,7 +24,7 @@ class SeedTest < Minitest::Test
       SeedTest#test_skip [test/fixture/seed.rb:7]:
 
       Re-run this test:
-        bundle exec tldr test/fixture/seed.rb:6
+        bundle exec tldr "test/fixture/seed.rb:6"
     MSG
     assert_equal 0, result.exit_code
     assert_includes result.stdout, "--seed 2"
