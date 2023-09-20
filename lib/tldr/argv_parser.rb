@@ -24,6 +24,10 @@ class TLDR
           config.seed = seed
         end
 
+        opts.on("#{CONFLAGS[:workers]} WORKERS", Integer, "Number of parallel workers (Default: #{Concurrent.processor_count}, the number of CPU cores)") do |workers|
+          config.workers = workers
+        end
+
         opts.on(CONFLAGS[:skip_test_helper], "Don't try loading a test helper before the tests") do |skip_test_helper|
           config.skip_test_helper = skip_test_helper
         end
@@ -36,8 +40,8 @@ class TLDR
           config.reporter = Kernel.const_get(reporter)
         end
 
-        opts.on("#{CONFLAGS[:workers]} WORKERS", Integer, "Number of parallel workers (Default: #{Concurrent.processor_count}, the number of CPU cores)") do |workers|
-          config.workers = workers
+        opts.on(CONFLAGS[:no_emoji], "Disable emoji in the output") do |no_emoji|
+          config.no_emoji = true # Apparently optparse will treat --no-.* options as false
         end
 
         opts.on("-v", CONFLAGS[:verbose], "Print stack traces for errors") do |verbose|

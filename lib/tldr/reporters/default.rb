@@ -1,18 +1,28 @@
 class TLDR
   module Reporters
     class Default < Base
+      def initialize(config, out = $stdout, err = $stderr)
+        super
+        @icons = @config.no_emoji ? IconProvider::Base.new : IconProvider::Emoji.new
+      end
+
       def before_suite tests
         @suite_start_time = Process.clock_gettime Process::CLOCK_MONOTONIC, :microsecond
         @out.print <<~MSG
           Options: #{tldr_command} #{@config.to_full_args}
 
-          🏃 Running:
+          #{@icons.run} Running:
 
         MSG
       end
 
       def after_test result
-        @out.print result.emoji
+        @out.print case result.type
+        when :success then @icons.success
+        when :skip then @icons.skip
+        when :failure then @icons.failure
+        when :error then @icons.error
+        end
       end
 
       def time_diff start, stop = Process.clock_gettime(Process::CLOCK_MONOTONIC, :microsecond)
@@ -22,18 +32,18 @@ class TLDR
       def after_tldr planned_tests, wip_tests, test_results
         stop_time = Process.clock_gettime Process::CLOCK_MONOTONIC, :microsecond
 
-        @out.print "🥵"
+        @out.print @icons.tldr
         @err.print "\n\n"
         wrap_in_horizontal_rule do
           @err.print [
             "too long; didn't run!",
-            "🏃 Completed #{test_results.size} of #{planned_tests.size} tests (#{((test_results.size.to_f / planned_tests.size) * 100).round}%) before running out of time.",
+            "#{@icons.run} Completed #{test_results.size} of #{planned_tests.size} tests (#{((test_results.size.to_f / planned_tests.size) * 100).round}%) before running out of time.",
             (<<~WIP.chomp if wip_tests.any?),
-              🙅 #{plural wip_tests.size, "test was", "tests were"} cancelled in progress:
+              #{@icons.wip} #{plural wip_tests.size, "test was", "tests were"} cancelled in progress:
               #{wip_tests.map { |wip_test| "  #{time_diff(wip_test.start_time, stop_time)}ms - #{describe(wip_test.test)}" }.join("\n")}
             WIP
             (<<~SLOW.chomp if test_results.any?),
-              🐢 Your #{[10, test_results.size].min} slowest completed tests:
+              #{@icons.slow} Your #{[10, test_results.size].min} slowest completed tests:
               #{test_results.sort_by(&:runtime).last(10).reverse.map { |result| "  #{result.runtime}ms - #{describe(result.test)}" }.join("\n")}
             SLOW
             describe_tests_that_didnt_finish(@config, planned_tests, test_results)
@@ -50,8 +60,8 @@ class TLDR
         wrap_in_horizontal_rule do
           @err.print [
             "Failing fast after #{describe(last_result.test, last_result.relevant_location)} #{last_result.error? ? "errored" : "failed"}.",
-            ("🤐 #{plural wip_tests.size, "test was", "tests were"} cancelled in progress." if wip_tests.any?),
-            ("🙈 #{plural unrun_tests.size, "test was", "tests were"} not run at all." if unrun_tests.any?),
+            ("#{@icons.wip} #{plural wip_tests.size, "test was", "tests were"} cancelled in progress." if wip_tests.any?),
+            ("#{@icons.not_run} #{plural unrun_tests.size, "test was", "tests were"} not run at all." if unrun_tests.any?),
             describe_tests_that_didnt_finish(planned_tests, test_results)
           ].compact.join("\n\n")
         end
@@ -115,7 +125,7 @@ class TLDR
       end
 
       def wrap_in_horizontal_rule
-        rule = "🚨" + "=" * 20 + " ABORTED RUN " + "=" * 20 + "🚨"
+        rule = @icons.alarm + "=" * 20 + " ABORTED RUN " + "=" * 20 + @icons.alarm
         @err.print "#{rule}\n\n"
         yield
         @err.print "\n\n#{rule}"
@@ -132,7 +142,7 @@ class TLDR
           ("--comment \"Also include #{plural failed.size, "test"} that failed:\"" if failed.any?)
         ] + failed_locators
         <<~MSG
-          🤘 Run the #{plural unrun.size, "test"} that didn't finish:
+          #{@icons.rock_on} Run the #{plural unrun.size, "test"} that didn't finish:
             #{tldr_command} #{@config.to_full_args exclude: [:paths]} #{suggested_locators.join(" \\\n    ")}
         MSG
       end

@@ -11,11 +11,12 @@ class TLDR
     workers: "--workers",
     names: "--name",
     fail_fast: "--fail-fast",
+    no_emoji: "--no-emoji",
     paths: nil
   }.freeze
 
   Config = Struct.new :paths, :seed, :skip_test_helper, :verbose, :reporter,
-    :helper, :load_paths, :workers, :names, :fail_fast,
+    :helper, :load_paths, :workers, :names, :fail_fast, :no_emoji,
     keyword_init: true do
     def initialize(*args)
       super
@@ -35,7 +36,8 @@ class TLDR
         load_paths: ["test"],
         workers: Concurrent.processor_count,
         names: [],
-        fail_fast: false
+        fail_fast: false,
+        no_emoji: false
       }
     end
 
@@ -46,7 +48,7 @@ class TLDR
         self[key] = defaults[key] if self[key].empty?
       end
 
-      [:skip_test_helper, :verbose, :fail_fast].each do |key|
+      [:skip_test_helper, :verbose, :fail_fast, :no_emoji].each do |key|
         self[key] = defaults[key] if self[key].nil?
       end
 

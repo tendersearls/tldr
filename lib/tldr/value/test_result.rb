@@ -8,15 +8,6 @@ class TLDR
       @error_location = determine_error_location
     end
 
-    def emoji
-      case type
-      when :success then "😁"
-      when :skip then "🫥"
-      when :failure then "😡"
-      when :error then "🤬"
-      end
-    end
-
     def passing?
       success? || skip?
     end
