@@ -75,6 +75,7 @@ Here are the CLI options:
 ```
 $ tldr --help
 Usage: tldr [options] some_tests/**/*.rb some/path.rb:13 ...
+        --fail-fast                  Stop running tests as soon as one fails
         --helper HELPER              Path to a test helper to load before any tests (Default: "test/helper.rb")
     -n, --name PATTERN               One or more names or /pattern/ of tests to run (like: foo_test, /foo_.*/, Foo#foo_test)
     -s, --seed SEED                  Seed for randomization

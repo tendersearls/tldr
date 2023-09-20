@@ -8,6 +8,10 @@ class TLDR
       OptionParser.new do |opts|
         opts.banner = "Usage: tldr [options] some_tests/**/*.rb some/path.rb:13 ..."
 
+        opts.on("--fail-fast", "Stop running tests as soon as one fails") do |fail_fast|
+          config.fail_fast = fail_fast
+        end
+
         opts.on("--helper HELPER", String, "Path to a test helper to load before any tests (Default: \"test/helper.rb\")") do |helper|
           config.helper = helper
         end

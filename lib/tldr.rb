@@ -5,7 +5,6 @@ require_relative "tldr/reporters"
 require_relative "tldr/argv_parser"
 require_relative "tldr/planner"
 require_relative "tldr/runner"
-require_relative "tldr/reporter"
 require_relative "tldr/assertions"
 require_relative "tldr/skippable"
 
@@ -20,8 +19,6 @@ class TLDR
 
   def self.run config
     config.set_defaults!
-    Reporter.new.report(config,
-      Runner.new.run(config,
-        Planner.new.plan(config)))
+    Runner.new.run(config, Planner.new.plan(config))
   end
 end

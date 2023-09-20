@@ -21,6 +21,10 @@ class TLDR
       success? || skip?
     end
 
+    def failing?
+      !passing?
+    end
+
     def success?
       type == :success
     end
