@@ -41,6 +41,26 @@ You can, of course, also just run a specific test file or glob:
 $ bundle exec tldr test/this/one/in/particular.rb
 ```
 
+### Options
+
+Here are the CLI options:
+
+```
+$ tldr --help
+Usage: tldr [options] some_tests/**/*.rb some/path.rb:13 ...
+        --fail-fast                  Stop running tests as soon as one fails
+    -n, --name PATTERN               One or more names or /pattern/ of tests to run (like: foo_test, /foo_.*/, Foo#foo_test)
+    -s, --seed SEED                  Seed for randomization
+        --workers WORKERS            Number of parallel workers (Default: 8, the number of CPU cores)
+        --helper HELPER              Path to a test helper to load before any tests (Default: "test/helper.rb")
+        --skip-test-helper           Don't try loading a test helper before the tests
+    -l, --load-path PATH             Add one or more paths to the $LOAD_PATH (Default: ["test"])
+    -r, --reporter REPORTER          Custom reporter class (Default: "TLDR::Reporters::Default")
+        --no-emoji                   Disable emoji in the output
+    -v, --verbose                    Print stack traces for errors
+        --comment COMMENT            No-op comment, used internally for multi-line execution instructions
+```
+
 ### Minitest compatibility
 
 Tests you write with tldr are designed to be mostly-compatible with
@@ -66,26 +86,6 @@ select only the tests whose source covers those lines:
 
 ```
 $ bundle exec tldr test/fixture/line_number.rb:3:10
-```
-
-### Options
-
-Here are the CLI options:
-
-```
-$ tldr --help
-Usage: tldr [options] some_tests/**/*.rb some/path.rb:13 ...
-        --fail-fast                  Stop running tests as soon as one fails
-        --helper HELPER              Path to a test helper to load before any tests (Default: "test/helper.rb")
-    -n, --name PATTERN               One or more names or /pattern/ of tests to run (like: foo_test, /foo_.*/, Foo#foo_test)
-    -s, --seed SEED                  Seed for randomization
-        --workers WORKERS            Number of parallel workers (Default: 8, the number of CPU cores)
-        --skip-test-helper           Don't try loading a test helper before the tests
-    -l, --load-path PATH             Add one or more paths to the $LOAD_PATH (Default: ["test"])
-    -r, --reporter REPORTER          Custom reporter class (Default: "TLDR::Reporters::Default")
-        --no-emoji                   Disable emoji in the output
-    -v, --verbose                    Print stack traces for errors
-        --comment COMMENT            No-op comment, used internally for multi-line execution instructions
 ```
 
 ## Acknowledgements

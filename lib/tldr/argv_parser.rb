@@ -12,10 +12,6 @@ class TLDR
           config.fail_fast = fail_fast
         end
 
-        opts.on("#{CONFLAGS[:helper]} HELPER", String, "Path to a test helper to load before any tests (Default: \"test/helper.rb\")") do |helper|
-          config.helper = helper
-        end
-
         opts.on("-n", "#{CONFLAGS[:names]} PATTERN", Array, "One or more names or /pattern/ of tests to run (like: foo_test, /foo_.*/, Foo#foo_test)") do |name|
           config.names += name
         end
@@ -26,6 +22,10 @@ class TLDR
 
         opts.on("#{CONFLAGS[:workers]} WORKERS", Integer, "Number of parallel workers (Default: #{Concurrent.processor_count}, the number of CPU cores)") do |workers|
           config.workers = workers
+        end
+
+        opts.on("#{CONFLAGS[:helper]} HELPER", String, "Path to a test helper to load before any tests (Default: \"test/helper.rb\")") do |helper|
+          config.helper = helper
         end
 
         opts.on(CONFLAGS[:skip_test_helper], "Don't try loading a test helper before the tests") do |skip_test_helper|
