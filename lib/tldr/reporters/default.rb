@@ -46,7 +46,7 @@ class TLDR
               #{@icons.slow} Your #{[10, test_results.size].min} slowest completed tests:
               #{test_results.sort_by(&:runtime).last(10).reverse.map { |result| "  #{result.runtime}ms - #{describe(result.test)}" }.join("\n")}
             SLOW
-            describe_tests_that_didnt_finish(@config, planned_tests, test_results)
+            describe_tests_that_didnt_finish(planned_tests, test_results)
           ].compact.join("\n\n")
         end
 
