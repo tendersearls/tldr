@@ -137,7 +137,7 @@ class TLDR
 
         unrun_locators = consolidate unrun
         failed = test_results.select(&:failing?).map(&:test)
-        failed_locators = consolidate failed
+        failed_locators = consolidate failed, exclude: unrun_locators
         suggested_locators = unrun_locators + [
           ("--comment \"Also include #{plural failed.size, "test"} that failed:\"" if failed.any?)
         ] + failed_locators
@@ -147,10 +147,10 @@ class TLDR
         MSG
       end
 
-      def consolidate tests
+      def consolidate tests, exclude: []
         tests.group_by(&:file).map { |_, tests|
-          "\"#{tests.first.location.relative}:#{tests.map(&:line).sort.join(":")}\""
-        }.uniq
+          "\"#{tests.first.location.relative}:#{tests.map(&:line).uniq.sort.join(":")}\""
+        }.uniq - exclude
       end
 
       def tldr_command
