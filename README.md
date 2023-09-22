@@ -15,6 +15,10 @@ Some stuff you might like:
 by names or patterns (e.g. `--name test_fail,test_error --name "/_\d/"`)
 * Everything is **parallel by default**, with as many workers as processor cores
 on your machine (set with `--workers 42`)
+* By default, the CLI will prepend your most-recently-edited test file to the
+front of your suite so its tests will run first. The tests you're working on are
+the most likely you care about running, so TLDR runs them first (see the
+`--prepend` option)
 * And, of course, our signature feature: your test suite will never grow into
 a glacially slow, soul-sucking albatross around your neck, because **after 1.8
 seconds, it stops running your tests**, with a report on what it _was_ able to
