@@ -19,11 +19,12 @@ class ConfigTest < Minitest::Test
       workers: 3,
       names: ["/test_*/", "test_it"],
       fail_fast: true,
+      prepend_tests: ["a.rb:3"],
       paths: ["a.rb:3", "b.rb"]
     )
 
     assert_equal <<~MSG.chomp, config.to_full_args
-      --seed 42 --skip-test-helper --verbose --reporter TLDR::Reporters::Base --helper "test_helper.rb" --load-path "app" --load-path "lib" --workers 3 --name "/test_*/" --name "test_it" --fail-fast "a.rb:3" "b.rb"
+      --seed 42 --skip-test-helper --verbose --reporter TLDR::Reporters::Base --helper "test_helper.rb" --load-path "app" --load-path "lib" --workers 3 --name "/test_*/" --name "test_it" --fail-fast --prepend "a.rb:3" "a.rb:3" "b.rb"
     MSG
 
     assert_equal <<~MSG.chomp, config.to_single_path_args("lol.rb")

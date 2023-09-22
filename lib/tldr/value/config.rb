@@ -12,17 +12,21 @@ class TLDR
     names: "--name",
     fail_fast: "--fail-fast",
     no_emoji: "--no-emoji",
+    prepend_tests: "--prepend",
     paths: nil
   }.freeze
 
+  MOST_RECENTLY_MODIFIED_TAG = "MOST_RECENTLY_MODIFIED".freeze
+
   Config = Struct.new :paths, :seed, :skip_test_helper, :verbose, :reporter,
-    :helper, :load_paths, :workers, :names, :fail_fast, :no_emoji,
+    :helper, :load_paths, :workers, :names, :fail_fast, :no_emoji, :prepend_tests,
     keyword_init: true do
     def initialize(*args)
       super
       self.paths ||= []
       self.load_paths ||= []
       self.names ||= []
+      self.prepend_tests ||= []
     end
 
     def self.build_defaults
@@ -37,24 +41,43 @@ class TLDR
         workers: Concurrent.processor_count,
         names: [],
         fail_fast: false,
-        no_emoji: false
+        no_emoji: false,
+        prepend_tests: [MOST_RECENTLY_MODIFIED_TAG]
       }
     end
 
     def set_defaults!
       defaults = Config.build_defaults
 
-      [:paths, :load_paths, :names].each do |key|
+      # Arrays
+      [:paths, :load_paths, :names, :prepend_tests].each do |key|
         self[key] = defaults[key] if self[key].empty?
       end
 
+      # Booleans
       [:skip_test_helper, :verbose, :fail_fast, :no_emoji].each do |key|
         self[key] = defaults[key] if self[key].nil?
       end
 
+      # Values
       [:seed, :reporter, :helper, :workers].each do |key|
         self[key] ||= defaults[key]
       end
+    end
+
+    # We needed this hook (to be called by the planner), because we can't know
+    # the default prepend location until we have all the resolved test paths,
+    # so we have to mutate it after the fact.
+    def update_after_gathering_tests! tests
+      return unless prepend_tests.include?(MOST_RECENTLY_MODIFIED_TAG)
+
+      self.prepend_tests = prepend_tests.map { |path|
+        if path == MOST_RECENTLY_MODIFIED_TAG
+          most_recently_modified_test_file tests
+        else
+          path
+        end
+      }
     end
 
     def to_full_args(exclude: [])
@@ -63,7 +86,7 @@ class TLDR
 
     def to_single_path_args(path)
       argv = to_cli_argv(CONFLAGS.keys - [
-        :seed, :workers, :names, :fail_fast, :paths
+        :seed, :workers, :names, :fail_fast, :paths, :prepend_tests
       ])
 
       (argv + [bad_escape(path)]).join(" ")
@@ -96,6 +119,10 @@ class TLDR
       else
         "\"#{val}\""
       end
+    end
+
+    def most_recently_modified_test_file(tests)
+      tests.max_by { |test| File.mtime(test.file) }.file
     end
   end
 end

@@ -32,6 +32,10 @@ class TLDR
           config.skip_test_helper = skip_test_helper
         end
 
+        opts.on("#{CONFLAGS[:prepend_tests]} PATH", String, "Prepend one or more paths to run first (Default: your most recently modified test)") do |prepend|
+          config.prepend_tests << prepend
+        end
+
         opts.on("-l", "#{CONFLAGS[:load_paths]} PATH", Array, "Add one or more paths to the $LOAD_PATH (Default: [\"test\"])") do |load_path|
           config.load_paths += load_path
         end
