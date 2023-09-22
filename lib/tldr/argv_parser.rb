@@ -20,7 +20,7 @@ class TLDR
           config.seed = seed
         end
 
-        opts.on("#{CONFLAGS[:workers]} WORKERS", Integer, "Number of parallel workers (Default: #{Concurrent.processor_count}, the number of CPU cores)") do |workers|
+        opts.on("#{CONFLAGS[:workers]} WORKERS", Integer, "Number of parallel workers (Default: your processor count (#{Concurrent.processor_count}), 1 if a seed is set)") do |workers|
           config.workers = workers
         end
 

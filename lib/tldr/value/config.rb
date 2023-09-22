@@ -52,6 +52,11 @@ class TLDR
     def set_defaults!
       defaults = Config.build_defaults
 
+      # Special cases
+      if workers.nil?
+        self.workers = seed.nil? ? defaults[:workers] : 1
+      end
+
       # Arrays
       [:paths, :load_paths, :names, :prepend_tests].each do |key|
         self[key] = defaults[key] if self[key].empty?
@@ -63,7 +68,7 @@ class TLDR
       end
 
       # Values
-      [:seed, :reporter, :helper, :workers].each do |key|
+      [:seed, :reporter, :helper].each do |key|
         self[key] ||= defaults[key]
       end
     end
