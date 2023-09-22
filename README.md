@@ -95,10 +95,11 @@ Usage: tldr [options] some_tests/**/*.rb some/path.rb:13 ...
         --fail-fast                  Stop running tests as soon as one fails
     -n, --name PATTERN               One or more names or /pattern/ of tests to run (like: foo_test, /foo_.*/, Foo#foo_test)
     -s, --seed SEED                  Seed for randomization
-        --workers WORKERS            Number of parallel workers (Default: 24, the number of CPU cores)
+        --workers WORKERS            Number of parallel workers (Default: 8, the number of CPU cores)
         --helper HELPER              Path to a test helper to load before any tests (Default: "test/helper.rb")
         --skip-test-helper           Don't try loading a test helper before the tests
         --prepend PATH               Prepend one or more paths to run first (Default: your most recently modified test)
+        --no-prepend                 Don't prepend any tests before the rest of the suite
     -l, --load-path PATH             Add one or more paths to the $LOAD_PATH (Default: ["test"])
     -r, --reporter REPORTER          Custom reporter class (Default: "TLDR::Reporters::Default")
         --no-emoji                   Disable emoji in the output
@@ -121,7 +122,7 @@ with these caveats:
   deprecated `assert_send`, just `include
   TLDR::Assertions::MinitestCompatibility` into the `TLDR` base class or
   individual test classes
-
+G
 ## Acknowledgements
 
 Thanks to [George Sheppard](https://github.com/fuzzmonkey) for freeing up the

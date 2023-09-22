@@ -13,13 +13,15 @@ class TLDR
     fail_fast: "--fail-fast",
     no_emoji: "--no-emoji",
     prepend_tests: "--prepend",
+    no_prepend: "--no-prepend",
     paths: nil
   }.freeze
 
   MOST_RECENTLY_MODIFIED_TAG = "MOST_RECENTLY_MODIFIED".freeze
 
   Config = Struct.new :paths, :seed, :skip_test_helper, :verbose, :reporter,
-    :helper, :load_paths, :workers, :names, :fail_fast, :no_emoji, :prepend_tests,
+    :helper, :load_paths, :workers, :names, :fail_fast, :no_emoji,
+    :prepend_tests, :no_prepend,
     keyword_init: true do
     def initialize(*args)
       super
@@ -42,7 +44,8 @@ class TLDR
         names: [],
         fail_fast: false,
         no_emoji: false,
-        prepend_tests: [MOST_RECENTLY_MODIFIED_TAG]
+        prepend_tests: [MOST_RECENTLY_MODIFIED_TAG],
+        no_prepend: false
       }
     end
 
@@ -55,7 +58,7 @@ class TLDR
       end
 
       # Booleans
-      [:skip_test_helper, :verbose, :fail_fast, :no_emoji].each do |key|
+      [:skip_test_helper, :verbose, :fail_fast, :no_emoji, :no_prepend].each do |key|
         self[key] = defaults[key] if self[key].nil?
       end
 
@@ -86,7 +89,7 @@ class TLDR
 
     def to_single_path_args(path)
       argv = to_cli_argv(CONFLAGS.keys - [
-        :seed, :workers, :names, :fail_fast, :paths, :prepend_tests
+        :seed, :workers, :names, :fail_fast, :paths, :prepend_tests, :no_prepend
       ])
 
       (argv + [bad_escape(path)]).join(" ")

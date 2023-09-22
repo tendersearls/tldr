@@ -18,7 +18,7 @@ class TLDR
           ),
           config.seed
         ),
-        config.prepend_tests
+        config
       )
     end
 
@@ -33,8 +33,9 @@ class TLDR
       }
     end
 
-    def prepend tests, prepend_tests
-      prepended_locations = prepend_tests.flat_map { |path|
+    def prepend tests, config
+      return tests if config.no_prepend
+      prepended_locations = config.prepend_tests.flat_map { |path|
         path_input_to_locations path
       }
       prepended, rest = tests.partition { |test|

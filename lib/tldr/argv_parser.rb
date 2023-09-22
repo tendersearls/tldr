@@ -36,6 +36,10 @@ class TLDR
           config.prepend_tests << prepend
         end
 
+        opts.on(CONFLAGS[:no_prepend], "Don't prepend any tests before the rest of the suite") do |no_prepend|
+          config.no_prepend = true # Apparently optparse will treat --no-.* options as false
+        end
+
         opts.on("-l", "#{CONFLAGS[:load_paths]} PATH", Array, "Add one or more paths to the $LOAD_PATH (Default: [\"test\"])") do |load_path|
           config.load_paths += load_path
         end
@@ -45,7 +49,7 @@ class TLDR
         end
 
         opts.on(CONFLAGS[:no_emoji], "Disable emoji in the output") do |no_emoji|
-          config.no_emoji = true # Apparently optparse will treat --no-.* options as false
+          config.no_emoji = true
         end
 
         opts.on("-v", CONFLAGS[:verbose], "Print stack traces for errors") do |verbose|
