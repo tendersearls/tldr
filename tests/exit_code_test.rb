@@ -15,11 +15,11 @@ class ExitCodeTest < Minitest::Test
     assert_includes result.stdout, "😡"
     assert_includes result.stderr, <<~MSG
       1) Failure:
-      FailTest#test_fails [test/fixture/fail.rb:3]:
+      FailTest#test_fails [tests/fixture/fail.rb:3]:
       Expected false to be truthy
 
       Re-run this test:
-        bundle exec tldr "test/fixture/fail.rb:2"
+        bundle exec tldr "tests/fixture/fail.rb:2"
     MSG
     assert_equal 1, result.exit_code
   end
@@ -30,11 +30,11 @@ class ExitCodeTest < Minitest::Test
     assert_includes result.stdout, "🤬"
     assert_includes result.stderr, <<~MSG
       1) Error:
-      ErrorTest#test_errors [test/fixture/error.rb:3]:
+      ErrorTest#test_errors [tests/fixture/error.rb:3]:
       💥
 
       Re-run this test:
-        bundle exec tldr "test/fixture/error.rb:2"
+        bundle exec tldr "tests/fixture/error.rb:2"
     MSG
     assert_equal 2, result.exit_code
   end
@@ -44,10 +44,10 @@ class ExitCodeTest < Minitest::Test
 
     assert_includes result.stderr, <<~MSG
       1) Skip:
-      SuccessTest#test_skips [test/fixture/skip.rb:3]:
+      SuccessTest#test_skips [tests/fixture/skip.rb:3]:
 
       Re-run this test:
-        bundle exec tldr "test/fixture/skip.rb:2"
+        bundle exec tldr "tests/fixture/skip.rb:2"
     MSG
     assert_equal 0, result.exit_code
     assert_includes result.stdout, "🫥"

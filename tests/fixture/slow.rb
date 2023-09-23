@@ -1,4 +1,4 @@
-# Designed to be run with: tldr --seed 1 "test/fixture/slow.rb"
+# Designed to be run with: tldr --seed 1 "tests/fixture/slow.rb"
 class Slow < TLDR
   def test_one
     zzz
