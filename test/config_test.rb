@@ -66,11 +66,34 @@ class ConfigTest < Minitest::Test
     )
 
     assert_equal <<~MSG.chomp, config.to_full_args
-      --seed 1 --helper "test_helper.rb" --load-path "app" --load-path "/lol/ok/lib" --workers 1 --prepend "foo.rb" --exclude-path "bar.rb" "baz.rb"
+      --seed 1 --helper "test_helper.rb" --load-path "app" --load-path "/lol/ok/lib" --prepend "foo.rb" --exclude-path "bar.rb" "baz.rb"
     MSG
 
     assert_equal <<~MSG.chomp, config.to_single_path_args("#{Dir.pwd}/baz.rb")
       --helper "test_helper.rb" --load-path "app" --load-path "/lol/ok/lib" "baz.rb"
+    MSG
+  end
+
+  def test_cli_summary_ignores_prepend_when_it_matches_paths
+    config = TLDR::Config.new(
+      seed: 1,
+      prepend_tests: ["#{Dir.pwd}/foo.rb", "bar.rb"],
+      paths: ["#{Dir.pwd}/bar.rb", "foo.rb"]
+    )
+
+    assert_equal <<~MSG.chomp, config.to_full_args
+      --seed 1 "bar.rb" "foo.rb"
+    MSG
+  end
+
+  def test_cli_summary_ignores_workers_when_seed_is_set
+    config = TLDR::Config.new(
+      seed: 1,
+      paths: ["foo.rb"]
+    )
+
+    assert_equal <<~MSG.chomp, config.to_full_args
+      --seed 1 "foo.rb"
     MSG
   end
 end

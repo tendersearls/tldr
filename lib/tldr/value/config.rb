@@ -112,6 +112,18 @@ class TLDR
       options.map { |key|
         flag = CONFLAGS[key]
 
+        # Special cases
+        if key == :prepend_tests
+          # Don't print prepended tests if they're the same as the tests.
+          # This implementation seems very wrong.
+          if prepend_tests.map { |s| stringify(key, s) }.sort == paths.map { |s| stringify(:paths, s) }.sort
+            next
+          end
+        elsif key == :workers && workers == 1 && !seed.nil?
+          # Don't need to print workers when seed is set, since it'll be toggled to 1 when initialized
+          next
+        end
+
         if defaults[key] == self[key]
           next
         elsif self[key].is_a?(Array)
