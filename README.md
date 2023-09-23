@@ -15,6 +15,7 @@ Some stuff you might like:
 by names or patterns (e.g. `--name test_fail,test_error --name "/_\d/"`)
 * Everything is **parallel by default**, with as many workers as processor cores
 on your machine (set with `--workers 42`)
+* Surprisingly delightful color diff output when two things fail to equal one another, care of [@mcmire's super_diff gem](https://github.com/mcmire/super_diff)
 * By default, the CLI will prepend your most-recently-edited test file to the
 front of your suite so its tests will run first. The tests you're working on are
 the most likely you care about running, so TLDR runs them first (see the
