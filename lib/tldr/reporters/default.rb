@@ -9,7 +9,7 @@ class TLDR
       def before_suite tests
         @suite_start_time = Process.clock_gettime Process::CLOCK_MONOTONIC, :microsecond
         @out.print <<~MSG
-          Options: #{tldr_command} #{@config.to_full_args}
+          Command: #{tldr_command} #{@config.to_full_args}
 
           #{@icons.run} Running:
 

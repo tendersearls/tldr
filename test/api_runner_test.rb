@@ -5,7 +5,7 @@ class ApiRunnerTest < Minitest::Test
     result = TLDRunner.run_command "bundle exec ruby test/driver/api_runner.rb"
 
     assert_includes result.stdout, <<~MSG
-      Options: bundle exec tldr --seed 1 "test/fixture/c.rb"
+      Command: bundle exec tldr --seed 1 "test/fixture/c.rb"
 
       🏃 Running:
 
