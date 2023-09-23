@@ -38,7 +38,7 @@ class ConfigTest < Minitest::Test
   def test_cli_conversion_with_custom_options
     config = TLDR::Config.new(
       seed: 42,
-      skip_test_helper: true,
+      no_helper: true,
       verbose: true,
       reporter: TLDR::Reporters::Base,
       helper: "test_helper.rb",
@@ -49,15 +49,16 @@ class ConfigTest < Minitest::Test
       prepend_tests: ["a.rb:3"],
       paths: ["a.rb:3", "b.rb"],
       exclude_paths: ["c.rb:4"],
-      no_prepend: true
+      no_prepend: true,
+      exclude_names: "test_b_1"
     )
 
     assert_equal <<~MSG.chomp, config.to_full_args
-      --seed 42 --skip-test-helper --verbose --reporter TLDR::Reporters::Base --helper "test_helper.rb" --load-path "app" --load-path "lib" --workers 3 --name "/test_*/" --name "test_it" --fail-fast --prepend "a.rb:3" --no-prepend --exclude-path "c.rb:4" "a.rb:3" "b.rb"
+      --seed 42 --no-helper --verbose --reporter TLDR::Reporters::Base --helper "test_helper.rb" --load-path "app" --load-path "lib" --workers 3 --name "/test_*/" --name "test_it" --fail-fast --prepend "a.rb:3" --no-prepend --exclude-path "c.rb:4" --exclude-name "test_b_1" "a.rb:3" "b.rb"
     MSG
 
     assert_equal <<~MSG.chomp, config.to_single_path_args("lol.rb")
-      --skip-test-helper --verbose --reporter TLDR::Reporters::Base --helper "test_helper.rb" --load-path "app" --load-path "lib" "lol.rb"
+      --no-helper --verbose --reporter TLDR::Reporters::Base --helper "test_helper.rb" --load-path "app" --load-path "lib" --exclude-name "test_b_1" "lol.rb"
     MSG
   end
 

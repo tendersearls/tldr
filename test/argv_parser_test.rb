@@ -8,7 +8,7 @@ class ArgvParserTest < Minitest::Test
       "-v",
       "foo.rb:3",
       "--reporter", "TLDR::Reporters::Base",
-      "--skip-test-helper",
+      "--no-helper",
       "--helper", "spec/spec_helper.rb",
       "-l", "lib",
       "-l", "vendor,spec",
@@ -20,7 +20,7 @@ class ArgvParserTest < Minitest::Test
 
     assert_equal ["bar.rb", "foo.rb:3"], result.paths
     assert_equal 42, result.seed
-    assert result.skip_test_helper
+    assert result.no_helper
     assert result.verbose
     assert_equal TLDR::Reporters::Base, result.reporter
     assert_equal "spec/spec_helper.rb", result.helper
@@ -35,7 +35,7 @@ class ArgvParserTest < Minitest::Test
 
     assert_equal Dir["test/**/*_test.rb", "test/**/test_*.rb"], result.paths
     assert_includes 0..10_000, result.seed
-    refute result.skip_test_helper
+    refute result.no_helper
     refute result.verbose
     assert_equal TLDR::Reporters::Default, result.reporter
     assert_equal "test/helper.rb", result.helper

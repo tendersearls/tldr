@@ -25,6 +25,14 @@ class NameFiltersTest < Minitest::Test
     assert_includes result.stdout, "3️⃣"
   end
 
+  def test_with_pattern_with_comma
+    result = TLDRunner.should_succeed "name_filters.rb", "--name \"/test_my_[second]{1,6}_case/,test_my_first_case,/test_a_[third]{4,5}_case/\""
+
+    assert_includes result.stdout, "1️⃣"
+    assert_includes result.stdout, "2️⃣"
+    assert_includes result.stdout, "3️⃣"
+  end
+
   def test_with_class_name_and_regex
     result = TLDRunner.should_succeed "name_filters.rb", "--name \"/.*Filters#test_(a|my)_(second|third)_case/\""
 

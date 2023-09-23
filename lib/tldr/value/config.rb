@@ -3,7 +3,7 @@ require "concurrent"
 class TLDR
   CONFLAGS = {
     seed: "--seed",
-    skip_test_helper: "--skip-test-helper",
+    no_helper: "--no-helper",
     verbose: "--verbose",
     reporter: "--reporter",
     helper: "--helper",
@@ -15,15 +15,16 @@ class TLDR
     prepend_tests: "--prepend",
     no_prepend: "--no-prepend",
     exclude_paths: "--exclude-path",
+    exclude_names: "--exclude-name",
     paths: nil
   }.freeze
 
   PATH_FLAGS = [:paths, :helper, :load_paths, :prepend_tests, :exclude_paths].freeze
   MOST_RECENTLY_MODIFIED_TAG = "MOST_RECENTLY_MODIFIED".freeze
 
-  Config = Struct.new :paths, :seed, :skip_test_helper, :verbose, :reporter,
+  Config = Struct.new :paths, :seed, :no_helper, :verbose, :reporter,
     :helper, :load_paths, :workers, :names, :fail_fast, :no_emoji,
-    :prepend_tests, :no_prepend, :exclude_paths,
+    :prepend_tests, :no_prepend, :exclude_paths, :exclude_names,
     keyword_init: true do
     def initialize(*args)
       super
@@ -32,13 +33,14 @@ class TLDR
       self.names ||= []
       self.prepend_tests ||= []
       self.exclude_paths ||= []
+      self.exclude_names ||= []
     end
 
     def self.build_defaults
       {
         paths: Dir["test/**/*_test.rb", "test/**/test_*.rb"],
         seed: rand(10_000),
-        skip_test_helper: false,
+        no_helper: false,
         verbose: false,
         reporter: Reporters::Default,
         helper: "test/helper.rb",
@@ -49,7 +51,8 @@ class TLDR
         no_emoji: false,
         prepend_tests: [MOST_RECENTLY_MODIFIED_TAG],
         no_prepend: false,
-        exclude_paths: []
+        exclude_paths: [],
+        exclude_names: []
       }
     end
 
@@ -62,12 +65,12 @@ class TLDR
       end
 
       # Arrays
-      [:paths, :load_paths, :names, :prepend_tests, :exclude_paths].each do |key|
+      [:paths, :load_paths, :names, :prepend_tests, :exclude_paths, :exclude_names].each do |key|
         self[key] = defaults[key] if self[key].empty?
       end
 
       # Booleans
-      [:skip_test_helper, :verbose, :fail_fast, :no_emoji, :no_prepend].each do |key|
+      [:no_helper, :verbose, :fail_fast, :no_emoji, :no_prepend].each do |key|
         self[key] = defaults[key] if self[key].nil?
       end
 

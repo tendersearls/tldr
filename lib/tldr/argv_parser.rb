@@ -2,6 +2,8 @@ require "optparse"
 
 class TLDR
   class ArgvParser
+    PATTERN_FRIENDLY_SPLITTER = /,(?=(?:[^\/]*\/[^\/]*\/)*[^\/]*$)/
+
     def parse(args)
       config = Config.new
 
@@ -12,10 +14,6 @@ class TLDR
           config.fail_fast = fail_fast
         end
 
-        opts.on("-n", "#{CONFLAGS[:names]} PATTERN", Array, "One or more names or /pattern/ of tests to run (like: foo_test, /foo_.*/, Foo#foo_test)") do |name|
-          config.names += name
-        end
-
         opts.on("-s", "#{CONFLAGS[:seed]} SEED", Integer, "Seed for randomization") do |seed|
           config.seed = seed
         end
@@ -24,35 +22,43 @@ class TLDR
           config.workers = workers
         end
 
-        opts.on("#{CONFLAGS[:helper]} HELPER", String, "Path to a test helper to load before any tests (Default: \"test/helper.rb\")") do |helper|
-          config.helper = helper
+        opts.on("-n", "#{CONFLAGS[:names]} PATTERN", "One or more names or /patterns/ of tests to run (like: foo_test, /test_foo.*/, Foo#foo_test)") do |name|
+          config.names += name.split PATTERN_FRIENDLY_SPLITTER
         end
 
-        opts.on(CONFLAGS[:skip_test_helper], "Don't try loading a test helper before the tests") do |skip_test_helper|
-          config.skip_test_helper = skip_test_helper
-        end
-
-        opts.on("#{CONFLAGS[:prepend_tests]} PATH", Array, "Prepend one or more paths to run first (Default: your most recently modified test)") do |prepend|
-          config.prepend_tests += prepend
-        end
-
-        opts.on(CONFLAGS[:no_prepend], "Don't prepend any tests before the rest of the suite") do |no_prepend|
-          config.no_prepend = true # Apparently optparse will treat --no-.* options as false
-        end
-
-        opts.on("-l", "#{CONFLAGS[:load_paths]} PATH", Array, "Add one or more paths to the $LOAD_PATH (Default: [\"test\"])") do |load_path|
-          config.load_paths += load_path
+        opts.on("#{CONFLAGS[:exclude_names]} PATTERN", "One or more names or /patterns/ NOT to run") do |exclude_name|
+          config.exclude_names += exclude_name.split PATTERN_FRIENDLY_SPLITTER
         end
 
         opts.on("#{CONFLAGS[:exclude_paths]} PATH", Array, "One or more paths NOT to run (like: foo.rb, \"test/bar/**\", baz.rb:3)") do |path|
           config.exclude_paths += path
         end
 
+        opts.on("#{CONFLAGS[:helper]} HELPER", String, "Path to a test helper to load before any tests (Default: \"test/helper.rb\")") do |helper|
+          config.helper = helper
+        end
+
+        opts.on(CONFLAGS[:no_helper], "Don't try loading a test helper before the tests") do
+          config.no_helper = true
+        end
+
+        opts.on("#{CONFLAGS[:prepend_tests]} PATH", Array, "Prepend one or more paths to run before the rest (Default: most recently modified test)") do |prepend|
+          config.prepend_tests += prepend
+        end
+
+        opts.on(CONFLAGS[:no_prepend], "Don't prepend any tests before the rest of the suite") do
+          config.no_prepend = true
+        end
+
+        opts.on("-l", "#{CONFLAGS[:load_paths]} PATH", Array, "Add one or more paths to the $LOAD_PATH (Default: [\"test\"])") do |load_path|
+          config.load_paths += load_path
+        end
+
         opts.on("-r", "#{CONFLAGS[:reporter]} REPORTER", String, "Custom reporter class (Default: \"TLDR::Reporters::Default\")") do |reporter|
           config.reporter = Kernel.const_get(reporter)
         end
 
-        opts.on(CONFLAGS[:no_emoji], "Disable emoji in the output") do |no_emoji|
+        opts.on(CONFLAGS[:no_emoji], "Disable emoji in the output") do
           config.no_emoji = true
         end
 

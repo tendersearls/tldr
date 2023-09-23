@@ -15,9 +15,12 @@ class TLDR
       Plan.new prepend(
         shuffle(
           exclude_by_path(
-            filter_by_line(
-              filter_by_name(tests, config.names),
-              search_locations
+            exclude_by_name(
+              filter_by_line(
+                filter_by_name(tests, config.names),
+                search_locations
+              ),
+              config.exclude_names
             ),
             config.exclude_paths
           ),
@@ -42,23 +45,6 @@ class TLDR
           [Location.new(absolute_path, nil)]
         end
       }.uniq
-    end
-
-    # Because search paths to TLDR can include line numbers (e.g. a.rb:4), we
-    # can't just pass everything to Dir.glob. Instead, we have to check whether
-    # a user-provided search path looks like a glob, and if so, expand it
-    #
-    # Globby characters specified here:
-    # https://ruby-doc.org/3.2.2/Dir.html#method-c-glob
-    def expand_globs search_paths
-      search_paths.flat_map { |search_path|
-        if search_path.match?(/[*?\[\]{}]/)
-          raise Error, "Can't combine globs and line numbers in: #{search_path}" if search_path.match?(/:(\d+)$/)
-          Dir[search_path]
-        else
-          search_path
-        end
-      }
     end
 
     def gather_tests
@@ -92,6 +78,18 @@ class TLDR
       }
     end
 
+    def exclude_by_name tests, exclude_names
+      return tests if exclude_names.empty?
+
+      name_excludes = expand_names_with_patterns exclude_names
+
+      tests.reject { |test|
+        name_excludes.any? { |filter|
+          filter === test.method.to_s || filter === "#{test.klass}##{test.method}"
+        }
+      }
+    end
+
     def filter_by_line tests, search_locations
       line_specific_locations = search_locations.reject { |location| location.line.nil? }
       return tests if line_specific_locations.empty?
@@ -104,13 +102,7 @@ class TLDR
     def filter_by_name tests, names
       return tests if names.empty?
 
-      name_filters = names.map { |name|
-        if name.is_a?(String) && name =~ /^\/(.*)\/$/
-          Regexp.new $1
-        else
-          name
-        end
-      }
+      name_filters = expand_names_with_patterns names
 
       tests.select { |test|
         name_filters.any? { |filter|
@@ -126,7 +118,7 @@ class TLDR
     end
 
     def require_test_helper config
-      return if config.skip_test_helper || !File.exist?(config.helper)
+      return if config.no_helper || !File.exist?(config.helper)
       require File.expand_path(config.helper, Dir.pwd)
     end
 
@@ -145,6 +137,33 @@ class TLDR
     def locations_include_test? locations, test
       locations.any? { |location|
         location.file == test.file && (location.line.nil? || test.covers_line?(location.line))
+      }
+    end
+
+    # Because search paths to TLDR can include line numbers (e.g. a.rb:4), we
+    # can't just pass everything to Dir.glob. Instead, we have to check whether
+    # a user-provided search path looks like a glob, and if so, expand it
+    #
+    # Globby characters specified here:
+    # https://ruby-doc.org/3.2.2/Dir.html#method-c-glob
+    def expand_globs search_paths
+      search_paths.flat_map { |search_path|
+        if search_path.match?(/[*?\[\]{}]/)
+          raise Error, "Can't combine globs and line numbers in: #{search_path}" if search_path.match?(/:(\d+)$/)
+          Dir[search_path]
+        else
+          search_path
+        end
+      }
+    end
+
+    def expand_names_with_patterns names
+      names.map { |name|
+        if name.is_a?(String) && name =~ /^\/(.*)\/$/
+          Regexp.new $1
+        else
+          name
+        end
       }
     end
   end

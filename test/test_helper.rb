@@ -18,6 +18,12 @@ class Minitest::Test
     end
   end
 
+  def assert_includes_none haystack, needles
+    unless needles.none? { |needle| haystack.include? needle }
+      raise Minitest::Assertion, "Expected none of #{needles.inspect} to be found in in:\n\n---\n#{haystack}\n---"
+    end
+  end
+
   def assert_strings_appear_in_this_order haystack, needles
     og_haystack = haystack
     needles.each.with_index do |needle, i|
