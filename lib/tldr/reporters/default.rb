@@ -128,7 +128,7 @@ class TLDR
         rule = @icons.alarm + "=" * 20 + " ABORTED RUN " + "=" * 20 + @icons.alarm
         @err.print "#{rule}\n\n"
         yield
-        @err.print "\n\n#{rule}"
+        @err.print "\n\n#{rule}\n\n"
       end
 
       def describe_tests_that_didnt_finish planned_tests, test_results
