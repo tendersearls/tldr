@@ -89,7 +89,7 @@ class TLDR
         else
           path
         end
-      }
+      }.compact
     end
 
     def to_full_args(exclude: [])
@@ -151,6 +151,8 @@ class TLDR
     end
 
     def most_recently_modified_test_file(tests)
+      return if tests.empty?
+
       tests.max_by { |test| File.mtime(test.file) }.file
     end
   end
