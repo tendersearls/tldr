@@ -50,26 +50,9 @@ class PrependTest < Minitest::Test
     assert_strings_appear_in_this_order result.stdout, ["B3", "B2", "A2", "B1", "A1", "A3"]
   end
 
-  private
+  def test_globs
+    result = TLDRunner.should_succeed ["folder/*.rb", "c.rb"], "--prepend \"test/fixture/folder/*.rb\" --seed 1"
 
-  def assert_strings_appear_in_this_order haystack, needles
-    og_haystack = haystack
-    needles.each.with_index do |needle, i|
-      index = haystack.index(needle)
-      raise Minitest::Assertion, "#{needle.inspect} (string ##{i + 1} in #{needles.inspect}) not found in order in:\n\n---\n#{og_haystack}\n---" unless index
-
-      haystack = haystack[(index + needle.length)..]
-    end
-  end
-
-  def assert_these_appear_before_these haystack, before, after
-    og_haystack = haystack
-    before.each.with_index do |needle, i|
-      index = haystack.index(needle)
-
-      if (after_needle = after.find { |after_needle| haystack.index(after_needle) < index })
-        raise Minitest::Assertion, "#{needle.inspect} was expected to be found before #{after_needle.inspect} in:\n\n---\n#{og_haystack}\n---"
-      end
-    end
+    assert_these_appear_before_these result.stdout, ["A1", "A2", "A3", "B1", "B2", "B3"], ["C1", "C2", "C3"]
   end
 end

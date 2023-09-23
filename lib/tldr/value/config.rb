@@ -14,6 +14,7 @@ class TLDR
     no_emoji: "--no-emoji",
     prepend_tests: "--prepend",
     no_prepend: "--no-prepend",
+    exclude_paths: "--exclude-path",
     paths: nil
   }.freeze
 
@@ -21,7 +22,7 @@ class TLDR
 
   Config = Struct.new :paths, :seed, :skip_test_helper, :verbose, :reporter,
     :helper, :load_paths, :workers, :names, :fail_fast, :no_emoji,
-    :prepend_tests, :no_prepend,
+    :prepend_tests, :no_prepend, :exclude_paths,
     keyword_init: true do
     def initialize(*args)
       super
@@ -29,6 +30,7 @@ class TLDR
       self.load_paths ||= []
       self.names ||= []
       self.prepend_tests ||= []
+      self.exclude_paths ||= []
     end
 
     def self.build_defaults
@@ -45,7 +47,8 @@ class TLDR
         fail_fast: false,
         no_emoji: false,
         prepend_tests: [MOST_RECENTLY_MODIFIED_TAG],
-        no_prepend: false
+        no_prepend: false,
+        exclude_paths: []
       }
     end
 
@@ -58,7 +61,7 @@ class TLDR
       end
 
       # Arrays
-      [:paths, :load_paths, :names, :prepend_tests].each do |key|
+      [:paths, :load_paths, :names, :prepend_tests, :exclude_paths].each do |key|
         self[key] = defaults[key] if self[key].empty?
       end
 
@@ -94,7 +97,8 @@ class TLDR
 
     def to_single_path_args(path)
       argv = to_cli_argv(CONFLAGS.keys - [
-        :seed, :workers, :names, :fail_fast, :paths, :prepend_tests, :no_prepend
+        :seed, :workers, :names, :fail_fast, :paths, :prepend_tests,
+        :no_prepend, :exclude_paths
       ])
 
       (argv + [bad_escape(path)]).join(" ")

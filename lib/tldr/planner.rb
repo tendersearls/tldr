@@ -14,9 +14,12 @@ class TLDR
 
       Plan.new prepend(
         shuffle(
-          filter_by_line(
-            filter_by_name(tests, config.names),
-            search_locations
+          exclude_by_path(
+            filter_by_line(
+              filter_by_name(tests, config.names),
+              search_locations
+            ),
+            config.exclude_paths
           ),
           config.seed
         ),
@@ -41,6 +44,23 @@ class TLDR
       }.uniq
     end
 
+    # Because search paths to TLDR can include line numbers (e.g. a.rb:4), we
+    # can't just pass everything to Dir.glob. Instead, we have to check whether
+    # a user-provided search path looks like a glob, and if so, expand it
+    #
+    # Globby characters specified here:
+    # https://ruby-doc.org/3.2.2/Dir.html#method-c-glob
+    def expand_globs search_paths
+      search_paths.flat_map { |search_path|
+        if search_path.match?(/[*?\[\]{}]/)
+          raise Error, "Can't combine globs and line numbers in: #{search_path}" if search_path.match?(/:(\d+)$/)
+          Dir[search_path]
+        else
+          search_path
+        end
+      }
+    end
+
     def gather_tests
       gather_descendants(TLDR).flat_map { |subklass|
         subklass.instance_methods.grep(/^test_/).sort.map { |method|
@@ -52,11 +72,9 @@ class TLDR
 
     def prepend tests, config
       return tests if config.no_prepend
-      prepended_locations = expand_search_locations(config.prepend_tests)
+      prepended_locations = expand_search_locations expand_globs config.prepend_tests
       prepended, rest = tests.partition { |test|
-        prepended_locations.any? { |prepend|
-          prepend.file == test.file && (prepend.line.nil? || test.covers_line?(prepend.line))
-        }
+        locations_include_test? prepended_locations, test
       }
       prepended + rest
     end
@@ -65,14 +83,21 @@ class TLDR
       tests.shuffle(random: Random.new(seed))
     end
 
+    def exclude_by_path tests, exclude_paths
+      excluded_locations = expand_search_locations expand_globs exclude_paths
+      return tests if excluded_locations.empty?
+
+      tests.reject { |test|
+        locations_include_test? excluded_locations, test
+      }
+    end
+
     def filter_by_line tests, search_locations
       line_specific_locations = search_locations.reject { |location| location.line.nil? }
       return tests if line_specific_locations.empty?
 
       tests.select { |test|
-        line_specific_locations.any? { |location|
-          location.file == test.file && test.covers_line?(location.line)
-        }
+        locations_include_test? line_specific_locations, test
       }
     end
 
@@ -114,6 +139,12 @@ class TLDR
     def gather_descendants root_klass
       root_klass.subclasses + root_klass.subclasses.flat_map { |subklass|
         gather_descendants subklass
+      }
+    end
+
+    def locations_include_test? locations, test
+      locations.any? { |location|
+        location.file == test.file && (location.line.nil? || test.covers_line?(location.line))
       }
     end
   end

@@ -6,6 +6,36 @@ require "minitest/autorun"
 
 class Minitest::Test
   make_my_diffs_pretty!
+
+  protected
+
+  private
+
+  def assert_includes_all haystack, needles
+    unless needles.all? { |needle| haystack.include? needle }
+      raise Minitest::Assertion, "Expected all of #{needles.inspect} to be found in in:\n\n---\n#{haystack}\n---"
+    end
+  end
+
+  def assert_strings_appear_in_this_order haystack, needles
+    og_haystack = haystack
+    needles.each.with_index do |needle, i|
+      index = haystack.index(needle)
+      raise Minitest::Assertion, "#{needle.inspect} (string ##{i + 1} in #{needles.inspect}) not found in order in:\n\n---\n#{og_haystack}\n---" unless index
+
+      haystack = haystack[(index + needle.length)..]
+    end
+  end
+
+  def assert_these_appear_before_these haystack, before, after
+    before.each.with_index do |needle, i|
+      index = haystack.index(needle)
+
+      if (after_needle = after.find { |after_needle| haystack.index(after_needle) < index })
+        raise Minitest::Assertion, "#{needle.inspect} was expected to be found before #{after_needle.inspect} in:\n\n---\n#{haystack}\n---"
+      end
+    end
+  end
 end
 
 module TLDRunner

@@ -20,7 +20,7 @@ class TLDR
           config.seed = seed
         end
 
-        opts.on("#{CONFLAGS[:workers]} WORKERS", Integer, "Number of parallel workers (Default: your processor count (#{Concurrent.processor_count}), 1 if a seed is set)") do |workers|
+        opts.on("#{CONFLAGS[:workers]} WORKERS", Integer, "Number of parallel workers (Default: your processor count (#{Concurrent.processor_count}); 1 if a seed is set)") do |workers|
           config.workers = workers
         end
 
@@ -32,8 +32,8 @@ class TLDR
           config.skip_test_helper = skip_test_helper
         end
 
-        opts.on("#{CONFLAGS[:prepend_tests]} PATH", String, "Prepend one or more paths to run first (Default: your most recently modified test)") do |prepend|
-          config.prepend_tests << prepend
+        opts.on("#{CONFLAGS[:prepend_tests]} PATH", Array, "Prepend one or more paths to run first (Default: your most recently modified test)") do |prepend|
+          config.prepend_tests += prepend
         end
 
         opts.on(CONFLAGS[:no_prepend], "Don't prepend any tests before the rest of the suite") do |no_prepend|
@@ -42,6 +42,10 @@ class TLDR
 
         opts.on("-l", "#{CONFLAGS[:load_paths]} PATH", Array, "Add one or more paths to the $LOAD_PATH (Default: [\"test\"])") do |load_path|
           config.load_paths += load_path
+        end
+
+        opts.on("#{CONFLAGS[:exclude_paths]} PATH", Array, "One or more paths NOT to run (like: foo.rb, \"test/bar/**\", baz.rb:3)") do |path|
+          config.exclude_paths += path
         end
 
         opts.on("-r", "#{CONFLAGS[:reporter]} REPORTER", String, "Custom reporter class (Default: \"TLDR::Reporters::Default\")") do |reporter|
