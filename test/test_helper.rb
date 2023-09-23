@@ -94,4 +94,15 @@ module TLDRunner
       success?: status.success?
     )
   end
+
+  def self.run_command command
+    stdout, stderr, status = Open3.capture3 command
+
+    Result.new(
+      stdout: stdout.chomp,
+      stderr: stderr.chomp,
+      exit_code: status.exitstatus,
+      success?: status.success?
+    )
+  end
 end
