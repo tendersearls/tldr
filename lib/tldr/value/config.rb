@@ -18,6 +18,7 @@ class TLDR
     paths: nil
   }.freeze
 
+  PATH_FLAGS = [:paths, :helper, :load_paths, :prepend_tests, :exclude_paths].freeze
   MOST_RECENTLY_MODIFIED_TAG = "MOST_RECENTLY_MODIFIED".freeze
 
   Config = Struct.new :paths, :seed, :skip_test_helper, :verbose, :reporter,
@@ -101,7 +102,7 @@ class TLDR
         :no_prepend, :exclude_paths
       ])
 
-      (argv + [bad_escape(path)]).join(" ")
+      (argv + [stringify(:paths, path)]).join(" ")
     end
 
     private
@@ -114,18 +115,22 @@ class TLDR
         if defaults[key] == self[key]
           next
         elsif self[key].is_a?(Array)
-          self[key].map { |value| [flag, bad_escape(value)] }
+          self[key].map { |value| [flag, stringify(key, value)] }
         elsif self[key].is_a?(TrueClass) || self[key].is_a?(FalseClass)
           flag if self[key]
         elsif self[key].is_a?(Class)
           [flag, self[key].name]
         elsif !self[key].nil?
-          [flag, bad_escape(self[key])]
+          [flag, stringify(key, self[key])]
         end
       }.flatten.compact
     end
 
-    def bad_escape val
+    def stringify key, val
+      if PATH_FLAGS.include?(key) && val.start_with?(Dir.pwd)
+        val = val[Dir.pwd.length + 1..]
+      end
+
       if val.nil? || val.is_a?(Integer)
         val
       else

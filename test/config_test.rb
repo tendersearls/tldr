@@ -60,4 +60,22 @@ class ConfigTest < Minitest::Test
       --skip-test-helper --verbose --reporter TLDR::Reporters::Base --helper "test_helper.rb" --load-path "app" --load-path "lib" "lol.rb"
     MSG
   end
+
+  def test_cli_conversion_cuts_off_prepended_pwd
+    config = TLDR::Config.new(
+      helper: "#{Dir.pwd}/test_helper.rb",
+      load_paths: ["#{Dir.pwd}/app", "/lol/ok/lib"],
+      prepend_tests: ["#{Dir.pwd}/foo.rb"],
+      exclude_paths: ["#{Dir.pwd}/bar.rb"],
+      paths: ["#{Dir.pwd}/baz.rb"]
+    )
+
+    assert_equal <<~MSG.chomp, config.to_full_args
+      --helper "test_helper.rb" --load-path "app" --load-path "/lol/ok/lib" --prepend "foo.rb" --exclude-path "bar.rb" "baz.rb"
+    MSG
+
+    assert_equal <<~MSG.chomp, config.to_single_path_args("#{Dir.pwd}/baz.rb")
+      --helper "test_helper.rb" --load-path "app" --load-path "/lol/ok/lib" "baz.rb"
+    MSG
+  end
 end
