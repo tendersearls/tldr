@@ -37,8 +37,6 @@ class PrependTest < Minitest::Test
   end
 
   def test_no_prepend_does_not_prepend
-    FileUtils.touch("test/fixture/folder/a.rb")
-
     result = TLDRunner.should_succeed ["folder/a.rb", "folder/b.rb"], "--seed 1 --no-prepend"
 
     assert_strings_appear_in_this_order result.stdout, ["B3", "B2", "A2", "B1", "A1", "A3"]
