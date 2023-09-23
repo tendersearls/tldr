@@ -3,9 +3,11 @@ require "pathname"
 class TLDR
   class Planner
     def plan config
-      require_load_paths config
+      search_locations = expand_search_locations config.paths
+
+      prepend_load_paths config
       require_test_helper config
-      require_tests config.paths
+      require_tests search_locations
 
       tests = gather_tests
       config.update_after_gathering_tests! tests
@@ -14,7 +16,7 @@ class TLDR
         shuffle(
           filter_by_line(
             filter_by_name(tests, config.names),
-            config.paths
+            search_locations
           ),
           config.seed
         ),
@@ -23,6 +25,21 @@ class TLDR
     end
 
     private
+
+    def expand_search_locations path_strings
+      path_strings.flat_map { |path_string|
+        File.directory?(path_string) ? Dir["#{path_string}/**/*.rb"] : path_string
+      }.flat_map { |path_string|
+        absolute_path = File.expand_path(path_string.gsub(/:.*$/, ""), Dir.pwd)
+        line_numbers = path_string.scan(/:(\d+)/).flatten.map(&:to_i)
+
+        if line_numbers.any?
+          line_numbers.map { |line_number| Location.new absolute_path, line_number }
+        else
+          [Location.new(absolute_path, nil)]
+        end
+      }.uniq
+    end
 
     def gather_tests
       gather_descendants(TLDR).flat_map { |subklass|
@@ -35,9 +52,7 @@ class TLDR
 
     def prepend tests, config
       return tests if config.no_prepend
-      prepended_locations = config.prepend_tests.flat_map { |path|
-        path_input_to_locations path
-      }
+      prepended_locations = expand_search_locations(config.prepend_tests)
       prepended, rest = tests.partition { |test|
         prepended_locations.any? { |prepend|
           prepend.file == test.file && (prepend.line.nil? || test.covers_line?(prepend.line))
@@ -50,26 +65,15 @@ class TLDR
       tests.shuffle(random: Random.new(seed))
     end
 
-    def filter_by_line tests, paths
-      line_filters = parse_line_filters paths
-      return tests if line_filters.empty?
+    def filter_by_line tests, search_locations
+      line_specific_locations = search_locations.reject { |location| location.line.nil? }
+      return tests if line_specific_locations.empty?
 
       tests.select { |test|
-        line_filters[test.file].any? { |line|
-          test.covers_line? line
+        line_specific_locations.any? { |location|
+          location.file == test.file && test.covers_line?(location.line)
         }
       }
-    end
-
-    def path_input_to_locations path
-      file_path = absolutify_path path
-      line_numbers = path.scan(/:(\d+)/).flatten.map(&:to_i).sort
-
-      if line_numbers.any?
-        line_numbers.map { |line_number| Location.new file_path, line_number }
-      else
-        [Location.new(file_path, nil)]
-      end
     end
 
     def filter_by_name tests, names
@@ -90,7 +94,7 @@ class TLDR
       }
     end
 
-    def require_load_paths config
+    def prepend_load_paths config
       config.load_paths.each do |load_path|
         $LOAD_PATH.unshift File.expand_path(load_path, Dir.pwd)
       end
@@ -101,34 +105,16 @@ class TLDR
       require File.expand_path(config.helper, Dir.pwd)
     end
 
-    def require_tests paths
-      absolute_paths = paths.map { |arg| absolutify_path(arg) }.uniq
-      absolute_paths.each do |path|
-        require path
+    def require_tests search_locations
+      search_locations.each do |location|
+        require location.file
       end
-    end
-
-    def absolutify_path path
-      File.expand_path(path.gsub(/:.*$/, ""), Dir.pwd)
     end
 
     def gather_descendants root_klass
       root_klass.subclasses + root_klass.subclasses.flat_map { |subklass|
         gather_descendants subklass
       }
-    end
-
-    def parse_line_filters paths
-      filter_patterns = paths.select { |path| path.match?(/:\d+$/) }
-
-      Hash.new { |h, key| h[key] = [] }.tap do |line_filters|
-        filter_patterns.flat_map { |pattern|
-          file_path = absolutify_path pattern
-          line_numbers = pattern.scan(/:(\d+)/).flatten.map(&:to_i)
-
-          line_filters[file_path] = (line_filters[file_path] | line_numbers.map(&:to_i)).sort
-        }
-      end
     end
   end
 end
