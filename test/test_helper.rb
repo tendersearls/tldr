@@ -5,6 +5,7 @@ require "open3"
 require "minitest/autorun"
 
 class Minitest::Test
+  parallelize_me!
   make_my_diffs_pretty!
 
   protected

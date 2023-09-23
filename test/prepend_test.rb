@@ -26,19 +26,13 @@ class PrependTest < Minitest::Test
     assert_these_appear_before_these result.stdout, ["B1", "B2", "B3"], ["A1", "A2", "A3"]
   end
 
-  def test_modifying_a_prepends_a_by_default
+  def test_modifying_file_changes_prepend_default
     FileUtils.touch("test/fixture/folder/a.rb")
-
     result = TLDRunner.should_succeed ["folder/a.rb", "folder/b.rb"], "--seed 1"
-
     assert_these_appear_before_these result.stdout, ["A1", "A2", "A3"], ["B1", "B2", "B3"]
-  end
 
-  def test_modifying_a_prepends_b_by_default
     FileUtils.touch("test/fixture/folder/b.rb")
-
     result = TLDRunner.should_succeed ["folder/a.rb", "folder/b.rb"], "--seed 1"
-
     assert_these_appear_before_these result.stdout, ["B1", "B2", "B3"], ["A1", "A2", "A3"]
   end
 
