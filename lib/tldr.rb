@@ -18,7 +18,6 @@ class TLDR
   end
 
   def self.run config
-    config.set_defaults!
     Runner.new.run(config, Planner.new.plan(config))
   end
 end

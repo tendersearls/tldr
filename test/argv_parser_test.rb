@@ -31,7 +31,6 @@ class ArgvParserTest < Minitest::Test
 
   def test_defaults
     result = TLDR::ArgvParser.new.parse []
-    result.set_defaults!
 
     assert_equal Dir["test/**/*_test.rb", "test/**/test_*.rb"], result.paths
     assert_includes 0..10_000, result.seed

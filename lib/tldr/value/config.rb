@@ -26,14 +26,8 @@ class TLDR
     :helper, :load_paths, :workers, :names, :fail_fast, :no_emoji,
     :prepend_tests, :no_prepend, :exclude_paths, :exclude_names,
     keyword_init: true do
-    def initialize(*args)
-      super
-      self.paths ||= []
-      self.load_paths ||= []
-      self.names ||= []
-      self.prepend_tests ||= []
-      self.exclude_paths ||= []
-      self.exclude_names ||= []
+    def initialize(**args)
+      super(**merge_defaults(args))
     end
 
     def self.build_defaults
@@ -56,28 +50,31 @@ class TLDR
       }
     end
 
-    def set_defaults!
+    def merge_defaults(user_args)
+      merged_args = user_args.dup
       defaults = Config.build_defaults
 
       # Special cases
-      if workers.nil?
-        self.workers = seed.nil? ? defaults[:workers] : 1
+      if merged_args[:workers].nil?
+        merged_args[:workers] = merged_args[:seed].nil? ? defaults[:workers] : 1
       end
 
       # Arrays
       [:paths, :load_paths, :names, :prepend_tests, :exclude_paths, :exclude_names].each do |key|
-        self[key] = defaults[key] if self[key].empty?
+        merged_args[key] = defaults[key] if merged_args[key].nil? || merged_args[key].empty?
       end
 
       # Booleans
       [:no_helper, :verbose, :fail_fast, :no_emoji, :no_prepend].each do |key|
-        self[key] = defaults[key] if self[key].nil?
+        merged_args[key] = defaults[key] if merged_args[key].nil?
       end
 
       # Values
       [:seed, :reporter, :helper].each do |key|
-        self[key] ||= defaults[key]
+        merged_args[key] ||= defaults[key]
       end
+
+      merged_args
     end
 
     # We needed this hook (to be called by the planner), because we can't know
