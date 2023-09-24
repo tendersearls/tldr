@@ -35,11 +35,11 @@ class DotfileTest < Minitest::Test
   end
 
   def test_overriding_a_lot_of_values_in_a_dotfile
-    result = TLDRunner.run_command "bundle exec tldr --base-path example/d --seed 5 --load-path foo --workers 2 --name test_stuff --prepend nope --exclude-path nada --exclude-name test_b_2"
+    result = TLDRunner.run_command "bundle exec tldr --base-path example/d --seed 5 --load-path foo --workers 13 --name test_stuff --prepend nope --exclude-path nada --exclude-name test_b_2"
 
     assert_empty result.stderr
     assert_includes result.stdout, <<~MSG
-      Command: bundle exec tldr --seed 5 --verbose --helper "test_helper.rb" --load-path "foo" --workers 2 --name "test_stuff" --fail-fast --prepend "nope" --exclude-path "nada" --exclude-name "test_b_2" --base-path "example/d"
+      Command: bundle exec tldr --seed 5 --verbose --helper "test_helper.rb" --load-path "foo" --workers 13 --name "test_stuff" --fail-fast --prepend "nope" --exclude-path "nada" --exclude-name "test_b_2" --base-path "example/d"
     MSG
   end
 end
