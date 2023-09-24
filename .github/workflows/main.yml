@@ -29,9 +29,9 @@ jobs:
       run: |
         cd example/a
         bundle install
-        bundle exec tldr
+        bundle exec tldr | grep "😁😁"
     - name: Run a simple API example
       run: |
         cd example/b
         bundle install
-        bundle exec ruby -Itest test/some_test.rb
+        bundle exec ruby -Itest test/some_test.rb | grep "😁"

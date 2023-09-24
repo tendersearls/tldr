@@ -118,7 +118,7 @@ class TLDR
     end
 
     def require_test_helper config
-      return if config.no_helper || !File.exist?(config.helper)
+      return if config.no_helper || config.helper.nil? || !File.exist?(config.helper)
       require File.expand_path(config.helper, Dir.pwd)
     end
 

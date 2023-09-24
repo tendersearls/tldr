@@ -1,13 +1,23 @@
 PATH
-  remote: ..
+  remote: ../..
   specs:
-    tldr (0.0.1)
+    tldr (0.1.0)
       concurrent-ruby (~> 1.2)
+      super_diff (~> 0.10)
 
 GEM
   remote: https://rubygems.org/
   specs:
+    attr_extras (7.1.0)
     concurrent-ruby (1.2.2)
+    diff-lcs (1.5.0)
+    optimist (3.1.0)
+    patience_diff (1.2.0)
+      optimist (~> 3.0)
+    super_diff (0.10.0)
+      attr_extras (>= 6.2.4)
+      diff-lcs
+      patience_diff
 
 PLATFORMS
   arm64-darwin-22

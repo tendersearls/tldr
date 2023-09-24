@@ -5,7 +5,7 @@ class AtExitDriverTest < Minitest::Test
     result = TLDRunner.run_command "bundle exec ruby tests/driver/at_exit_driver.rb"
 
     assert_includes result.stdout, <<~MSG
-      Command: bundle exec tldr --seed 5 --prepend "tests/driver/at_exit_driver.rb" --exclude-name "test_y"
+      Command: bundle exec tldr --seed 5 --exclude-name "test_y"
 
       🏃 Running:
 

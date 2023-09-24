@@ -14,6 +14,16 @@ class ConfigTest < Minitest::Test
     assert_equal Concurrent.processor_count, config.workers
   end
 
+
+  def test_non_cli_defaults
+    config = TLDR::Config.new
+
+    assert_equal [], config.paths
+    assert_nil config.helper
+    assert_equal [], config.load_paths
+    assert_equal [], config.prepend_tests
+  end
+
   def test_default_workers_set_to_one_when_seed_is_set_explicitly
     config = TLDR::Config.new(seed: 1234)
 

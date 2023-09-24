@@ -24,35 +24,47 @@ class TLDR
 
   Config = Struct.new :paths, :seed, :no_helper, :verbose, :reporter,
     :helper, :load_paths, :workers, :names, :fail_fast, :no_emoji,
-    :prepend_tests, :no_prepend, :exclude_paths, :exclude_names,
+    :prepend_tests, :no_prepend, :exclude_paths, :exclude_names, :cli_mode,
     keyword_init: true do
     def initialize(**args)
       super(**merge_defaults(args))
     end
 
-    def self.build_defaults
-      {
-        paths: Dir["test/**/*_test.rb", "test/**/test_*.rb"],
+    def self.build_defaults(cli_mode = false)
+      common = {
         seed: rand(10_000),
         no_helper: false,
         verbose: false,
         reporter: Reporters::Default,
-        helper: "test/helper.rb",
-        load_paths: ["test"],
         workers: Concurrent.processor_count,
         names: [],
         fail_fast: false,
         no_emoji: false,
-        prepend_tests: [MOST_RECENTLY_MODIFIED_TAG],
         no_prepend: false,
         exclude_paths: [],
         exclude_names: []
       }
+
+      if cli_mode
+        common.merge(
+          paths: Dir["test/**/*_test.rb", "test/**/test_*.rb"],
+          helper: "test/helper.rb",
+          load_paths: ["test"],
+          prepend_tests: [MOST_RECENTLY_MODIFIED_TAG]
+        )
+      else
+        common.merge(
+          paths: [],
+          helper: nil,
+          load_paths: [],
+          prepend_tests: []
+        )
+      end
     end
 
     def merge_defaults(user_args)
       merged_args = user_args.dup
-      defaults = Config.build_defaults
+      defaults = Config.build_defaults(merged_args[:cli_mode])
 
       # Special cases
       if merged_args[:workers].nil?
@@ -108,7 +120,7 @@ class TLDR
     private
 
     def to_cli_argv(options = CONFLAGS.keys)
-      defaults = Config.build_defaults
+      defaults = Config.build_defaults(cli_mode)
       options.map { |key|
         flag = CONFLAGS[key]
 

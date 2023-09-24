@@ -88,14 +88,14 @@ $ tldr --name FooTest#test_foo -n test_bar,test_baz -n /_qux/
 
 ### Running tests without the CLI
 
-If you'd rather use TLDR by running Ruby files instead of the CLI (similar to
-`require "minitest/autorun"`), here's how you can accomplish that.
+If you'd rather use TLDR by running Ruby files instead of the `tldr` CLI
+(similar to `require "minitest/autorun"`), here's how to do it!
 
 Given a file `test/some_test.rb`:
 
 ```ruby
 require "tldr"
-TLDR::Run.at_exit(TLDR::Config.new(fail_fast: true))
+TLDR::Run.at_exit! TLDR::Config.new(no_emoji: true)
 
 class SomeTest < TLDR
   def test_truth
@@ -110,43 +110,39 @@ You could run the test with:
 $ ruby test/some_test.rb
 ```
 
-While TLDR will add `test/` to the load path and load a `test/helper.rb` file
-automatically, since you'll be defining your test class before TLDR has a chance
-to require your helper, you might want to require it explicitly in your test:
+To maximize control and to avoid running code accidentally (and _unlike_ the
+`tldr` CLI), running `at_exit!` will not set default values to the `paths`,
+`helper`, `load_paths`, and `prepend_tests` config properties. You'll have to
+pass any values you want to set on a [Config object](/lib/tldr/value/config.rb)
+and pass it to `at_exit!`.
+
+To avoid running multiple suites accidentally, if `TLDR::Run.at_exit!` is
+encountered multiple times, only the first hook will be registered. If the
+`tldr` CLI is running and encounters a call to `at_exit!`, it will be ignored.
+
+#### Setting up the load path
+
+When running TLDR from a Ruby script, one thing the framework can't help you with
+is setting up load paths for you.
+
+If you want to require code in `test/` or `lib/` without using
+`require_relative`, you'll need to add those directories to the load path. You
+can do this programmatically by prepending the path to `$LOAD_PATH`, like
+this:
 
 ```ruby
+$LOAD_PATH.unshift "test"
+
 require "tldr"
-TLDR::Run.at_exit(TLDR::Config.new(fail_fast: true))
+TLDR::Run.at_exit! TLDR::Config.new(no_emoji: true)
 
 require "helper"
-
-class SomeTest < TLDR
-  def test_truth
-    assert true
-  end
-end
 ```
 
-Because you would be executing `require "helper"` before running TLDR, this
-would just require adding `test/` to your load path from the command line, like
-this:
+Or by using Ruby's `-I` flag to include it:
 
 ```
 $ ruby -Itest test/some_test.rb
-```
-
-And you should see some output like this:
-
-```
-Command: bundle exec tldr --seed 2380 --fail-fast
-
-🏃 Running:
-
-😁
-
-Finished in 0ms.
-
-1 test class, 1 test method, 0 failures, 0 errors, 0 skips
 ```
 
 ### Options
@@ -172,6 +168,9 @@ Usage: tldr [options] some_tests/**/*.rb some/path.rb:13 ...
     -v, --verbose                    Print stack traces for errors
         --comment COMMENT            No-op comment, used internally for multi-line execution instructions
 ```
+
+After being parsed, all the CLI options are converted into a
+[TLDR::Config](/lib/tldr/value/config.rb) object.
 
 ### Minitest compatibility
 

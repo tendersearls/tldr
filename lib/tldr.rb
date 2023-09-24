@@ -23,7 +23,7 @@ class TLDR
     end
 
     @@at_exit_registered = false
-    def self.at_exit config = Config.new
+    def self.at_exit! config = Config.new
       # Ignore at_exit when running tldr CLI, since that will run any tests
       return if $PROGRAM_NAME.end_with? "tldr"
       # Ignore at_exit when we've already registered an at_exit hook

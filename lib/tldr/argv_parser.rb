@@ -5,7 +5,9 @@ class TLDR
     PATTERN_FRIENDLY_SPLITTER = /,(?=(?:[^\/]*\/[^\/]*\/)*[^\/]*$)/
 
     def parse(args)
-      options = {}
+      options = {
+        cli_mode: true
+      }
 
       OptionParser.new do |opts|
         opts.banner = "Usage: tldr [options] some_tests/**/*.rb some/path.rb:13 ..."

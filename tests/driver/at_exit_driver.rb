@@ -1,9 +1,9 @@
 require "tldr"
 
-TLDR::Run.at_exit(TLDR::Config.new(seed: 5, exclude_names: ["test_y"]))
+TLDR::Run.at_exit! TLDR::Config.new(seed: 5, exclude_names: ["test_y"])
 
-# First in shuold win
-TLDR::Run.at_exit(TLDR::Config.new(seed: 5, exclude_names: ["test_z"]))
+# First in wins
+TLDR::Run.at_exit! TLDR::Config.new(seed: 5, exclude_names: ["test_z"])
 
 class Z < TLDR
   def test_z
