@@ -24,7 +24,13 @@ class TLDR
         end
 
         sleep 1.8
-        wait_for_irb_to_exit(&explode)
+        # Don't hard-kill the runner if user is debugging, it'll
+        # screw up their terminal slash be a bad time
+        if IRB.CurrentContext
+          IRB.conf[:AT_EXIT] << explode
+        else
+          explode.call
+        end
       }
 
       results = parallelize(plan.tests, config.workers) { |test|
@@ -75,7 +81,12 @@ class TLDR
           reporter.after_fail_fast plan.tests, @wip.dup, @results.dup, fast_failed_result
           exit! exit_code([fast_failed_result])
         end
-        wait_for_irb_to_exit(&abort)
+
+        if IRB.CurrentContext
+          IRB.conf[:AT_EXIT] << abort
+        else
+          abort.call
+        end
       end
     end
 
@@ -91,16 +102,6 @@ class TLDR
         1
       else
         0
-      end
-    end
-
-    # Don't hard-kill the runner if user is debugging, it'll
-    # screw up their terminal slash be a bad time
-    def wait_for_irb_to_exit(&blk)
-      if IRB.CurrentContext
-        IRB.conf[:AT_EXIT] << blk
-      else
-        blk.call
       end
     end
   end
