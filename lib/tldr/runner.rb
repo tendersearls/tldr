@@ -17,6 +17,7 @@ class TLDR
 
       time_bomb = Thread.new {
         explode = proc do
+          next if ENV["CI"] && !$stderr.tty?
           next if @run_aborted.true?
           @run_aborted.make_true
           reporter.after_tldr plan.tests, @wip.dup, @results.dup
