@@ -203,7 +203,7 @@ with these caveats:
   deprecated `assert_send`, just `include
   TLDR::Assertions::MinitestCompatibility` into the `TLDR` base class or
   individual test classes
-G
+
 ## Acknowledgements
 
 Thanks to [George Sheppard](https://github.com/fuzzmonkey) for freeing up the
