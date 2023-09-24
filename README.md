@@ -1,4 +1,4 @@
-# TLDR - a test framework that doesn't have time for slow tests
+# TLDR - for people who don't have time for slow tests
 
 **tl;dr, this is a very nice test runner for Ruby that fails after 1.8 seconds**
 
