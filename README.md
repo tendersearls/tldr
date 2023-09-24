@@ -204,6 +204,10 @@ with these caveats:
   TLDR::Assertions::MinitestCompatibility` into the `TLDR` base class or
   individual test classes
 
+### How will I run all my tests in CI without the time bomb going off?
+
+TLDR will run all your tests in CI without the time bomb going off.
+
 ## Acknowledgements
 
 Thanks to [George Sheppard](https://github.com/fuzzmonkey) for freeing up the
