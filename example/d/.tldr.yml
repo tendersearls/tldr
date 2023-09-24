@@ -1,0 +1,12 @@
+seed: 42
+verbose: true
+reporter: TLDR::Reporters::Default
+helper: "test_helper.rb"
+load_paths: ["app", "lib"]
+workers: 3
+names: ["/test_*/", "test_it"]
+fail_fast: true
+prepend_tests: ["a.rb:3"]
+paths: ["a.rb:3", "b.rb"]
+exclude_paths: ["c.rb:4"]
+exclude_names: ["test_b_1"]

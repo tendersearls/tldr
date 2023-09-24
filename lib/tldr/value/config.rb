@@ -17,6 +17,7 @@ class TLDR
     exclude_paths: "--exclude-path",
     exclude_names: "--exclude-name",
     base_path: "--base-path",
+    no_dotfile: "--no-dotfile",
     paths: nil
   }.freeze
 
@@ -26,12 +27,17 @@ class TLDR
   Config = Struct.new :paths, :seed, :no_helper, :verbose, :reporter,
     :helper, :load_paths, :workers, :names, :fail_fast, :no_emoji,
     :prepend_tests, :no_prepend, :exclude_paths, :exclude_names, :base_path,
+    :no_dotfile,
     :cli_mode, keyword_init: true do
     def initialize(**args)
       change_working_directory_because_i_am_bad_and_i_should_feel_bad!(args[:base_path])
+      args = merge_dotfile_args(args) unless args[:no_dotfile]
 
       super(**merge_defaults(args))
     end
+
+    # Must be set when the Config is first initialized
+    undef_method :cli_mode=, :no_dotfile=, :base_path=
 
     def self.build_defaults(cli_mode = false)
       common = {
@@ -183,6 +189,23 @@ class TLDR
     # without a loss in accuracy, would love to not have to use Dir.chdir!
     def change_working_directory_because_i_am_bad_and_i_should_feel_bad!(base_path)
       Dir.chdir(base_path) unless base_path.nil?
+    end
+
+    def merge_dotfile_args(args)
+      return args if args[:no_dotfile] || !File.exist?(".tldr.yml")
+      require "yaml"
+
+      dotfile_args = YAML.load_file(".tldr.yml").transform_keys { |k| k.to_sym }
+      # Since we don't have shell expansion, we have to glob any paths ourselves
+      if dotfile_args.key?(:paths)
+        dotfile_args[:paths] = dotfile_args[:paths].flat_map { |path| Dir[path] }
+      end
+      # The argv parser normally does this:
+      if dotfile_args.key?(:reporter)
+        dotfile_args[:reporter] = Kernel.const_get(dotfile_args[:reporter])
+      end
+
+      dotfile_args.merge(args)
     end
   end
 end

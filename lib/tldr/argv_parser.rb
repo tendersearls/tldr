@@ -69,6 +69,10 @@ class TLDR
           options[:base_path] = path
         end
 
+        opts.on(CONFLAGS[:no_dotfile], "Disable loading .tldr.yml dotfile") do
+          options[:no_dotfile] = true
+        end
+
         opts.on(CONFLAGS[:no_emoji], "Disable emoji in the output") do
           options[:no_emoji] = true
         end

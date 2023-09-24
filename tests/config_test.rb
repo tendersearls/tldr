@@ -60,7 +60,7 @@ class ConfigTest < Minitest::Test
       prepend_tests: ["a.rb:3"],
       paths: ["a.rb:3", "b.rb"],
       exclude_paths: ["c.rb:4"],
-      exclude_names: "test_b_1"
+      exclude_names: ["test_b_1"]
     )
 
     assert_equal <<~MSG.chomp, config.to_full_args

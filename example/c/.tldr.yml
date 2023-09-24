@@ -1,0 +1,3 @@
+paths:
+  - "spec/**/*_spec.rb"
+helper: "spec/spec_helper.rb"

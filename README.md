@@ -165,6 +165,7 @@ Usage: tldr [options] some_tests/**/*.rb some/path.rb:13 ...
     -l, --load-path PATH             Add one or more paths to the $LOAD_PATH (Default: ["test"])
     -r, --reporter REPORTER          Set a custom reporter class (Default: "TLDR::Reporters::Default")
         --base-path PATH             Change the working directory for all relative paths (Default: current working directory)
+        --no-dotfile                 Disable loading .tldr.yml dotfile
         --no-emoji                   Disable emoji in the output
     -v, --verbose                    Print stack traces for errors
         --comment COMMENT            No-op comment, used internally for multi-line execution instructions
@@ -172,6 +173,20 @@ Usage: tldr [options] some_tests/**/*.rb some/path.rb:13 ...
 
 After being parsed, all the CLI options are converted into a
 [TLDR::Config](/lib/tldr/value/config.rb) object.
+
+### Setting defaults in .tldr.yml
+
+The `tldr` CLI will look for a `.tldr.yml` file in your project root (your
+working directory or whatever `--base-path` you set), which can contain values
+for any properties on [TLDR::Config](/lib/tldr/value/config.rb) (with the
+exception of `--base-path` itself).
+
+Any values found in the dotfile will override TLDR's built-in values, but can
+still be specified by the `tldr` CLI or a `TLDR::Config` object passed to
+[TLDR::Run.at_exit!](#running-tests-without-the-cli).
+
+Here's an [example project](/example/c) that specifies a `.tldr.yml` file as
+well as some [internal tests](/tests/dotfile_test.rb) demonstrating its behavior.
 
 ### Minitest compatibility
 
