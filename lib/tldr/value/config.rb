@@ -16,6 +16,7 @@ class TLDR
     no_prepend: "--no-prepend",
     exclude_paths: "--exclude-path",
     exclude_names: "--exclude-name",
+    base_path: "--base-path",
     paths: nil
   }.freeze
 
@@ -24,9 +25,11 @@ class TLDR
 
   Config = Struct.new :paths, :seed, :no_helper, :verbose, :reporter,
     :helper, :load_paths, :workers, :names, :fail_fast, :no_emoji,
-    :prepend_tests, :no_prepend, :exclude_paths, :exclude_names, :cli_mode,
-    keyword_init: true do
+    :prepend_tests, :no_prepend, :exclude_paths, :exclude_names, :base_path,
+    :cli_mode, keyword_init: true do
     def initialize(**args)
+      change_working_directory_because_i_am_bad_and_i_should_feel_bad!(args[:base_path])
+
       super(**merge_defaults(args))
     end
 
@@ -42,7 +45,8 @@ class TLDR
         no_emoji: false,
         no_prepend: false,
         exclude_paths: [],
-        exclude_names: []
+        exclude_names: [],
+        base_path: nil
       }
 
       if cli_mode
@@ -126,11 +130,16 @@ class TLDR
 
         # Special cases
         if key == :prepend_tests
-          # Don't print prepended tests if they're the same as the tests.
-          # This implementation seems very wrong.
           if prepend_tests.map { |s| stringify(key, s) }.sort == paths.map { |s| stringify(:paths, s) }.sort
+            # Don't print prepended tests if they're the same as the test paths
+            next
+          elsif no_prepend
+            # Don't print prepended tests if they're disabled
             next
           end
+        elsif key == :helper && no_helper
+          # Don't print the helper if it's disabled
+          next
         elsif key == :workers && workers == 1 && !seed.nil?
           # Don't need to print workers when seed is set, since it'll be toggled to 1 when initialized
           next
@@ -166,6 +175,14 @@ class TLDR
       return if tests.empty?
 
       tests.max_by { |test| File.mtime(test.file) }.file
+    end
+
+    # If the user sets a custom base path, we need to change the working directory
+    # ASAP, even before globbing to find default paths of tests. If there is
+    # a way to change all of our Dir.glob calls to be relative to base_path
+    # without a loss in accuracy, would love to not have to use Dir.chdir!
+    def change_working_directory_because_i_am_bad_and_i_should_feel_bad!(base_path)
+      Dir.chdir(base_path) unless base_path.nil?
     end
   end
 end

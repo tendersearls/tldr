@@ -61,8 +61,12 @@ class TLDR
           options[:load_paths] += load_path
         end
 
-        opts.on("-r", "#{CONFLAGS[:reporter]} REPORTER", String, "Custom reporter class (Default: \"TLDR::Reporters::Default\")") do |reporter|
+        opts.on("-r", "#{CONFLAGS[:reporter]} REPORTER", String, "Set a custom reporter class (Default: \"TLDR::Reporters::Default\")") do |reporter|
           options[:reporter] = Kernel.const_get(reporter)
+        end
+
+        opts.on("#{CONFLAGS[:base_path]} PATH", String, "Change the working directory for all relative paths (Default: current working directory)") do |path|
+          options[:base_path] = path
         end
 
         opts.on(CONFLAGS[:no_emoji], "Disable emoji in the output") do

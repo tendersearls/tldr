@@ -154,7 +154,7 @@ $ tldr --help
 Usage: tldr [options] some_tests/**/*.rb some/path.rb:13 ...
         --fail-fast                  Stop running tests as soon as one fails
     -s, --seed SEED                  Seed for randomization
-        --workers WORKERS            Number of parallel workers (Default: your processor count (24); 1 if a seed is set)
+        --workers WORKERS            Number of parallel workers (Default: your processor count (8); 1 if a seed is set)
     -n, --name PATTERN               One or more names or /patterns/ of tests to run (like: foo_test, /test_foo.*/, Foo#foo_test)
         --exclude-name PATTERN       One or more names or /patterns/ NOT to run
         --exclude-path PATH          One or more paths NOT to run (like: foo.rb, "test/bar/**", baz.rb:3)
@@ -163,7 +163,8 @@ Usage: tldr [options] some_tests/**/*.rb some/path.rb:13 ...
         --prepend PATH               Prepend one or more paths to run before the rest (Default: most recently modified test)
         --no-prepend                 Don't prepend any tests before the rest of the suite
     -l, --load-path PATH             Add one or more paths to the $LOAD_PATH (Default: ["test"])
-    -r, --reporter REPORTER          Custom reporter class (Default: "TLDR::Reporters::Default")
+    -r, --reporter REPORTER          Set a custom reporter class (Default: "TLDR::Reporters::Default")
+        --base-path PATH             Change the working directory for all relative paths (Default: current working directory)
         --no-emoji                   Disable emoji in the output
     -v, --verbose                    Print stack traces for errors
         --comment COMMENT            No-op comment, used internally for multi-line execution instructions

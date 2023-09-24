@@ -14,6 +14,15 @@ class ConfigTest < Minitest::Test
     assert_equal Concurrent.processor_count, config.workers
   end
 
+  def test_cli_defaults
+    config = TLDR::Config.new cli_mode: true
+
+    # Won't work unless we change dir to example/a and it'll create pollution
+    # assert_equal ["test/add_test.rb", "test/test_subtract.rb"], config.paths
+    assert_equal "test/helper.rb", config.helper
+    assert_equal ["test"], config.load_paths
+    assert_equal [TLDR::MOST_RECENTLY_MODIFIED_TAG], config.prepend_tests
+  end
 
   def test_non_cli_defaults
     config = TLDR::Config.new
@@ -41,7 +50,6 @@ class ConfigTest < Minitest::Test
   def test_cli_conversion_with_custom_options
     config = TLDR::Config.new(
       seed: 42,
-      no_helper: true,
       verbose: true,
       reporter: TLDR::Reporters::Base,
       helper: "test_helper.rb",
@@ -52,16 +60,39 @@ class ConfigTest < Minitest::Test
       prepend_tests: ["a.rb:3"],
       paths: ["a.rb:3", "b.rb"],
       exclude_paths: ["c.rb:4"],
-      no_prepend: true,
       exclude_names: "test_b_1"
     )
 
     assert_equal <<~MSG.chomp, config.to_full_args
-      --seed 42 --no-helper --verbose --reporter TLDR::Reporters::Base --helper "test_helper.rb" --load-path "app" --load-path "lib" --workers 3 --name "/test_*/" --name "test_it" --fail-fast --prepend "a.rb:3" --no-prepend --exclude-path "c.rb:4" --exclude-name "test_b_1" "a.rb:3" "b.rb"
+      --seed 42 --verbose --reporter TLDR::Reporters::Base --helper "test_helper.rb" --load-path "app" --load-path "lib" --workers 3 --name "/test_*/" --name "test_it" --fail-fast --prepend "a.rb:3" --exclude-path "c.rb:4" --exclude-name "test_b_1" "a.rb:3" "b.rb"
     MSG
 
     assert_equal <<~MSG.chomp, config.to_single_path_args("lol.rb")
-      --no-helper --verbose --reporter TLDR::Reporters::Base --helper "test_helper.rb" --load-path "app" --load-path "lib" --exclude-name "test_b_1" "lol.rb"
+      --verbose --reporter TLDR::Reporters::Base --helper "test_helper.rb" --load-path "app" --load-path "lib" --exclude-name "test_b_1" "lol.rb"
+    MSG
+  end
+
+  def test_cli_conversion_omits_prepend_with_no_prepend
+    config = TLDR::Config.new(
+      seed: 1,
+      no_prepend: true,
+      prepend_tests: ["a.rb:3"]
+    )
+
+    assert_equal <<~MSG.chomp, config.to_full_args
+      --seed 1 --no-prepend
+    MSG
+  end
+
+  def test_cli_conversion_omits_helper_with_no_helper
+    config = TLDR::Config.new(
+      seed: 1,
+      no_helper: true,
+      helper: "some/silly/helper.rb"
+    )
+
+    assert_equal <<~MSG.chomp, config.to_full_args
+      --seed 1 --no-helper
     MSG
   end
 
