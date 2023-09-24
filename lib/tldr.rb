@@ -13,17 +13,17 @@ class TLDR
   include Skippable
 
   module Run
-    def self.tests config
-      Runner.new.run config, Planner.new.plan(config)
-    end
-
     def self.cli argv
       config = ArgvParser.new.parse argv
       tests config
     end
 
+    def self.tests config = Config.new
+      Runner.new.run config, Planner.new.plan(config)
+    end
+
     @@at_exit_registered = false
-    def self.at_exit config
+    def self.at_exit config = Config.new
       # Ignore at_exit when running tldr CLI, since that will run any tests
       return if $PROGRAM_NAME.end_with? "tldr"
       # Ignore at_exit when we've already registered an at_exit hook

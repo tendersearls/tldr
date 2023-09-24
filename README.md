@@ -86,6 +86,69 @@ $ tldr --name FooTest#test_foo -n test_bar,test_baz -n /_qux/
 (The above will translate to this array of name fiilters internally:
  `["FooTest#test_foo", "test_bar", "test_baz", "/_qux/"]`.)
 
+### Running tests without the CLI
+
+If you'd rather use TLDR by running Ruby files instead of the CLI (similar to
+`require "minitest/autorun"`), here's how you can accomplish that.
+
+Given a file `test/some_test.rb`:
+
+```ruby
+require "tldr"
+TLDR::Run.at_exit(TLDR::Config.new(fail_fast: true))
+
+class SomeTest < TLDR
+  def test_truth
+    assert true
+  end
+end
+```
+
+You could run the test with:
+
+```
+$ ruby test/some_test.rb
+```
+
+While TLDR will add `test/` to the load path and load a `test/helper.rb` file
+automatically, since you'll be defining your test class before TLDR has a chance
+to require your helper, you might want to require it explicitly in your test:
+
+```ruby
+require "tldr"
+TLDR::Run.at_exit(TLDR::Config.new(fail_fast: true))
+
+require "helper"
+
+class SomeTest < TLDR
+  def test_truth
+    assert true
+  end
+end
+```
+
+Because you would be executing `require "helper"` before running TLDR, this
+would just require adding `test/` to your load path from the command line, like
+this:
+
+```
+$ ruby -Itest test/some_test.rb
+```
+
+And you should see some output like this:
+
+```
+Command: bundle exec tldr --seed 2380 --fail-fast
+
+🏃 Running:
+
+😁
+
+Finished in 0ms.
+
+1 test class, 1 test method, 0 failures, 0 errors, 0 skips
+```
+
 ### Options
 
 Here is the full list of CLI options:
