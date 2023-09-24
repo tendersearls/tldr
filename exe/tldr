@@ -2,4 +2,4 @@
 
 require "tldr"
 
-TLDR::API.cli(ARGV)
+TLDR::Run.cli(ARGV)

@@ -22,4 +22,4 @@ class FunTest < TLDR
   end
 end
 
-TLDR::API.run(TLDR::Config.new(paths: []))
+TLDR::Run.run(TLDR::Config.new(paths: []))

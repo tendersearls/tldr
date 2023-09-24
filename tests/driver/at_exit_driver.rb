@@ -1,8 +1,9 @@
 require "tldr"
 
-at_exit do
-  TLDR::API.run(TLDR::Config.new(seed: 5, exclude_names: ["test_y"]))
-end
+TLDR::Run.at_exit(TLDR::Config.new(seed: 5, exclude_names: ["test_y"]))
+
+# First in shuold win
+TLDR::Run.at_exit(TLDR::Config.new(seed: 5, exclude_names: ["test_z"]))
 
 class Z < TLDR
   def test_z
