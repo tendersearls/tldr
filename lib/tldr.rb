@@ -12,12 +12,14 @@ class TLDR
   include Assertions
   include Skippable
 
-  def self.cli argv
-    config = ArgvParser.new.parse(argv)
-    run(config)
-  end
+  module API
+    def self.cli argv
+      config = ArgvParser.new.parse(argv)
+      run(config)
+    end
 
-  def self.run config
-    Runner.new.run(config, Planner.new.plan(config))
+    def self.run config
+      Runner.new.run(config, Planner.new.plan(config))
+    end
   end
 end

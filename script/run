@@ -3,4 +3,4 @@ $LOAD_PATH.unshift File.expand_path("../lib", __dir__)
 
 require "tldr"
 
-TLDR.cli(ARGV)
+TLDR::API.cli(ARGV)

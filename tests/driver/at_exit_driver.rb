@@ -1,7 +1,7 @@
 require "tldr"
 
 at_exit do
-  TLDR.run(TLDR::Config.new(seed: 5, exclude_names: ["test_y"]))
+  TLDR::API.run(TLDR::Config.new(seed: 5, exclude_names: ["test_y"]))
 end
 
 class Z < TLDR
