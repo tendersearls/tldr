@@ -10,7 +10,7 @@ class TLDR
     # Memoizing at call time, because re-parsing isn't free and isn't usually necessary
     def end_line
       @end_line ||= begin
-        test_method = klass.instance_method(method)
+        test_method = SorbetCompatibility.unwrap_method klass.instance_method(method)
         RubyVM::AbstractSyntaxTree.of(test_method).last_lineno
       end
     end
