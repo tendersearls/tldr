@@ -139,7 +139,7 @@ class TLDR
         failed = test_results.select(&:failing?).map(&:test)
         failed_locators = consolidate failed, exclude: unrun_locators
         suggested_locators = unrun_locators + [
-          ("--comment \"Also include #{plural failed.size, "test"} that failed:\"" if failed.any?)
+          ("--comment \"Also include #{plural failed.size, "test"} that failed:\"" if failed_locators.any?)
         ] + failed_locators
         <<~MSG
           #{@icons.rock_on} Run the #{plural unrun.size, "test"} that didn't finish:
