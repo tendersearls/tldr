@@ -11,7 +11,7 @@ class ConfigTest < Minitest::Test
   def test_defaults
     config = TLDR::Config.new
 
-    assert_equal Concurrent.processor_count, config.workers
+    assert_equal Concurrent::RubyThreadPoolExecutor::DEFAULT_MAX_POOL_SIZE, config.workers
   end
 
   def test_cli_defaults

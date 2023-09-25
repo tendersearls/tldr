@@ -20,7 +20,7 @@ class TLDR
           options[:seed] = seed
         end
 
-        opts.on("#{CONFLAGS[:workers]} WORKERS", Integer, "Number of parallel workers (Default: your processor count (#{Concurrent.processor_count}); 1 if a seed is set)") do |workers|
+        opts.on("#{CONFLAGS[:workers]} WORKERS", Integer, "Max number of parallel threads (Default: #{Concurrent::RubyThreadPoolExecutor::DEFAULT_MAX_POOL_SIZE}; 1 if a seed is set)") do |workers|
           options[:workers] = workers
         end
 

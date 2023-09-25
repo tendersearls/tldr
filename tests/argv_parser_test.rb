@@ -39,7 +39,7 @@ class ArgvParserTest < Minitest::Test
     assert_equal TLDR::Reporters::Default, result.reporter
     assert_equal "test/helper.rb", result.helper
     assert_equal ["test"], result.load_paths
-    assert_equal Concurrent.processor_count, result.workers
+    assert_equal Concurrent::RubyThreadPoolExecutor::DEFAULT_MAX_POOL_SIZE, result.workers
     assert_equal [], result.names
   end
 end

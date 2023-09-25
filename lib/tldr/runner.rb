@@ -67,10 +67,15 @@ class TLDR
 
     def parallelize tests, workers, &blk
       return tests.map(&blk) if tests.size < 2 || workers < 2
-      group_size = (tests.size.to_f / workers).ceil
-      tests.each_slice(group_size).map { |group|
-        Concurrent::Promises.future {
-          group.map(&blk)
+      tldr_pool = Concurrent::ThreadPoolExecutor.new(
+        name: "tldr",
+        max_threads: workers,
+        auto_terminate: true
+      )
+
+      tests.map { |test|
+        Concurrent::Promises.future_on(tldr_pool) {
+          blk.call test
         }
       }.flat_map(&:value)
     end

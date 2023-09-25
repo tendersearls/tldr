@@ -45,7 +45,7 @@ class TLDR
         no_helper: false,
         verbose: false,
         reporter: Reporters::Default,
-        workers: Concurrent.processor_count,
+        workers: Concurrent::RubyThreadPoolExecutor::DEFAULT_MAX_POOL_SIZE,
         names: [],
         fail_fast: false,
         no_emoji: false,
