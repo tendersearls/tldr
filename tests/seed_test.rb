@@ -4,12 +4,10 @@ class SeedTest < Minitest::Test
   def test_order_1
     result = TLDRunner.should_succeed "seed.rb", "--seed 1"
 
-    assert_includes result.stderr, <<~MSG
-      1) Skip:
-      SeedTest#test_skip [tests/fixture/seed.rb:7]:
+    assert_includes result.stdout, <<~MSG
+      Skipped tests:
 
-      Re-run this test:
-        bundle exec tldr "tests/fixture/seed.rb:6"
+        - SeedTest#test_skip [tests/fixture/seed.rb:6]
     MSG
     assert_equal 0, result.exit_code
     assert_includes result.stdout, "--seed 1"
@@ -19,12 +17,10 @@ class SeedTest < Minitest::Test
   def test_order_2
     result = TLDRunner.should_succeed "seed.rb", "--seed 2"
 
-    assert_includes result.stderr, <<~MSG
-      1) Skip:
-      SeedTest#test_skip [tests/fixture/seed.rb:7]:
+    assert_includes result.stdout, <<~MSG
+      Skipped tests:
 
-      Re-run this test:
-        bundle exec tldr "tests/fixture/seed.rb:6"
+        - SeedTest#test_skip [tests/fixture/seed.rb:6]
     MSG
     assert_equal 0, result.exit_code
     assert_includes result.stdout, "--seed 2"

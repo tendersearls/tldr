@@ -13,13 +13,14 @@ class ExitCodeTest < Minitest::Test
     result = TLDRunner.should_fail "fail.rb"
 
     assert_includes result.stdout, "😡"
-    assert_includes result.stderr, <<~MSG
-      1) Failure:
-      FailTest#test_fails [tests/fixture/fail.rb:3]:
+    assert_includes result.stderr, <<~MSG.chomp
+      Failing tests:
+
+      1) FailTest#test_fails [tests/fixture/fail.rb:3] failed:
       Expected false to be truthy
 
-      Re-run this test:
-        bundle exec tldr "tests/fixture/fail.rb:2"
+        Re-run this test:
+          bundle exec tldr "tests/fixture/fail.rb:2"
     MSG
     assert_equal 1, result.exit_code
   end
@@ -28,13 +29,14 @@ class ExitCodeTest < Minitest::Test
     result = TLDRunner.should_fail "error.rb"
 
     assert_includes result.stdout, "🤬"
-    assert_includes result.stderr, <<~MSG
-      1) Error:
-      ErrorTest#test_errors [tests/fixture/error.rb:3]:
+    assert_includes result.stderr, <<~MSG.chomp
+      Failing tests:
+
+      1) ErrorTest#test_errors [tests/fixture/error.rb:3] errored:
       💥
 
-      Re-run this test:
-        bundle exec tldr "tests/fixture/error.rb:2"
+        Re-run this test:
+          bundle exec tldr "tests/fixture/error.rb:2"
     MSG
     assert_equal 2, result.exit_code
   end
@@ -42,12 +44,10 @@ class ExitCodeTest < Minitest::Test
   def test_skip
     result = TLDRunner.should_succeed "skip.rb"
 
-    assert_includes result.stderr, <<~MSG
-      1) Skip:
-      SuccessTest#test_skips [tests/fixture/skip.rb:3]:
+    assert_includes result.stdout, <<~MSG
+      Skipped tests:
 
-      Re-run this test:
-        bundle exec tldr "tests/fixture/skip.rb:2"
+        - SuccessTest#test_skips [tests/fixture/skip.rb:2]
     MSG
     assert_equal 0, result.exit_code
     assert_includes result.stdout, "🫥"

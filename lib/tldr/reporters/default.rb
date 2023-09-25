@@ -71,17 +71,19 @@ class TLDR
 
       def after_suite test_results
         duration = time_diff @suite_start_time
-        summary = summarize test_results
+        test_results = test_results.sort_by { |result| [result.test.location.file, result.test.location.line] }
 
         @out.print "\n\n"
-        summary.each.with_index do |summary, index|
-          @err.print "#{index + 1}) #{summary}\n\n"
-        end
+        @err.print summarize_failures(test_results).join("\n\n")
 
+        @out.print "\n\n"
+        @out.print summarize_skips(test_results).join("\n")
+
+        @out.print "\n\n"
         @out.print "Finished in #{duration}ms."
 
         @out.print "\n\n"
-        class_count = test_results.map { |result| result.test.class }.uniq.size
+        class_count = test_results.uniq { |result| result.test.class }.size
         test_count = test_results.size
         @out.print [
           plural(class_count, "test class", "test classes"),
@@ -96,24 +98,28 @@ class TLDR
 
       private
 
-      def summarize results
-        results.reject { |result| result.error.nil? }
-          .sort_by { |result| result.test.location.locator }
-          .map { |result| summarize_result result }
+      def summarize_failures results
+        failures = results.select { |result| result.failing? }
+        return failures if failures.empty?
+
+        ["Failing tests:"] + failures.map.with_index { |result, i| summarize_result result, i }
       end
 
-      def summarize_result result
+      def summarize_result result, index
         [
-          "#{result.type.to_s.capitalize}:",
-          "#{describe(result.test, result.relevant_location)}:",
+          "#{index + 1}) #{describe(result.test, result.relevant_location)} #{result.failure? ? "failed" : "errored"}:",
           result.error.message.chomp,
-          <<~RERUN.chomp,
-
-            Re-run this test:
-              #{tldr_command} #{@config.to_single_path_args(result.test.location.locator)}
-          RERUN
+          "\n  Re-run this test:",
+          "    #{tldr_command} #{@config.to_single_path_args(result.test.location.locator)}",
           (TLDR.filter_backtrace(result.error.backtrace).join("\n") if @config.verbose)
         ].compact.reject(&:empty?).join("\n").strip
+      end
+
+      def summarize_skips results
+        skips = results.select { |result| result.skip? }
+        return skips if skips.empty?
+
+        ["Skipped tests:\n"] + skips.map { |result| "  - #{describe(result.test)}" }
       end
 
       def describe test, location = test.location
