@@ -175,6 +175,8 @@ class AssertionsTest < AssertionTestCase
 
   def test_assert_match
     @subject.assert_match(/foo/, "food")
+    result = @subject.assert_match("foo", "food")
+    assert_equal "foo", result[0]
     should_fail "Expected \"drink\" to match /foo/" do
       @subject.assert_match(/foo/, "drink")
     end

@@ -158,7 +158,9 @@ class TLDR
         "Expected #{Assertions.h(actual)} to match #{Assertions.h(matcher)}"
       }
       assert_respond_to matcher, :=~
+      matcher = Regexp.new Regexp.escape matcher if String === matcher
       assert matcher =~ actual, message
+      Regexp.last_match
     end
 
     def refute_match matcher, actual, message = nil
