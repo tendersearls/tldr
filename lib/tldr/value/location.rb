@@ -1,11 +1,10 @@
 class TLDR
   Location = Struct.new :file, :line do
     def relative
-      file_path = Pathname.new(file)
-      if file_path.absolute?
-        file_path.relative_path_from(Pathname.new(Dir.pwd))
+      if file.start_with?(Dir.pwd)
+        file[Dir.pwd.length + 1..]
       else
-        file_path
+        file
       end
     end
 
