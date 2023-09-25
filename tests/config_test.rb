@@ -8,12 +8,6 @@ class ConfigTest < Minitest::Test
     assert_equal "\"lol.rb:4\"", config.to_single_path_args("lol.rb:4")
   end
 
-  def test_defaults
-    config = TLDR::Config.new
-
-    assert_equal Concurrent::RubyThreadPoolExecutor::DEFAULT_MAX_POOL_SIZE, config.workers
-  end
-
   def test_cli_defaults
     config = TLDR::Config.new cli_mode: true
 
@@ -33,18 +27,18 @@ class ConfigTest < Minitest::Test
     assert_equal [], config.prepend_tests
   end
 
-  def test_default_workers_set_to_one_when_seed_is_set_explicitly
+  def test_default_no_parallel_when_seed_is_set_explicitly
     config = TLDR::Config.new(seed: 1234)
 
-    assert_equal 1, config.workers
+    refute config.parallel
   end
 
-  def test_default_workers_configurable_when_seed_is_set_explicitly
+  def test_parallel_configurable_when_seed_is_set_explicitly
     config = TLDR::Config.new
     config.seed = 1234
-    config.workers = 42
+    config.parallel = true
 
-    assert_equal 42, config.workers
+    assert config.parallel
   end
 
   def test_cli_conversion_with_custom_options
@@ -54,7 +48,7 @@ class ConfigTest < Minitest::Test
       reporter: TLDR::Reporters::Base,
       helper: "test_helper.rb",
       load_paths: ["app", "lib"],
-      workers: 3,
+      parallel: true,
       names: ["/test_*/", "test_it"],
       fail_fast: true,
       prepend_tests: ["a.rb:3"],
@@ -64,7 +58,7 @@ class ConfigTest < Minitest::Test
     )
 
     assert_equal <<~MSG.chomp, config.to_full_args
-      --seed 42 --verbose --reporter TLDR::Reporters::Base --helper "test_helper.rb" --load-path "app" --load-path "lib" --workers 3 --name "/test_*/" --name "test_it" --fail-fast --prepend "a.rb:3" --exclude-path "c.rb:4" --exclude-name "test_b_1" "a.rb:3" "b.rb"
+      --seed 42 --verbose --reporter TLDR::Reporters::Base --helper "test_helper.rb" --load-path "app" --load-path "lib" --parallel --name "/test_*/" --name "test_it" --fail-fast --prepend "a.rb:3" --exclude-path "c.rb:4" --exclude-name "test_b_1" "a.rb:3" "b.rb"
     MSG
 
     assert_equal <<~MSG.chomp, config.to_single_path_args("lol.rb")
@@ -82,6 +76,13 @@ class ConfigTest < Minitest::Test
     assert_equal <<~MSG.chomp, config.to_full_args
       --seed 1 --no-prepend
     MSG
+  end
+
+  def test_parallel_logic
+    assert_includes TLDR::Config.new(parallel: true, seed: 1).to_full_args, "--parallel"
+    refute_includes TLDR::Config.new(parallel: true).to_full_args, "--parallel"
+    assert_includes TLDR::Config.new(parallel: false).to_full_args, "--no-parallel"
+    refute_includes TLDR::Config.new(parallel: false, seed: 1).to_full_args, "--parallel"
   end
 
   def test_cli_conversion_omits_helper_with_no_helper
@@ -127,7 +128,7 @@ class ConfigTest < Minitest::Test
     MSG
   end
 
-  def test_cli_summary_ignores_workers_when_seed_is_set
+  def test_cli_summary_ignores_no_parallel_when_seed_is_set
     config = TLDR::Config.new(
       seed: 1,
       paths: ["foo.rb"]

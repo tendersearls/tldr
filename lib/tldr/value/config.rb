@@ -8,7 +8,7 @@ class TLDR
     reporter: "--reporter",
     helper: "--helper",
     load_paths: "--load-path",
-    workers: "--workers",
+    parallel: "--[no-]parallel",
     names: "--name",
     fail_fast: "--fail-fast",
     no_emoji: "--no-emoji",
@@ -25,10 +25,10 @@ class TLDR
   MOST_RECENTLY_MODIFIED_TAG = "MOST_RECENTLY_MODIFIED".freeze
 
   Config = Struct.new :paths, :seed, :no_helper, :verbose, :reporter,
-    :helper, :load_paths, :workers, :names, :fail_fast, :no_emoji,
+    :helper, :load_paths, :parallel, :names, :fail_fast, :no_emoji,
     :prepend_tests, :no_prepend, :exclude_paths, :exclude_names, :base_path,
     :no_dotfile,
-    :cli_mode, keyword_init: true do
+    :seed_set_intentionally, :cli_mode, keyword_init: true do
     def initialize(**args)
       change_working_directory_because_i_am_bad_and_i_should_feel_bad!(args[:base_path])
       args = merge_dotfile_args(args) unless args[:no_dotfile]
@@ -45,7 +45,7 @@ class TLDR
         no_helper: false,
         verbose: false,
         reporter: Reporters::Default,
-        workers: Concurrent::RubyThreadPoolExecutor::DEFAULT_MAX_POOL_SIZE,
+        parallel: true,
         names: [],
         fail_fast: false,
         no_emoji: false,
@@ -75,10 +75,12 @@ class TLDR
     def merge_defaults(user_args)
       merged_args = user_args.dup
       defaults = Config.build_defaults(merged_args[:cli_mode])
+      merged_args[:seed_set_intentionally] = !merged_args[:seed].nil?
 
       # Special cases
-      if merged_args[:workers].nil?
-        merged_args[:workers] = merged_args[:seed].nil? ? defaults[:workers] : 1
+      if merged_args[:parallel].nil?
+        # Disable parallelization if seed is set
+        merged_args[:parallel] = merged_args[:seed].nil?
       end
 
       # Arrays
@@ -120,7 +122,7 @@ class TLDR
 
     def to_single_path_args(path)
       argv = to_cli_argv(CONFLAGS.keys - [
-        :seed, :workers, :names, :fail_fast, :paths, :prepend_tests,
+        :seed, :parallel, :names, :fail_fast, :paths, :prepend_tests,
         :no_prepend, :exclude_paths
       ])
 
@@ -146,9 +148,13 @@ class TLDR
         elsif key == :helper && no_helper
           # Don't print the helper if it's disabled
           next
-        elsif key == :workers && workers == 1 && !seed.nil?
-          # Don't need to print workers when seed is set, since it'll be toggled to 1 when initialized
-          next
+        elsif key == :parallel
+          val = if !seed_set_intentionally && !parallel
+            "--no-parallel"
+          elsif !seed.nil? && seed_set_intentionally && parallel
+            "--parallel"
+          end
+          next val
         end
 
         if defaults[key] == self[key]

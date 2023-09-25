@@ -34,7 +34,7 @@ class TLDR
         end
       }
 
-      results = parallelize(plan.tests, config.workers) { |test|
+      results = parallelize(plan.tests, config.parallel) { |test|
         e = nil
         start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC, :microsecond)
         wip_test = WIPTest.new test, start_time
@@ -65,11 +65,10 @@ class TLDR
 
     private
 
-    def parallelize tests, workers, &blk
-      return tests.map(&blk) if tests.size < 2 || workers < 2
+    def parallelize tests, parallel, &blk
+      return tests.map(&blk) if tests.size < 2 || !parallel
       tldr_pool = Concurrent::ThreadPoolExecutor.new(
         name: "tldr",
-        max_threads: workers,
         auto_terminate: true
       )
 

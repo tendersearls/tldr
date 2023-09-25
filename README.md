@@ -13,8 +13,7 @@ Some stuff you might like:
 
 * A CLI that can run tests by line number(s) (e.g. `foo.rb:5 bar.rb:3:10`) and
 by names or patterns (e.g. `--name test_fail,test_error --name "/_\d/"`)
-* Everything is **parallel by default**, and seems pretty fast (you can set the
-max number of threads with `--workers 42`)
+* Everything is **parallel by default**, and seems pretty fast (you can disable with `--no-parallel`)
 * Surprisingly delightful color diff output when two things fail to equal one another, care of [@mcmire's super_diff gem](https://github.com/mcmire/super_diff)
 * By default, the CLI will prepend your most-recently-edited test file to the
 front of your suite so its tests will run first. The tests you're working on are
@@ -154,7 +153,7 @@ $ tldr --help
 Usage: tldr [options] some_tests/**/*.rb some/path.rb:13 ...
         --fail-fast                  Stop running tests as soon as one fails
     -s, --seed SEED                  Seed for randomization
-        --workers WORKERS            Max number of parallel threads (Default: 2147483647; 1 if a seed is set)
+        --[no-]parallel              Parallelize tests (Default: true)
     -n, --name PATTERN               One or more names or /patterns/ of tests to run (like: foo_test, /test_foo.*/, Foo#foo_test)
         --exclude-name PATTERN       One or more names or /patterns/ NOT to run
         --exclude-path PATH          One or more paths NOT to run (like: foo.rb, "test/bar/**", baz.rb:3)

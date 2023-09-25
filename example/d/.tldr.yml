@@ -3,7 +3,7 @@ verbose: true
 reporter: TLDR::Reporters::Default
 helper: "test_helper.rb"
 load_paths: ["app", "lib"]
-workers: 3
+parallel: true
 names: ["/test_*/", "test_it"]
 fail_fast: true
 prepend_tests: ["a.rb:3"]

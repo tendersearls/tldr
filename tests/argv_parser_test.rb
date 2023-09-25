@@ -12,7 +12,7 @@ class ArgvParserTest < Minitest::Test
       "--helper", "spec/spec_helper.rb",
       "-l", "lib",
       "-l", "vendor,spec",
-      "--workers", "99",
+      "--no-parallel",
       "--name", "foo",
       "--load-path", "app",
       "-n", "bar,baz"
@@ -25,7 +25,7 @@ class ArgvParserTest < Minitest::Test
     assert_equal TLDR::Reporters::Base, result.reporter
     assert_equal "spec/spec_helper.rb", result.helper
     assert_equal ["lib", "vendor", "spec", "app"], result.load_paths
-    assert_equal 99, result.workers
+    refute result.parallel
     assert_equal ["foo", "bar", "baz"], result.names
   end
 
@@ -39,7 +39,7 @@ class ArgvParserTest < Minitest::Test
     assert_equal TLDR::Reporters::Default, result.reporter
     assert_equal "test/helper.rb", result.helper
     assert_equal ["test"], result.load_paths
-    assert_equal Concurrent::RubyThreadPoolExecutor::DEFAULT_MAX_POOL_SIZE, result.workers
+    assert result.parallel
     assert_equal [], result.names
   end
 end

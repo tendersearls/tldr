@@ -30,16 +30,16 @@ class DotfileTest < Minitest::Test
 
     assert_empty result.stderr
     assert_includes result.stdout, <<~MSG
-      Command: bundle exec tldr --seed 42 --verbose --helper "test_helper.rb" --load-path "app" --load-path "lib" --workers 3 --name "/test_*/" --name "test_it" --fail-fast --prepend "a.rb:3" --exclude-path "c.rb:4" --exclude-name "test_b_1" --base-path "example/d"
+      Command: bundle exec tldr --seed 42 --verbose --helper "test_helper.rb" --load-path "app" --load-path "lib" --parallel --name "/test_*/" --name "test_it" --fail-fast --prepend "a.rb:3" --exclude-path "c.rb:4" --exclude-name "test_b_1" --base-path "example/d"
     MSG
   end
 
   def test_overriding_a_lot_of_values_in_a_dotfile
-    result = TLDRunner.run_command "bundle exec tldr --base-path example/d --seed 5 --load-path foo --workers 13 --name test_stuff --prepend nope --exclude-path nada --exclude-name test_b_2"
+    result = TLDRunner.run_command "bundle exec tldr --base-path example/d --seed 5 --load-path foo --no-parallel --name test_stuff --prepend nope --exclude-path nada --exclude-name test_b_2"
 
     assert_empty result.stderr
     assert_includes result.stdout, <<~MSG
-      Command: bundle exec tldr --seed 5 --verbose --helper "test_helper.rb" --load-path "foo" --workers 13 --name "test_stuff" --fail-fast --prepend "nope" --exclude-path "nada" --exclude-name "test_b_2" --base-path "example/d"
+      Command: bundle exec tldr --seed 5 --verbose --helper "test_helper.rb" --load-path "foo" --name "test_stuff" --fail-fast --prepend "nope" --exclude-path "nada" --exclude-name "test_b_2" --base-path "example/d"
     MSG
   end
 end
