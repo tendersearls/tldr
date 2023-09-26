@@ -234,7 +234,7 @@ The vast majority of test suites in the wild are not parallelized and the vast
 majority of _those_ will only parallelize by forking processes as opposed to
 using a thread pool. We wanted to encourage more people to save time (after all,
 you only get 1.8 seconds here) by making your test suite run as fast as it can,
-so your tests run in parallel by default.
+so your tests run in parallel threads by default.
 
 If you're writing new code and tests with TLDR and dutifully running `tldr`
 constantly for fast feedback, odds are that this will help you catch thread
