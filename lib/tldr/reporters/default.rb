@@ -73,10 +73,8 @@ class TLDR
         duration = time_diff @suite_start_time
         test_results = test_results.sort_by { |result| [result.test.location.file, result.test.location.line] }
 
-        @out.print "\n\n"
         @err.print summarize_failures(test_results).join("\n\n")
 
-        @out.print "\n\n"
         @out.print summarize_skips(test_results).join("\n")
 
         @out.print "\n\n"
@@ -102,7 +100,7 @@ class TLDR
         failures = results.select { |result| result.failing? }
         return failures if failures.empty?
 
-        ["Failing tests:"] + failures.map.with_index { |result, i| summarize_result result, i }
+        ["\n\nFailing tests:"] + failures.map.with_index { |result, i| summarize_result result, i }
       end
 
       def summarize_result result, index
@@ -119,7 +117,7 @@ class TLDR
         skips = results.select { |result| result.skip? }
         return skips if skips.empty?
 
-        ["Skipped tests:\n"] + skips.map { |result| "  - #{describe(result.test)}" }
+        ["\n\nSkipped tests:\n"] + skips.map { |result| "  - #{describe(result.test)}" }
       end
 
       def describe test, location = test.location
