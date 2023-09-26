@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+## [0.2.0]
+
+- Add a rake task "tldr"
 ## [0.1.1]
 
 - Improve Minitest compatibility by mixing in Assertions#capture_io
