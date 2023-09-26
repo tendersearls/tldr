@@ -238,13 +238,13 @@ so your tests run in parallel threads by default.
 
 If you're writing new code and tests with TLDR and dutifully running `tldr`
 constantly for fast feedback, odds are that this will help you catch thread
-safety issues early—this is a good thing, because it gives you a chance to fix
-them! But maybe you're porting an existing test suite to TLDR and running in
-parallel for the first time, or maybe you need to test something that simply
-_can't_ be exercised in a thread-safe way. For those cases, TLDR's goal is to
-give you some tools to prevent you from giving up and adding `--no-parallel` to
-your entire test suite and **slowing everything down for the sake of a few
-tests**.
+safety issues early—this is a good thing, because it gives you a chance to
+address them before they're too hard to fix! But maybe you're porting an
+existing test suite to TLDR and running in parallel for the first time, or maybe
+you need to test something that simply _can't_ be exercised in a thread-safe
+way. For those cases, TLDR's goal is to give you some tools to prevent you from
+giving up and adding `--no-parallel` to your entire test suite and **slowing
+everything down for the sake of a few tests**.
 
 So, when you see a test that is failing when run in parallel with the rest of your
 suite, here is what we recommend doing, in priority order:
