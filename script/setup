@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+set -e
+
+bundle
+
+cd example/a
+bundle
+cd ../..
+
+cd example/b
+bundle
+cd ../..
+
+cd example/c
+bundle
+cd ../..
+
+cd example/d
+bundle
+cd ../..

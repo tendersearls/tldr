@@ -23,15 +23,8 @@ jobs:
       with:
         ruby-version: ${{ matrix.ruby }}
         bundler-cache: true
-    - name: Run the default task
-      run: bundle exec rake
-    - name: Run a simple CLI example
-      run: |
-        cd example/a
-        bundle install
-        bundle exec tldr | grep "😁😁"
-    - name: Run a simple API example
-      run: |
-        cd example/b
-        bundle install
-        bundle exec ruby -Itest test/some_test.rb | grep "😁"
+    - name: Run setup script
+      run: script/setup
+    - name: Run tests
+      run: script/test
+

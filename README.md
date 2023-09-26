@@ -203,6 +203,28 @@ with these caveats:
   TLDR::Assertions::MinitestCompatibility` into the `TLDR` base class or
   individual test classes
 
+### Running TLDR with Rake
+
+TLDR ships with a [very](lib/tldr/rake.rb) minimal rake task that simply shells
+out to the `tldr` CLI. If you want to run TLDR with Rake, you can configure
+the test run by setting flags on an env var named `TLDR_OPTS` or else in
+the [.tldr.yml](#setting-defaults-in-tldryml).
+
+Here's an example Rakefile:
+
+```ruby
+require "standard/rake"
+require "tldr/rake"
+
+task default: [:tldr, "standard:fix"]
+```
+
+You could then run the task with:
+
+```
+$ TLDR_OPTS="--no-parallel" bundle exec rake tldr
+```
+
 ### How will I run all my tests in CI without the time bomb going off?
 
 TLDR will run all your tests in CI without the time bomb going off.

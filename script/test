@@ -1,25 +1,14 @@
-#!/usr/bin/env ruby
-$LOAD_PATH.unshift File.expand_path("../lib", __dir__)
+#!/usr/bin/env bash
 
-require "tldr"
+set -e
 
-class FunTest < TLDR
-  def test_passes
-    assert true
-  end
+bundle exec rake
 
-  def test_false
-    assert false
-  end
+cd example/a
+bundle exec tldr | grep "😁😁"
+cd ../..
 
-  def test_hello
-    raise "💥"
-  end
-
-  def test_slow
-    skip
-    sleep 2
-  end
-end
-
-TLDR::Run.run(TLDR::Config.new(paths: []))
+cd example/b
+bundle exec ruby -Itest test/some_test.rb | grep "😁"
+bundle exec rake tldr | grep "😁"
+cd ../..

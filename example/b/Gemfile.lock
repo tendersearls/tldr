@@ -1,7 +1,7 @@
 PATH
   remote: ../..
   specs:
-    tldr (0.1.0)
+    tldr (0.1.1)
       concurrent-ruby (~> 1.2)
       super_diff (~> 0.10)
 
@@ -14,6 +14,7 @@ GEM
     optimist (3.1.0)
     patience_diff (1.2.0)
       optimist (~> 3.0)
+    rake (13.0.6)
     super_diff (0.10.0)
       attr_extras (>= 6.2.4)
       diff-lcs
@@ -23,6 +24,7 @@ PLATFORMS
   arm64-darwin-22
 
 DEPENDENCIES
+  rake
   tldr!
 
 BUNDLED WITH
