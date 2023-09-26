@@ -28,7 +28,7 @@ class TLDR
       SuperDiff::EqualityMatchers::Main.call(expected:, actual:)
     end
 
-    def self.capture_io
+    def capture_io
       captured_stdout, captured_stderr = StringIO.new, StringIO.new
 
       original_stdout, original_stderr = $stdout, $stderr
@@ -204,7 +204,7 @@ class TLDR
     def assert_output expected_stdout, expected_stderr, message = nil, &block
       assert_block "assert_output requires a block to capture output" unless block
 
-      actual_stdout, actual_stderr = Assertions.capture_io(&block)
+      actual_stdout, actual_stderr = capture_io(&block)
 
       if Regexp === expected_stderr
         assert_match expected_stderr, actual_stderr, "In stderr"
