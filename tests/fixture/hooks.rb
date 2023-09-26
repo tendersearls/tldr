@@ -1,5 +1,6 @@
 class Hooks < TLDR
   def setup
+    super
     print "\nA"
   end
 
@@ -12,6 +13,7 @@ class Hooks < TLDR
   end
 
   def teardown
+    super
     print "C"
   end
 end

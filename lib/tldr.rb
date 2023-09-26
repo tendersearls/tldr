@@ -14,6 +14,12 @@ class TLDR
   include Assertions
   include Skippable
 
+  def setup
+  end
+
+  def teardown
+  end
+
   module Run
     def self.cli argv
       config = ArgvParser.new.parse argv
