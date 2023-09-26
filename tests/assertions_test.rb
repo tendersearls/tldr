@@ -298,7 +298,8 @@ class AssertionsTest < AssertionTestCase
   end
 
   def test_assert_raises
-    @subject.assert_raises(ArgumentError) { raise ArgumentError }
+    e = @subject.assert_raises(ArgumentError) { raise ArgumentError, "hi" }
+    assert_equal e.message, "hi"
     @subject.assert_raises(IOError, ArgumentError) { raise ArgumentError }
     nested_e = assert_raises TLDR::Failure do
       @subject.assert_raises {
