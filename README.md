@@ -229,6 +229,11 @@ $ TLDR_OPTS="--no-parallel" bundle exec rake tldr
 
 TLDR will run all your tests in CI without the time bomb going off.
 
+### What about mocking?
+
+TLDR is laser-focused on running tests. Might we interest you in a refreshing
+[mocktail](https://github.com/testdouble/mocktail), instead?
+
 ## Acknowledgements
 
 Thanks to [George Sheppard](https://github.com/fuzzmonkey) for freeing up the
