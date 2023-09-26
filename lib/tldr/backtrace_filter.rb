@@ -1,8 +1,6 @@
 class TLDR
   class BacktraceFilter
     BASE_PATH = __dir__.freeze
-    SORBET_RUNTIME_PATTERN = %r{sorbet-runtime.*[/\\]lib[/\\]types[/\\]private[/\\]}
-    CONCURRENT_RUBY_PATTERN = %r{concurrent-ruby.*[/\\]lib[/\\]concurrent-ruby[/\\]concurrent[/\\]}
 
     def filter backtrace
       return ["No backtrace"] unless backtrace
@@ -32,9 +30,7 @@ class TLDR
     end
 
     def internal? frame
-      frame.start_with?(BASE_PATH) ||
-        frame.match?(SORBET_RUNTIME_PATTERN) ||
-        frame.match?(CONCURRENT_RUBY_PATTERN)
+      frame.start_with?(BASE_PATH)
     end
   end
 
