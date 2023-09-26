@@ -1,10 +1,11 @@
 class TLDR
-  Test = Struct.new :klass, :method, :file, :line do
-    attr_reader :location
+  Test = Struct.new :klass, :method do
+    attr_reader :file, :line, :location
 
     def initialize(*args)
       super
-      @location = Location.new(file, line)
+      @file, @line = SorbetCompatibility.unwrap_method(klass.instance_method(method)).source_location
+      @location = Location.new file, line
     end
 
     # Memoizing at call time, because re-parsing isn't free and isn't usually necessary
@@ -18,6 +19,10 @@ class TLDR
     # Test exact match starting line condition first to save us a potential re-parsing to look up end_line
     def covers_line? l
       line == l || (l >= line && l <= end_line)
+    end
+
+    def group?
+      false
     end
   end
 end

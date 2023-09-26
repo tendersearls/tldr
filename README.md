@@ -225,6 +225,46 @@ You could then run the task with:
 $ TLDR_OPTS="--no-parallel" bundle exec rake tldr
 ```
 
+### Parallel-by-default was a bold choice—also my tests are failing now, thanks
+
+**Read this before you add `--no-parallel` because some tests are failing when
+you run `tldr`.**
+
+The vast majority of test suites in the wild are not parallelized and the vast
+majority of _those_ will only parallelize by forking processes as opposed to
+using a thread pool. We wanted to encourage more people to save time (after all,
+you only get 1.8 seconds here) by making your test suite run as fast as it can,
+so your tests run in parallel by default.
+
+If you're writing new code and tests with TLDR and dutifully running `tldr`
+constantly for fast feedback, odds are that this will help you catch thread
+safety issues early—this is a good thing, because it gives you a chance to fix
+them! But maybe you're porting an existing test suite to TLDR and running in
+parallel for the first time, or maybe you need to test something that simply
+_can't_ be exercised in a thread-safe way. For those cases, TLDR's goal is to
+give you some tools to prevent you from giving up and adding `--no-parallel` to
+your entire test suite and **slowing everything down for the sake of a few
+tests**.
+
+So, when you see a test that is failing when run in parallel with the rest of your
+suite, here is what we recommend doing, in priority order:
+
+1. Figure out a way to redesign the test (or the code under test) to be
+thread-safe.  Modern versions of Ruby provide a number of tools to make this
+easier than it used to be, and it may be as simple as making an instance
+variable thread-local
+2. If the problem is that a subset of your tests depend on the same resource,
+try using [TLDR.run_these_together!](/lib/tldr/run_these_together.rb) class to
+group the tests together. This will ensure that those tests run in the same
+thread in sequence (here's a a [simple
+example](/tests/fixture/run_these_together.rb))
+3. Give up and make the whole suite `--no-parallel`. If you find that you need
+to resort to this, you might save some keystrokes by adding `parallel: false` in
+a [.tldr.yml](#setting-defaults-in-tldryml) file
+
+We have a couple other ideas of ways to incorporate non-thread-safe tests into
+your suite without slowing down the rest of your tests, so stay tuned!
+
 ### How will I run all my tests in CI without the time bomb going off?
 
 TLDR will run all your tests in CI without the time bomb going off.

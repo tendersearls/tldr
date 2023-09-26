@@ -1,9 +1,9 @@
 require "irb"
-require "concurrent"
 
 class TLDR
   class Runner
     def initialize
+      @parallelizer = Parallelizer.new
       @wip = Concurrent::Array.new
       @results = Concurrent::Array.new
       @run_aborted = Concurrent::AtomicBoolean.new false
@@ -34,7 +34,7 @@ class TLDR
         end
       }
 
-      results = parallelize(plan.tests, config.parallel) { |test|
+      results = @parallelizer.parallelize(plan.tests, config.parallel) { |test|
         e = nil
         start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC, :microsecond)
         wip_test = WIPTest.new test, start_time
@@ -64,20 +64,6 @@ class TLDR
     end
 
     private
-
-    def parallelize tests, parallel, &blk
-      return tests.map(&blk) if tests.size < 2 || !parallel
-      tldr_pool = Concurrent::ThreadPoolExecutor.new(
-        name: "tldr",
-        auto_terminate: true
-      )
-
-      tests.map { |test|
-        Concurrent::Promises.future_on(tldr_pool) {
-          blk.call test
-        }
-      }.flat_map(&:value)
-    end
 
     def fail_fast reporter, plan, fast_failed_result
       unless @run_aborted.true?

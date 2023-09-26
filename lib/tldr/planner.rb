@@ -50,8 +50,7 @@ class TLDR
     def gather_tests
       gather_descendants(TLDR).flat_map { |subklass|
         subklass.instance_methods.grep(/^test_/).sort.map { |method|
-          file, line = SorbetCompatibility.unwrap_method(subklass.instance_method(method)).source_location
-          Test.new subklass, method, file, line
+          Test.new subklass, method
         }
       }
     end

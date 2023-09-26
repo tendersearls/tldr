@@ -1,14 +1,19 @@
-require_relative "tldr/version"
+require "concurrent-ruby"
+
+require_relative "tldr/argv_parser"
+require_relative "tldr/assertions"
 require_relative "tldr/backtrace_filter"
 require_relative "tldr/error"
-require_relative "tldr/value"
-require_relative "tldr/reporters"
-require_relative "tldr/argv_parser"
+require_relative "tldr/parallelizer"
 require_relative "tldr/planner"
+require_relative "tldr/reporters"
+require_relative "tldr/run_these_together"
 require_relative "tldr/runner"
-require_relative "tldr/assertions"
 require_relative "tldr/skippable"
 require_relative "tldr/sorbet_compatibility"
+require_relative "tldr/strategizer"
+require_relative "tldr/value"
+require_relative "tldr/version"
 
 class TLDR
   include Assertions

@@ -1,5 +1,3 @@
-require "concurrent"
-
 class Parallel < TLDR
   # run manually with:
   #  $ time be tldr tests/fixture/parallel.rb

@@ -1,5 +1,3 @@
-require "concurrent"
-
 class TLDR
   CONFLAGS = {
     seed: "--seed",
