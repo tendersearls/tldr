@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.3.0]
+
+* Add `TLDR.run_these_together!` method to allow tests that can't safely be run
+concurrently to be grouped and run together
+
 ## [0.2.1]
 
 * Define a default empty setup/teardown in the base class, to guard against
