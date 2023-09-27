@@ -7,10 +7,10 @@ class TLDR
     end
 
     def test_no_groups
-      result = @subject.strategize some_tests, []
+      result = @subject.strategize some_tests, [], []
 
-      assert_equal some_tests, result.tests
-      assert_equal some_tests, result.tests_and_groups
+      assert_equal some_tests, result.parallel_tests_and_groups
+      assert_equal [], result.thread_unsafe_tests
     end
 
     def test_basic_group
@@ -18,20 +18,19 @@ class TLDR
         TestGroup.new([[TB, :test_2], ["TLDR::StrategizerTest::TC", :test_1]])
       ]
 
-      result = @subject.strategize some_tests, some_groups
+      result = @subject.strategize some_tests, some_groups, []
 
-      assert_equal some_tests, result.tests
       assert_equal [
         Test.new(TA, :test_1),
         Test.new(TA, :test_2),
         Test.new(TB, :test_1),
         TestGroup.new([[TB, :test_2], ["TLDR::StrategizerTest::TC", :test_1]]),
         Test.new(TC, :test_2)
-      ], result.tests_and_groups
+      ], result.parallel_tests_and_groups
       assert_equal [
         Test.new(TB, :test_2),
         Test.new(TC, :test_1)
-      ], result.tests_and_groups[3].tests
+      ], result.parallel_tests_and_groups[3].tests
     end
 
     def test_overlapping_groups_where_a_test_appears_in_multiple_groups
@@ -40,22 +39,21 @@ class TLDR
         TestGroup.new([["TLDR::StrategizerTest::TB", :test_2], [TA, :test_1]])
       ]
 
-      result = @subject.strategize some_tests, some_groups
+      result = @subject.strategize some_tests, some_groups, []
 
-      assert_equal some_tests, result.tests
       assert_equal [
         Test.new(TB, :test_2),
         Test.new(TA, :test_1),
         Test.new(TC, :test_1)
-      ], result.tests_and_groups.first.tests
+      ], result.parallel_tests_and_groups.first.tests
       assert_equal some_tests - [
         Test.new(TA, :test_1),
         Test.new(TB, :test_2),
         Test.new(TC, :test_1)
-      ], result.tests_and_groups[1..]
+      ], result.parallel_tests_and_groups[1..]
     end
 
-    def test_weird_repitition
+    def test_weird_repetition
       some_groups = [
         TestGroup.new([[TA, nil]]),
         TestGroup.new([[TA, nil]]),
@@ -63,19 +61,65 @@ class TLDR
         TestGroup.new([[TA, :test_2], [TC, :test_1]]),
         TestGroup.new([[TB, :test_2], [TC, :test_2]])
       ]
+      unsafe_groups = [
+        TestGroup.new([[TA, :test_2]]),
+        TestGroup.new([[TB, :test_1]])
+      ]
 
-      result = @subject.strategize some_tests, some_groups
+      result = @subject.strategize some_tests, some_groups, unsafe_groups
 
-      assert_equal some_tests, result.tests
-      assert_equal 2, result.tests_and_groups.size
+      assert_equal 2, result.parallel_tests_and_groups.size
+      assert_equal [
+        Test.new(TA, :test_1),
+        Test.new(TB, :test_2),
+        Test.new(TC, :test_2)
+      ], result.parallel_tests_and_groups.first.tests
+      assert_equal Test.new(TC, :test_1), result.parallel_tests_and_groups[1]
+      assert_equal [
+        Test.new(TA, :test_2),
+        Test.new(TB, :test_1)
+      ], result.thread_unsafe_tests
+    end
+
+    def test_thread_unsafe_tests
+      unsafe_groups = [
+        TestGroup.new([[TA, nil], [TB, :test_2]])
+      ]
+
+      result = @subject.strategize some_tests, [], unsafe_groups
+
+      assert_equal some_tests - [
+        Test.new(TA, :test_1),
+        Test.new(TA, :test_2),
+        Test.new(TB, :test_2)
+      ], result.parallel_tests_and_groups
       assert_equal [
         Test.new(TA, :test_1),
         Test.new(TA, :test_2),
-        Test.new(TB, :test_2),
-        Test.new(TC, :test_1),
+        Test.new(TB, :test_2)
+      ], result.thread_unsafe_tests
+    end
+
+    def test_grouped_tests_that_arent_selected_by_the_runner
+      some_groups = [
+        TestGroup.new([[TA, nil]]),
+        TestGroup.new([[TB, :test_1], [TB, :test_2]])
+      ]
+      unsafe_groups = [
+        TestGroup.new([[TC, nil]])
+      ]
+
+      result = @subject.strategize [
+        Test.new(TA, :test_1),
         Test.new(TC, :test_2)
-      ], result.tests_and_groups.first.tests
-      assert_equal Test.new(TB, :test_1), result.tests_and_groups[1]
+      ], some_groups, unsafe_groups
+
+      assert_equal [
+        Test.new(TA, :test_1)
+      ], result.parallel_tests_and_groups
+      assert_equal [
+        Test.new(TC, :test_2)
+      ], result.thread_unsafe_tests
     end
 
     private
