@@ -17,11 +17,16 @@ class TLDR
       end
 
       def after_test result
-        @out.print case result.type
+        output = case result.type
         when :success then @icons.success
         when :skip then @icons.skip
         when :failure then @icons.failure
         when :error then @icons.error
+        end
+        if @config.verbose
+          @out.puts "#{output} #{result.type.capitalize} - #{describe(result.test, result.relevant_location)}"
+        else
+          @out.print output
         end
       end
 
