@@ -6,7 +6,7 @@ load_paths: ["app", "lib"]
 parallel: true
 names: ["/test_*/", "test_it"]
 fail_fast: true
-prepend_tests: ["a.rb:3"]
+prepend_paths: ["a.rb:3"]
 paths: ["a.rb:3", "b.rb"]
 exclude_paths: ["c.rb:4"]
 exclude_names: ["test_b_1"]

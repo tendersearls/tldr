@@ -8,12 +8,18 @@ class TLDR
       )
     end
 
-    def parallelize all_tests, parallel, &blk
-      return run_in_sequence(all_tests, &blk) if all_tests.size < 2 || !parallel
+    def parallelize all_tests, config, &blk
+      return run_in_sequence(all_tests, &blk) if all_tests.size < 2 || !config.parallel
 
-      strategy = @strategizer.strategize all_tests, GROUPED_TESTS, THREAD_UNSAFE_TESTS
+      strategy = @strategizer.strategize(
+        all_tests,
+        GROUPED_TESTS,
+        THREAD_UNSAFE_TESTS,
+        (config.no_prepend ? [] : config.prepend_paths)
+      )
 
-      run_in_parallel(strategy.parallel_tests_and_groups, &blk) +
+      run_in_sequence(strategy.prepend_thread_unsafe_tests, &blk) +
+        run_in_parallel(strategy.parallel_tests_and_groups, &blk) +
         run_in_sequence(strategy.thread_unsafe_tests, &blk)
     end
 

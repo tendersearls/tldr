@@ -2,12 +2,36 @@ require "test_helper"
 
 class TLDR
   class StrategizerTest < Minitest::Test
+    class TA < TLDR
+      def test_1
+      end
+
+      def test_2
+      end
+    end
+
+    class TB < TLDR
+      def test_1
+      end
+
+      def test_2
+      end
+    end
+
+    class TC < TLDR
+      def test_1
+      end
+
+      def test_2
+      end
+    end
+
     def setup
       @subject = Strategizer.new
     end
 
     def test_no_groups
-      result = @subject.strategize some_tests, [], []
+      result = @subject.strategize some_tests, [], [], []
 
       assert_equal some_tests, result.parallel_tests_and_groups
       assert_equal [], result.thread_unsafe_tests
@@ -18,7 +42,7 @@ class TLDR
         TestGroup.new([[TB, :test_2], ["TLDR::StrategizerTest::TC", :test_1]])
       ]
 
-      result = @subject.strategize some_tests, some_groups, []
+      result = @subject.strategize some_tests, some_groups, [], []
 
       assert_equal [
         Test.new(TA, :test_1),
@@ -39,7 +63,7 @@ class TLDR
         TestGroup.new([["TLDR::StrategizerTest::TB", :test_2], [TA, :test_1]])
       ]
 
-      result = @subject.strategize some_tests, some_groups, []
+      result = @subject.strategize some_tests, some_groups, [], []
 
       assert_equal [
         Test.new(TB, :test_2),
@@ -66,7 +90,7 @@ class TLDR
         TestGroup.new([[TB, :test_1]])
       ]
 
-      result = @subject.strategize some_tests, some_groups, unsafe_groups
+      result = @subject.strategize some_tests, some_groups, unsafe_groups, []
 
       assert_equal 2, result.parallel_tests_and_groups.size
       assert_equal [
@@ -86,7 +110,7 @@ class TLDR
         TestGroup.new([[TA, nil], [TB, :test_2]])
       ]
 
-      result = @subject.strategize some_tests, [], unsafe_groups
+      result = @subject.strategize some_tests, [], unsafe_groups, []
 
       assert_equal some_tests - [
         Test.new(TA, :test_1),
@@ -97,6 +121,25 @@ class TLDR
         Test.new(TA, :test_1),
         Test.new(TA, :test_2),
         Test.new(TB, :test_2)
+      ], result.thread_unsafe_tests
+    end
+
+    def test_thread_unsafe_tests_with_prepend
+      unsafe_groups = [
+        TestGroup.new([[TA, nil], [TB, :test_2]])
+      ]
+
+      result = @subject.strategize some_tests, [], unsafe_groups, ["tests/strategizer_test.rb:18"]
+
+      assert_equal [Test.new(TB, :test_2)], result.prepend_thread_unsafe_tests
+      assert_equal some_tests - [
+        Test.new(TA, :test_1),
+        Test.new(TA, :test_2),
+        Test.new(TB, :test_2)
+      ], result.parallel_tests_and_groups
+      assert_equal [
+        Test.new(TA, :test_1),
+        Test.new(TA, :test_2)
       ], result.thread_unsafe_tests
     end
 
@@ -112,7 +155,7 @@ class TLDR
       result = @subject.strategize [
         Test.new(TA, :test_1),
         Test.new(TC, :test_2)
-      ], some_groups, unsafe_groups
+      ], some_groups, unsafe_groups, []
 
       assert_equal [
         Test.new(TA, :test_1)
@@ -133,30 +176,6 @@ class TLDR
         Test.new(TC, :test_1),
         Test.new(TC, :test_2)
       ]
-    end
-
-    class TA < TLDR
-      def test_1
-      end
-
-      def test_2
-      end
-    end
-
-    class TB < TLDR
-      def test_1
-      end
-
-      def test_2
-      end
-    end
-
-    class TC < TLDR
-      def test_1
-      end
-
-      def test_2
-      end
     end
   end
 end

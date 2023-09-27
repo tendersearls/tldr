@@ -3,7 +3,7 @@ require "pathname"
 class TLDR
   class Planner
     def plan config
-      search_locations = expand_search_locations config.paths
+      search_locations = PathUtil.expand_search_locations config.paths
 
       prepend_load_paths config
       require_test_helper config
@@ -32,21 +32,6 @@ class TLDR
 
     private
 
-    def expand_search_locations path_strings
-      path_strings.flat_map { |path_string|
-        File.directory?(path_string) ? Dir["#{path_string}/**/*.rb"] : path_string
-      }.flat_map { |path_string|
-        absolute_path = File.expand_path(path_string.gsub(/:.*$/, ""), Dir.pwd)
-        line_numbers = path_string.scan(/:(\d+)/).flatten.map(&:to_i)
-
-        if line_numbers.any?
-          line_numbers.map { |line_number| Location.new absolute_path, line_number }
-        else
-          [Location.new(absolute_path, nil)]
-        end
-      }.uniq
-    end
-
     def gather_tests
       gather_descendants(TLDR).flat_map { |subklass|
         subklass.instance_methods.grep(/^test_/).sort.map { |method|
@@ -57,9 +42,9 @@ class TLDR
 
     def prepend tests, config
       return tests if config.no_prepend
-      prepended_locations = expand_search_locations expand_globs config.prepend_tests
+      prepended_locations = PathUtil.expand_search_locations PathUtil.expand_globs config.prepend_paths
       prepended, rest = tests.partition { |test|
-        locations_include_test? prepended_locations, test
+        PathUtil.locations_include_test? prepended_locations, test
       }
       prepended + rest
     end
@@ -69,11 +54,11 @@ class TLDR
     end
 
     def exclude_by_path tests, exclude_paths
-      excluded_locations = expand_search_locations expand_globs exclude_paths
+      excluded_locations = PathUtil.expand_search_locations PathUtil.expand_globs exclude_paths
       return tests if excluded_locations.empty?
 
       tests.reject { |test|
-        locations_include_test? excluded_locations, test
+        PathUtil.locations_include_test? excluded_locations, test
       }
     end
 
@@ -94,7 +79,7 @@ class TLDR
       return tests if line_specific_locations.empty?
 
       tests.select { |test|
-        locations_include_test? line_specific_locations, test
+        PathUtil.locations_include_test? line_specific_locations, test
       }
     end
 
@@ -130,29 +115,6 @@ class TLDR
     def gather_descendants root_klass
       root_klass.subclasses + root_klass.subclasses.flat_map { |subklass|
         gather_descendants subklass
-      }
-    end
-
-    def locations_include_test? locations, test
-      locations.any? { |location|
-        location.file == test.file && (location.line.nil? || test.covers_line?(location.line))
-      }
-    end
-
-    # Because search paths to TLDR can include line numbers (e.g. a.rb:4), we
-    # can't just pass everything to Dir.glob. Instead, we have to check whether
-    # a user-provided search path looks like a glob, and if so, expand it
-    #
-    # Globby characters specified here:
-    # https://ruby-doc.org/3.2.2/Dir.html#method-c-glob
-    def expand_globs search_paths
-      search_paths.flat_map { |search_path|
-        if search_path.match?(/[*?\[\]{}]/)
-          raise Error, "Can't combine globs and line numbers in: #{search_path}" if search_path.match?(/:(\d+)$/)
-          Dir[search_path]
-        else
-          search_path
-        end
       }
     end
 

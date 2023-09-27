@@ -47,9 +47,9 @@ class TLDR
           options[:no_helper] = true
         end
 
-        opts.on "#{CONFLAGS[:prepend_tests]} PATH", Array, "Prepend one or more paths to run before the rest (Default: most recently modified test)" do |prepend|
-          options[:prepend_tests] ||= []
-          options[:prepend_tests] += prepend
+        opts.on "#{CONFLAGS[:prepend_paths]} PATH", Array, "Prepend one or more paths to run before the rest (Default: most recently modified test)" do |prepend|
+          options[:prepend_paths] ||= []
+          options[:prepend_paths] += prepend
         end
 
         opts.on CONFLAGS[:no_prepend], "Don't prepend any tests before the rest of the suite" do

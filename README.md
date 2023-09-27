@@ -207,7 +207,7 @@ $ ruby test/some_test.rb
 
 To maximize control and to avoid running code accidentally (and _unlike_ the
 `tldr` CLI), running `at_exit!` will not set default values to the `paths`,
-`helper`, `load_paths`, and `prepend_tests` config properties. You'll have to
+`helper`, `load_paths`, and `prepend_paths` config properties. You'll have to
 pass any values you want to set on a [Config object](/lib/tldr/value/config.rb)
 and pass it to `at_exit!`.
 

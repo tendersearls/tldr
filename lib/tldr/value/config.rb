@@ -10,7 +10,7 @@ class TLDR
     names: "--name",
     fail_fast: "--fail-fast",
     no_emoji: "--no-emoji",
-    prepend_tests: "--prepend",
+    prepend_paths: "--prepend",
     no_prepend: "--no-prepend",
     exclude_paths: "--exclude-path",
     exclude_names: "--exclude-name",
@@ -19,12 +19,12 @@ class TLDR
     paths: nil
   }.freeze
 
-  PATH_FLAGS = [:paths, :helper, :load_paths, :prepend_tests, :exclude_paths].freeze
+  PATH_FLAGS = [:paths, :helper, :load_paths, :prepend_paths, :exclude_paths].freeze
   MOST_RECENTLY_MODIFIED_TAG = "MOST_RECENTLY_MODIFIED".freeze
 
   Config = Struct.new :paths, :seed, :no_helper, :verbose, :reporter,
     :helper, :load_paths, :parallel, :names, :fail_fast, :no_emoji,
-    :prepend_tests, :no_prepend, :exclude_paths, :exclude_names, :base_path,
+    :prepend_paths, :no_prepend, :exclude_paths, :exclude_names, :base_path,
     :no_dotfile,
     :seed_set_intentionally, :cli_mode, keyword_init: true do
     def initialize(**args)
@@ -58,14 +58,14 @@ class TLDR
           paths: Dir["test/**/*_test.rb", "test/**/test_*.rb"],
           helper: "test/helper.rb",
           load_paths: ["test"],
-          prepend_tests: [MOST_RECENTLY_MODIFIED_TAG]
+          prepend_paths: [MOST_RECENTLY_MODIFIED_TAG]
         )
       else
         common.merge(
           paths: [],
           helper: nil,
           load_paths: [],
-          prepend_tests: []
+          prepend_paths: []
         )
       end
     end
@@ -82,7 +82,7 @@ class TLDR
       end
 
       # Arrays
-      [:paths, :load_paths, :names, :prepend_tests, :exclude_paths, :exclude_names].each do |key|
+      [:paths, :load_paths, :names, :prepend_paths, :exclude_paths, :exclude_names].each do |key|
         merged_args[key] = defaults[key] if merged_args[key].nil? || merged_args[key].empty?
       end
 
@@ -103,9 +103,9 @@ class TLDR
     # the default prepend location until we have all the resolved test paths,
     # so we have to mutate it after the fact.
     def update_after_gathering_tests! tests
-      return unless prepend_tests.include?(MOST_RECENTLY_MODIFIED_TAG)
+      return unless prepend_paths.include?(MOST_RECENTLY_MODIFIED_TAG)
 
-      self.prepend_tests = prepend_tests.map { |path|
+      self.prepend_paths = prepend_paths.map { |path|
         if path == MOST_RECENTLY_MODIFIED_TAG
           most_recently_modified_test_file tests
         else
@@ -120,7 +120,7 @@ class TLDR
 
     def to_single_path_args(path)
       argv = to_cli_argv(CONFLAGS.keys - [
-        :seed, :parallel, :names, :fail_fast, :paths, :prepend_tests,
+        :seed, :parallel, :names, :fail_fast, :paths, :prepend_paths,
         :no_prepend, :exclude_paths
       ])
 
@@ -135,8 +135,8 @@ class TLDR
         flag = CONFLAGS[key]
 
         # Special cases
-        if key == :prepend_tests
-          if prepend_tests.map { |s| stringify(key, s) }.sort == paths.map { |s| stringify(:paths, s) }.sort
+        if key == :prepend_paths
+          if prepend_paths.map { |s| stringify(key, s) }.sort == paths.map { |s| stringify(:paths, s) }.sort
             # Don't print prepended tests if they're the same as the test paths
             next
           elsif no_prepend

@@ -34,7 +34,7 @@ class TLDR
         end
       }
 
-      results = @parallelizer.parallelize(plan.tests, config.parallel) { |test|
+      results = @parallelizer.parallelize(plan.tests, config) { |test|
         e = nil
         start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC, :microsecond)
         wip_test = WIPTest.new test, start_time

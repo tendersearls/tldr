@@ -1,6 +1,6 @@
 class TLDR
   class Strategizer
-    Strategy = Struct.new :parallel_tests_and_groups, :thread_unsafe_tests
+    Strategy = Struct.new :prepend_thread_unsafe_tests, :parallel_tests_and_groups, :thread_unsafe_tests
 
     # Combine all discovered test methods with any methods grouped by run_these_together!
     #
@@ -8,13 +8,14 @@ class TLDR
     #   - Map over tests to build out groups in order to retain shuffle order
     #     (group will run in position of first test in the group)
     #   - If a test is in multiple groups, only run it once
-    def strategize all_tests, run_these_together_groups, thread_unsafe_test_groups
+    def strategize all_tests, run_these_together_groups, thread_unsafe_test_groups, prepend_paths
       thread_unsafe_tests, thread_safe_tests = partition_unsafe(all_tests, thread_unsafe_test_groups)
+      prepend_thread_unsafe_tests, thread_unsafe_tests = partition_prepend(thread_unsafe_tests, prepend_paths)
 
       grouped_tests = prepare_run_together_groups run_these_together_groups, thread_safe_tests, thread_unsafe_tests
       already_included_groups = []
 
-      Strategy.new thread_safe_tests.map { |test|
+      Strategy.new prepend_thread_unsafe_tests, thread_safe_tests.map { |test|
         if (group = grouped_tests.find { |group| group.tests.include? test })
           if already_included_groups.include? group
             next
@@ -36,6 +37,16 @@ class TLDR
     def partition_unsafe tests, thread_unsafe_test_groups
       tests.partition { |test|
         thread_unsafe_test_groups.any? { |group| group.tests.include? test }
+      }
+    end
+
+    # Sadly duplicative with Planner.rb, necessitating the extraction of PathUtil
+    # Suboptimal, but we do indeed need to do this work in two places ¯\_(ツ)_/¯
+    def partition_prepend thread_unsafe_tests, prepend_paths
+      locations = PathUtil.expand_search_locations PathUtil.expand_globs prepend_paths
+
+      thread_unsafe_tests.partition { |test|
+        PathUtil.locations_include_test? locations, test
       }
     end
 

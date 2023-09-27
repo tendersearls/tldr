@@ -15,7 +15,7 @@ class ConfigTest < Minitest::Test
     # assert_equal ["test/add_test.rb", "test/test_subtract.rb"], config.paths
     assert_equal "test/helper.rb", config.helper
     assert_equal ["test"], config.load_paths
-    assert_equal [TLDR::MOST_RECENTLY_MODIFIED_TAG], config.prepend_tests
+    assert_equal [TLDR::MOST_RECENTLY_MODIFIED_TAG], config.prepend_paths
   end
 
   def test_non_cli_defaults
@@ -24,7 +24,7 @@ class ConfigTest < Minitest::Test
     assert_equal [], config.paths
     assert_nil config.helper
     assert_equal [], config.load_paths
-    assert_equal [], config.prepend_tests
+    assert_equal [], config.prepend_paths
   end
 
   def test_default_no_parallel_when_seed_is_set_explicitly
@@ -51,7 +51,7 @@ class ConfigTest < Minitest::Test
       parallel: true,
       names: ["/test_*/", "test_it"],
       fail_fast: true,
-      prepend_tests: ["a.rb:3"],
+      prepend_paths: ["a.rb:3"],
       paths: ["a.rb:3", "b.rb"],
       exclude_paths: ["c.rb:4"],
       exclude_names: ["test_b_1"]
@@ -70,7 +70,7 @@ class ConfigTest < Minitest::Test
     config = TLDR::Config.new(
       seed: 1,
       no_prepend: true,
-      prepend_tests: ["a.rb:3"]
+      prepend_paths: ["a.rb:3"]
     )
 
     assert_equal <<~MSG.chomp, config.to_full_args
@@ -102,7 +102,7 @@ class ConfigTest < Minitest::Test
       seed: 1,
       helper: "#{Dir.pwd}/test_helper.rb",
       load_paths: ["#{Dir.pwd}/app", "/lol/ok/lib"],
-      prepend_tests: ["#{Dir.pwd}/foo.rb"],
+      prepend_paths: ["#{Dir.pwd}/foo.rb"],
       exclude_paths: ["#{Dir.pwd}/bar.rb"],
       paths: ["#{Dir.pwd}/baz.rb"]
     )
@@ -119,7 +119,7 @@ class ConfigTest < Minitest::Test
   def test_cli_summary_ignores_prepend_when_it_matches_paths
     config = TLDR::Config.new(
       seed: 1,
-      prepend_tests: ["#{Dir.pwd}/foo.rb", "bar.rb"],
+      prepend_paths: ["#{Dir.pwd}/foo.rb", "bar.rb"],
       paths: ["#{Dir.pwd}/bar.rb", "foo.rb"]
     )
 
