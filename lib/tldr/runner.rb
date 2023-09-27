@@ -42,7 +42,16 @@ class TLDR
         runtime = time_it(start_time) do
           instance = test.klass.new
           instance.setup if instance.respond_to? :setup
-          instance.send(test.method)
+          if instance.respond_to? :around
+            did_run = false
+            instance.around {
+              did_run = true
+              instance.send(test.method)
+            }
+            raise Error, "#{test.klass}#around failed to yield or call the passed test block" unless did_run
+          else
+            instance.send(test.method)
+          end
           instance.teardown if instance.respond_to? :teardown
         rescue Skip, Failure, StandardError => e
         end

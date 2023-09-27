@@ -147,7 +147,8 @@ well as some [internal tests](/tests/dotfile_test.rb) demonstrating its behavior
 Tests you write with tldr are designed to be mostly-compatible with
 [Minitest](https://github.com/minitest/minitest) tests. Some notes:
 
-* `setup` and `teardown` hook methods should work as you expect
+* `setup` and `teardown` hook methods should work as you expect. (We even threw
+in [an `around` hook](https://github.com/splattael/minitest-around) as a bonus!)
 * All of Minitest's assertions (e.g. `assert`, `assert_equals`) are provided,
 with these caveats:
   * To retain the `expected, actual` argument ordering, `tldr` defines
