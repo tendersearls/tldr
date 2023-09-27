@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+## [0.4.0]
+
 * Add `TLDR.dont_run_these_in_parallel!` method to allow tests to indicate that they
 must be run in isolation and not concurrently with any other tests
 * Add support for `around` hooks (similar to [minitest-around](https://github.com/splattael/minitest-around))
