@@ -1,6 +1,8 @@
 # TLDR - for people who don't have time for slow tests
 
-**tl;dr, this is a very nice test runner for Ruby that quits after 1.8 seconds**
+Okay, you might need to sit down for this:
+
+**tl;dr, TLDR is a Ruby test framework that stops running your tests after 1.8 seconds.**
 
 We initially meant this as a joke [while
 pairin'](https://www.youtube.com/live/bmi-SWeH4MA?si=p5g1j1FQZrbYEOCg&t=63), but
@@ -9,13 +11,15 @@ in addition to being funny, it was also a pretty good idea. So we fleshed out
 [Minitest-compatible](#minitest-compatibility), and downright pleasant test
 framework for Ruby.
 
-The "big idea" here is to run the `tldr` command repeatedly as you work—as
-opposed to only running the test of whatever you're working on—even if your
-suite is over the 1.8 second time limit. Because TLDR shuffles and runs in
-parallel and is guaranteed to take less than two seconds, **you'll actually wind
-up running _all_ of your tests quite often as you work**, catching any problems
-much earlier than if you wait until the end of the day to push your work and let
-a continuous integration server run the full suite.
+The "big idea" here is TLDR is designed for users to run the `tldr` command
+repeatedly as they work—as opposed to only running the tests for whatever is
+being worked on. Even if the suite run over the 1.8 second time limit. Because
+TLDR shuffles and runs in parallel and is guaranteed to take less than two
+seconds,
+**you'll actually wind up running _all_ of your tests quite often as you work**,
+catching any problems much earlier than if you had waited until the end of the
+day to push your work and let a continuous integration server run the full
+suite.
 
 Some stuff you might like:
 
