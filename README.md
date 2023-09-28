@@ -181,6 +181,27 @@ You could then run the task with:
 $ TLDR_OPTS="--no-parallel" bundle exec rake tldr
 ```
 
+One reason you'd want to invoke TLDR with Rake is because you have multiple
+test suites that you want to be able to conveniently run separately ([this
+talk](https://blog.testdouble.com/talks/2014-05-25-breaking-up-with-your-test-suite/)
+discussed a few reasons why this can be useful).
+
+To create a custom TLDR Rake test, just instantiate `TLDR::Task` like this:
+
+```ruby
+require "tldr/rake"
+
+TLDR::Task.new(name: :safe_tests, config: TLDR::Config.new(
+  paths: FileList["safe/**/*_test.rb"],
+  helper: "safe/helper.rb",
+  load_paths: ["lib", "safe"]
+))
+```
+
+The above will create a second Rake task named `safe_tests` running a different
+set of tests than the default `tldr` task. Here's [an
+example](/example/b/Rakefile).
+
 ### Running tests without the CLI
 
 If you'd rather use TLDR by running Ruby files instead of the `tldr` CLI

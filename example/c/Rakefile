@@ -1,0 +1,7 @@
+require "tldr/rake"
+
+TLDR::Task.new(name: :b_tests, config: TLDR::Config.new(
+  base_path: "../b"
+))
+
+task default: :tldr

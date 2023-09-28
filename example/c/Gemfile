@@ -1,3 +1,4 @@
 source "https://rubygems.org"
 
 gem "tldr", path: "../.."
+gem "rake"

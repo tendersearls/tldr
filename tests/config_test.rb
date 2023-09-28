@@ -9,7 +9,7 @@ class ConfigTest < Minitest::Test
   end
 
   def test_cli_defaults
-    config = TLDR::Config.new cli_mode: true
+    config = TLDR::Config.new cli_defaults: true
 
     # Won't work unless we change dir to example/a and it'll create pollution
     # assert_equal ["test/add_test.rb", "test/test_subtract.rb"], config.paths
@@ -19,7 +19,7 @@ class ConfigTest < Minitest::Test
   end
 
   def test_non_cli_defaults
-    config = TLDR::Config.new
+    config = TLDR::Config.new cli_defaults: false
 
     assert_equal [], config.paths
     assert_nil config.helper
@@ -137,5 +137,23 @@ class ConfigTest < Minitest::Test
     assert_equal <<~MSG.chomp, config.to_full_args
       --seed 1 "foo.rb"
     MSG
+  end
+
+  def test_merging_configs_basic
+    config = TLDR::Config.new(no_emoji: true, prepend_paths: ["a.rb:1"], paths: ["a.rb"])
+    other = TLDR::Config.new(no_emoji: false, seed: 1, prepend_paths: ["a.rb:2"], config_intended_for_merge_only: true)
+
+    result = config.merge other
+
+    refute_same result, config
+    refute result.config_intended_for_merge_only
+    # Seed logic still works, it was just resolved by the otherconfig
+    assert result.seed_set_intentionally
+    assert_equal 1, result.seed
+    refute result.parallel
+    # Basic merging happens
+    assert_equal ["a.rb"], result.paths
+    assert_equal ["a.rb:2"], result.prepend_paths
+    refute result.no_emoji
   end
 end

@@ -26,18 +26,28 @@ class TLDR
     :helper, :load_paths, :parallel, :names, :fail_fast, :no_emoji,
     :prepend_paths, :no_prepend, :exclude_paths, :exclude_names, :base_path,
     :no_dotfile,
-    :seed_set_intentionally, :cli_mode, keyword_init: true do
+    # Internal properties
+    :config_intended_for_merge_only, :seed_set_intentionally, :cli_defaults,
+    keyword_init: true do
     def initialize(**args)
-      change_working_directory_because_i_am_bad_and_i_should_feel_bad!(args[:base_path])
-      args = merge_dotfile_args(args) unless args[:no_dotfile]
+      unless args[:config_intended_for_merge_only]
+        change_working_directory_because_i_am_bad_and_i_should_feel_bad!(args[:base_path])
+        args = merge_dotfile_args(args) unless args[:no_dotfile]
+      end
+      args = undefault_parallel_if_seed_set(args)
+      unless args[:config_intended_for_merge_only]
+        args = merge_defaults(args)
+      end
 
-      super(**merge_defaults(args))
+      super(**args)
     end
 
-    # Must be set when the Config is first initialized
-    undef_method :cli_mode=, :no_dotfile=, :base_path=
+    # These are for internal tracking and resolved at initialization-time
+    undef_method :config_intended_for_merge_only=, :seed_set_intentionally=,
+      # These must be set when the Config is first initialized
+      :cli_defaults=, :no_dotfile=, :base_path=
 
-    def self.build_defaults(cli_mode = false)
+    def self.build_defaults cli_defaults: true
       common = {
         seed: rand(10_000),
         no_helper: false,
@@ -53,7 +63,7 @@ class TLDR
         base_path: nil
       }
 
-      if cli_mode
+      if cli_defaults
         common.merge(
           paths: Dir["test/**/*_test.rb", "test/**/test_*.rb"],
           helper: "test/helper.rb",
@@ -70,16 +80,16 @@ class TLDR
       end
     end
 
-    def merge_defaults(user_args)
-      merged_args = user_args.dup
-      defaults = Config.build_defaults(merged_args[:cli_mode])
-      merged_args[:seed_set_intentionally] = !merged_args[:seed].nil?
+    def undefault_parallel_if_seed_set args
+      args.merge(
+        seed_set_intentionally: !args[:seed].nil?,
+        parallel: (args[:parallel].nil? ? args[:seed].nil? : args[:parallel])
+      )
+    end
 
-      # Special cases
-      if merged_args[:parallel].nil?
-        # Disable parallelization if seed is set
-        merged_args[:parallel] = merged_args[:seed].nil?
-      end
+    def merge_defaults user_args
+      merged_args = user_args.dup
+      defaults = Config.build_defaults(cli_defaults: merged_args[:cli_defaults])
 
       # Arrays
       [:paths, :load_paths, :names, :prepend_paths, :exclude_paths, :exclude_names].each do |key|
@@ -97,6 +107,14 @@ class TLDR
       end
 
       merged_args
+    end
+
+    def merge other
+      this_config = to_h
+      kwargs = this_config.merge(
+        other.to_h.compact.except(:config_intended_for_merge_only)
+      )
+      Config.new(**kwargs)
     end
 
     # We needed this hook (to be called by the planner), because we can't know
@@ -129,8 +147,8 @@ class TLDR
 
     private
 
-    def to_cli_argv(options = CONFLAGS.keys)
-      defaults = Config.build_defaults(cli_mode)
+    def to_cli_argv options = CONFLAGS.keys
+      defaults = Config.build_defaults(cli_defaults: true)
       options.map { |key|
         flag = CONFLAGS[key]
 
