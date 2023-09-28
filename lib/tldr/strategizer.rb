@@ -14,7 +14,6 @@ class TLDR
 
       grouped_tests = prepare_run_together_groups run_these_together_groups, thread_safe_tests, thread_unsafe_tests
       already_included_groups = []
-
       Strategy.new prepend_thread_unsafe_tests, thread_safe_tests.map { |test|
         if (group = grouped_tests.find { |group| group.tests.include? test })
           if already_included_groups.include? group

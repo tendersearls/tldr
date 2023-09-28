@@ -133,7 +133,12 @@ class TLDR
     end
 
     def to_full_args(exclude: [])
-      to_cli_argv(CONFLAGS.keys - exclude).join(" ")
+      to_cli_argv(
+        CONFLAGS.keys -
+        exclude - [
+          (:seed unless seed_set_intentionally)
+        ]
+      ).join(" ")
     end
 
     def to_single_path_args(path)

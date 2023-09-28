@@ -7,6 +7,9 @@ class ExitCodeTest < Minitest::Test
     assert_equal "", result.stderr
     assert_equal 0, result.exit_code
     assert_includes result.stdout, "😁"
+    # Command shouldn't include --seed if it wasn't explicitly set
+    assert_includes result.stdout, "Command: bundle exec tldr \"tests/fixture/success.rb\"\n"
+    assert_match(/🌱 --seed \d+/, result.stdout)
   end
 
   def test_failure

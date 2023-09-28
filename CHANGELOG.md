@@ -1,5 +1,13 @@
 ## [Unreleased]
 
+* Define your own Rake tasks with `TLDR::Task` and pass in a custom configuration
+* Any tests with `--prepend` AND marked thread-unsafe with `dont_run_these_in_parallel`
+will be run BEFORE the parallel tests start running. This way if you're working
+on a non-parallelizable test, running `tldr` will automatically run it first
+thing
+* Stop printing `--seed` in run commands, since it can be confusing to discover
+that will disable `--parallel`. Instead, print the seed option beneath
+
 ## [0.4.0]
 
 * Add `TLDR.dont_run_these_in_parallel!` method to allow tests to indicate that they

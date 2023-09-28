@@ -43,6 +43,10 @@ module IconProvider
     def rock_on
       ""
     end
+
+    def seed
+      ""
+    end
   end
 
   class Emoji < Base
@@ -88,6 +92,10 @@ module IconProvider
 
     def rock_on
       "🤘"
+    end
+
+    def seed
+      "🌱"
     end
   end
 end

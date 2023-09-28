@@ -4,7 +4,7 @@ class ConfigTest < Minitest::Test
   def test_pre_defaults
     config = TLDR::Config.new
 
-    assert_match(/--seed \d+/, config.to_full_args)
+    assert_equal "", config.to_full_args
     assert_equal "\"lol.rb:4\"", config.to_single_path_args("lol.rb:4")
   end
 
