@@ -1,6 +1,8 @@
 class TLDR
   module PathUtil
-    def self.expand_search_locations path_strings
+    def self.expand_paths path_strings, globs: true
+      path_strings = expand_globs path_strings if globs
+
       path_strings.flat_map { |path_string|
         File.directory?(path_string) ? Dir["#{path_string}/**/*.rb"] : path_string
       }.flat_map { |path_string|

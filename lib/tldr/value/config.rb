@@ -4,7 +4,7 @@ class TLDR
     no_helper: "--no-helper",
     verbose: "--verbose",
     reporter: "--reporter",
-    helper: "--helper",
+    helper_paths: "--helper",
     load_paths: "--load-path",
     parallel: "--[no-]parallel",
     names: "--name",
@@ -19,16 +19,18 @@ class TLDR
     paths: nil
   }.freeze
 
-  PATH_FLAGS = [:paths, :helper, :load_paths, :prepend_paths, :exclude_paths].freeze
+  PATH_FLAGS = [:paths, :helper_paths, :load_paths, :prepend_paths, :exclude_paths].freeze
   MOST_RECENTLY_MODIFIED_TAG = "MOST_RECENTLY_MODIFIED".freeze
-
-  Config = Struct.new :paths, :seed, :no_helper, :verbose, :reporter,
-    :helper, :load_paths, :parallel, :names, :fail_fast, :no_emoji,
+  CONFIG_ATTRIBUTES = [
+    :paths, :seed, :no_helper, :verbose, :reporter,
+    :helper_paths, :load_paths, :parallel, :names, :fail_fast, :no_emoji,
     :prepend_paths, :no_prepend, :exclude_paths, :exclude_names, :base_path,
     :no_dotfile,
     # Internal properties
-    :config_intended_for_merge_only, :seed_set_intentionally, :cli_defaults,
-    keyword_init: true do
+    :config_intended_for_merge_only, :seed_set_intentionally, :cli_defaults
+  ].freeze
+
+  Config = Struct.new(*CONFIG_ATTRIBUTES, keyword_init: true) do
     def initialize(**args)
       unless args[:config_intended_for_merge_only]
         change_working_directory_because_i_am_bad_and_i_should_feel_bad!(args[:base_path])
@@ -66,14 +68,14 @@ class TLDR
       if cli_defaults
         common.merge(
           paths: Dir["test/**/*_test.rb", "test/**/test_*.rb"],
-          helper: "test/helper.rb",
+          helper_paths: ["test/helper.rb"],
           load_paths: ["test"],
           prepend_paths: [MOST_RECENTLY_MODIFIED_TAG]
         )
       else
         common.merge(
           paths: [],
-          helper: nil,
+          helper_paths: [],
           load_paths: [],
           prepend_paths: []
         )
@@ -92,7 +94,7 @@ class TLDR
       defaults = Config.build_defaults(cli_defaults: merged_args[:cli_defaults])
 
       # Arrays
-      [:paths, :load_paths, :names, :prepend_paths, :exclude_paths, :exclude_names].each do |key|
+      [:paths, :helper_paths, :load_paths, :names, :prepend_paths, :exclude_paths, :exclude_names].each do |key|
         merged_args[key] = defaults[key] if merged_args[key].nil? || merged_args[key].empty?
       end
 
@@ -102,7 +104,7 @@ class TLDR
       end
 
       # Values
-      [:seed, :reporter, :helper].each do |key|
+      [:seed, :reporter].each do |key|
         merged_args[key] ||= defaults[key]
       end
 
@@ -166,7 +168,7 @@ class TLDR
             # Don't print prepended tests if they're disabled
             next
           end
-        elsif key == :helper && no_helper
+        elsif key == :helper_paths && no_helper
           # Don't print the helper if it's disabled
           next
         elsif key == :parallel

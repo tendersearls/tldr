@@ -35,11 +35,12 @@ class TLDR
           options[:exclude_paths] += path
         end
 
-        opts.on "#{CONFLAGS[:helper]} HELPER", String, "Path to a test helper to load before any tests (Default: \"test/helper.rb\")" do |helper|
-          options[:helper] = helper
+        opts.on "#{CONFLAGS[:helper_paths]} PATH", Array, "One or more paths to a helper that is required before any tests (Default: \"test/helper.rb\")" do |path|
+          options[:helper_paths] ||= []
+          options[:helper_paths] += path
         end
 
-        opts.on CONFLAGS[:no_helper], "Don't try loading a test helper before the tests" do
+        opts.on CONFLAGS[:no_helper], "Don't require any test helpers" do
           options[:no_helper] = true
         end
 

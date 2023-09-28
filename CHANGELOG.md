@@ -1,4 +1,5 @@
 * Stop shelling out to `tldr` from our Rake task. Rescue `SystemExit` instead
+* Rename `Config#helper` to `Config#helper_paths`, which YAML config keys
 
 ## [0.5.0]
 

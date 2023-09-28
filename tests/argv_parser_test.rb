@@ -23,7 +23,7 @@ class ArgvParserTest < Minitest::Test
     assert result.no_helper
     assert result.verbose
     assert_equal TLDR::Reporters::Base, result.reporter
-    assert_equal "spec/spec_helper.rb", result.helper
+    assert_equal ["spec/spec_helper.rb"], result.helper_paths
     assert_equal ["lib", "vendor", "spec", "app"], result.load_paths
     refute result.parallel
     assert_equal ["foo", "bar", "baz"], result.names
@@ -37,7 +37,7 @@ class ArgvParserTest < Minitest::Test
     refute result.no_helper
     refute result.verbose
     assert_equal TLDR::Reporters::Default, result.reporter
-    assert_equal "test/helper.rb", result.helper
+    assert_equal ["test/helper.rb"], result.helper_paths
     assert_equal ["test"], result.load_paths
     assert result.parallel
     assert_equal [], result.names

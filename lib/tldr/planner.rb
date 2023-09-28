@@ -3,7 +3,7 @@ require "pathname"
 class TLDR
   class Planner
     def plan config
-      search_locations = PathUtil.expand_search_locations config.paths
+      search_locations = PathUtil.expand_paths config.paths, globs: false
 
       prepend_load_paths config
       require_test_helper config
@@ -42,7 +42,7 @@ class TLDR
 
     def prepend tests, config
       return tests if config.no_prepend
-      prepended_locations = PathUtil.expand_search_locations PathUtil.expand_globs config.prepend_paths
+      prepended_locations = PathUtil.expand_paths config.prepend_paths
       prepended, rest = tests.partition { |test|
         PathUtil.locations_include_test? prepended_locations, test
       }
@@ -54,7 +54,7 @@ class TLDR
     end
 
     def exclude_by_path tests, exclude_paths
-      excluded_locations = PathUtil.expand_search_locations PathUtil.expand_globs exclude_paths
+      excluded_locations = PathUtil.expand_paths exclude_paths
       return tests if excluded_locations.empty?
 
       tests.reject { |test|
@@ -102,8 +102,12 @@ class TLDR
     end
 
     def require_test_helper config
-      return if config.no_helper || config.helper.nil? || !File.exist?(config.helper)
-      require File.expand_path(config.helper, Dir.pwd)
+      return if config.no_helper || config.helper_paths.empty?
+      PathUtil.expand_paths(config.helper_paths).map(&:file).uniq.each do |helper_file|
+        next unless File.exist?(helper_file)
+
+        require helper_file
+      end
     end
 
     def require_tests search_locations

@@ -42,7 +42,7 @@ class TLDR
     # Sadly duplicative with Planner.rb, necessitating the extraction of PathUtil
     # Suboptimal, but we do indeed need to do this work in two places ¯\_(ツ)_/¯
     def partition_prepend thread_unsafe_tests, prepend_paths
-      locations = PathUtil.expand_search_locations PathUtil.expand_globs prepend_paths
+      locations = PathUtil.expand_paths prepend_paths
 
       thread_unsafe_tests.partition { |test|
         PathUtil.locations_include_test? locations, test

@@ -2,7 +2,7 @@ require "tldr/rake"
 
 TLDR::Task.new(name: :safe_tests, config: TLDR::Config.new(
   paths: FileList["safe/**/*_test.rb"],
-  helper: "safe/helper.rb",
+  helper_paths: ["safe/helper.rb"],
   load_paths: ["lib", "safe"]
 ))
 

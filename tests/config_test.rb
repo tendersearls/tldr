@@ -13,7 +13,7 @@ class ConfigTest < Minitest::Test
 
     # Won't work unless we change dir to example/a and it'll create pollution
     # assert_equal ["test/add_test.rb", "test/test_subtract.rb"], config.paths
-    assert_equal "test/helper.rb", config.helper
+    assert_equal ["test/helper.rb"], config.helper_paths
     assert_equal ["test"], config.load_paths
     assert_equal [TLDR::MOST_RECENTLY_MODIFIED_TAG], config.prepend_paths
   end
@@ -22,7 +22,7 @@ class ConfigTest < Minitest::Test
     config = TLDR::Config.new cli_defaults: false
 
     assert_equal [], config.paths
-    assert_nil config.helper
+    assert_equal [], config.helper_paths
     assert_equal [], config.load_paths
     assert_equal [], config.prepend_paths
   end
@@ -46,7 +46,7 @@ class ConfigTest < Minitest::Test
       seed: 42,
       verbose: true,
       reporter: TLDR::Reporters::Base,
-      helper: "test_helper.rb",
+      helper_paths: ["test_helper.rb"],
       load_paths: ["app", "lib"],
       parallel: true,
       names: ["/test_*/", "test_it"],
@@ -89,7 +89,7 @@ class ConfigTest < Minitest::Test
     config = TLDR::Config.new(
       seed: 1,
       no_helper: true,
-      helper: "some/silly/helper.rb"
+      helper_paths: ["some/silly/helper.rb"]
     )
 
     assert_equal <<~MSG.chomp, config.to_full_args
@@ -100,7 +100,7 @@ class ConfigTest < Minitest::Test
   def test_cli_conversion_cuts_off_prepended_pwd
     config = TLDR::Config.new(
       seed: 1,
-      helper: "#{Dir.pwd}/test_helper.rb",
+      helper_paths: ["#{Dir.pwd}/test_helper.rb"],
       load_paths: ["#{Dir.pwd}/app", "/lol/ok/lib"],
       prepend_paths: ["#{Dir.pwd}/foo.rb"],
       exclude_paths: ["#{Dir.pwd}/bar.rb"],
