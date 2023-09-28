@@ -231,6 +231,9 @@ class TLDR
       if dotfile_args.key?(:reporter)
         dotfile_args[:reporter] = Kernel.const_get(dotfile_args[:reporter])
       end
+      if (invalid_args = dotfile_args.except(*CONFIG_ATTRIBUTES)).any?
+        raise Error, "Invalid keys in .tldr.yml file: #{invalid_args.keys.join(", ")}"
+      end
 
       dotfile_args.merge(args)
     end
