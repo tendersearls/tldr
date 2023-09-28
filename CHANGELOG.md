@@ -1,4 +1,4 @@
-## [Unreleased]
+## [0.5.0]
 
 * Define your own Rake tasks with `TLDR::Task` and pass in a custom configuration
 * Any tests with `--prepend` AND marked thread-unsafe with `dont_run_these_in_parallel`
