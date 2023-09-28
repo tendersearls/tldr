@@ -33,10 +33,8 @@ class TLDR
     private
 
     def gather_tests
-      gather_descendants(TLDR).flat_map { |subklass|
-        subklass.instance_methods.grep(/^test_/).sort.map { |method|
-          Test.new subklass, method
-        }
+      ClassUtil.gather_descendants(TLDR).flat_map { |subklass|
+        ClassUtil.gather_tests(subklass)
       }
     end
 
@@ -114,12 +112,6 @@ class TLDR
       search_locations.each do |location|
         require location.file
       end
-    end
-
-    def gather_descendants root_klass
-      root_klass.subclasses + root_klass.subclasses.flat_map { |subklass|
-        gather_descendants subklass
-      }
     end
 
     def expand_names_with_patterns names

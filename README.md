@@ -23,8 +23,8 @@ suite.
 
 Some stuff you might like:
 
-* A CLI that can run tests by line number(s) (e.g. `foo.rb:5 bar.rb:3:10`) and
-by names or patterns (e.g. `--name test_fail,test_error --name "/_\d/"`)
+* A CLI that can specify tests by line number(s) (e.g. `foo.rb:5 bar.rb:3:10`)
+and by names or patterns (e.g. `--name test_fail,test_error --name "/_\d/"`)
 * Everything is **parallel by default**, and seems pretty darn fast; TLDR
 also provides [several escape hatches to sequester tests that aren't thread-safe](#parallel-by-default-is-nice-in-theory-but-half-my-tests-are-failing-wat)
 * Surprisingly delightful color diff output when two things fail to equal one

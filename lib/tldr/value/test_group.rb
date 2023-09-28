@@ -6,8 +6,8 @@ class TLDR
       @tests ||= configuration.flat_map { |(klass, method)|
         klass = Kernel.const_get(klass) if klass.is_a? String
         if method.nil?
-          klass.instance_methods.grep(/^test_/).sort.map { |method|
-            Test.new klass, method
+          ([klass] + ClassUtil.gather_descendants(klass)).flat_map { |klass|
+            ClassUtil.gather_tests(klass)
           }
         else
           Test.new klass, method
