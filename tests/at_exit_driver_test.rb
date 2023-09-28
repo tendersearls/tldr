@@ -6,6 +6,7 @@ class AtExitDriverTest < Minitest::Test
 
     assert_includes result.stdout, <<~MSG
       Command: bundle exec tldr --seed 5 --exclude-name "test_y"
+      🌱 --seed 5
 
       🏃 Running:
 

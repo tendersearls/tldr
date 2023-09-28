@@ -8,6 +8,7 @@ class DotfileTest < Minitest::Test
     assert_includes result.stdout, <<~MSG
       👓
       Command: bundle exec tldr --seed 1 --helper "spec/spec_helper.rb" --no-prepend --base-path "example/c" "spec/math_spec.rb"
+      🌱 --seed 1
 
       🏃 Running:
 

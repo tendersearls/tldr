@@ -9,7 +9,8 @@ class TLDR
       def before_suite tests
         @suite_start_time = Process.clock_gettime Process::CLOCK_MONOTONIC, :microsecond
         @out.print <<~MSG
-          Command: #{tldr_command} #{@config.to_full_args}#{"\n#{@icons.seed} #{CONFLAGS[:seed]} #{@config.seed}" unless @config.seed_set_intentionally}
+          Command: #{tldr_command} #{@config.to_full_args}
+          #{@icons.seed} #{CONFLAGS[:seed]} #{@config.seed}
 
           #{@icons.run} Running:
 

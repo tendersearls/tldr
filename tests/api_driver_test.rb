@@ -6,6 +6,7 @@ class ApiDriverTest < Minitest::Test
 
     assert_includes result.stdout, <<~MSG
       Command: bundle exec tldr --seed 1 "tests/fixture/c.rb"
+      🌱 --seed 1
 
       🏃 Running:
 
