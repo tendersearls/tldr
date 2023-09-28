@@ -4,7 +4,6 @@ class RakeTaskTest < Minitest::Test
   def test_running_rake
     result = TLDRunner.run_command "cd example/b && TLDR_OPTS=\"--seed 1\" bundle exec rake"
 
-    puts result.stdout
     assert_includes result.stdout, <<~MSG
       neat!
       Command: bundle exec tldr --seed 1
@@ -14,6 +13,7 @@ class RakeTaskTest < Minitest::Test
 
       😁
     MSG
+    assert 1, result.stdout.scan("😁").size
   end
 
   def test_running_custom_rake_task
@@ -28,6 +28,7 @@ class RakeTaskTest < Minitest::Test
 
       😁
     MSG
+    assert 1, result.stdout.scan("😁").size
   end
 
   def test_running_custom_base_path

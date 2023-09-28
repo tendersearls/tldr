@@ -40,6 +40,8 @@ class TLDR
     def self.at_exit! config = Config.new
       # Ignore at_exit when running tldr CLI, since that will run any tests
       return if $PROGRAM_NAME.end_with? "tldr"
+      # Also ignore if we're running from within our rake task
+      return if caller.any? { |line| line.include? "lib/tldr/rake.rb" }
       # Ignore at_exit when we've already registered an at_exit hook
       return if @@at_exit_registered
 
