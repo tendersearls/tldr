@@ -31,10 +31,28 @@ class TLDR
     end
 
     def test_no_groups
-      result = @subject.strategize some_tests, [], [], []
+      result = @subject.strategize some_tests, [], [], Config.new(prepend_paths: [])
 
+      assert result.parallel?
+      assert_equal some_tests, result.all_tests
       assert_equal some_tests, result.parallel_tests_and_groups
-      assert_equal [], result.thread_unsafe_tests
+      assert_equal [], result.append_sequential_tests
+    end
+
+    def test_one_test
+      tests = [Test.new(TA, :test_1)]
+
+      result = @subject.strategize tests, [], [], Config.new(prepend_paths: [])
+
+      refute result.parallel?
+      assert_equal tests, result.all_tests
+    end
+
+    def test_parallel_disabled
+      result = @subject.strategize some_tests, [], [], Config.new(prepend_paths: [], parallel: false)
+
+      refute result.parallel?
+      assert_equal some_tests, result.all_tests
     end
 
     def test_basic_group
@@ -42,8 +60,10 @@ class TLDR
         TestGroup.new([[TB, :test_2], ["TLDR::StrategizerTest::TC", :test_1]])
       ]
 
-      result = @subject.strategize some_tests, some_groups, [], []
+      result = @subject.strategize some_tests, some_groups, [], Config.new(prepend_paths: [])
 
+      assert result.parallel?
+      assert_equal some_tests, result.all_tests
       assert_equal [
         Test.new(TA, :test_1),
         Test.new(TA, :test_2),
@@ -63,8 +83,10 @@ class TLDR
         TestGroup.new([["TLDR::StrategizerTest::TB", :test_2], [TA, :test_1]])
       ]
 
-      result = @subject.strategize some_tests, some_groups, [], []
+      result = @subject.strategize some_tests, some_groups, [], Config.new(prepend_paths: [])
 
+      assert result.parallel?
+      assert_equal some_tests, result.all_tests
       assert_equal [
         Test.new(TB, :test_2),
         Test.new(TA, :test_1),
@@ -90,8 +112,10 @@ class TLDR
         TestGroup.new([[TB, :test_1]])
       ]
 
-      result = @subject.strategize some_tests, some_groups, unsafe_groups, []
+      result = @subject.strategize some_tests, some_groups, unsafe_groups, Config.new(prepend_paths: [])
 
+      assert result.parallel?
+      assert_equal some_tests, result.all_tests
       assert_equal 2, result.parallel_tests_and_groups.size
       assert_equal [
         Test.new(TA, :test_1),
@@ -102,16 +126,18 @@ class TLDR
       assert_equal [
         Test.new(TA, :test_2),
         Test.new(TB, :test_1)
-      ], result.thread_unsafe_tests
+      ], result.append_sequential_tests
     end
 
-    def test_thread_unsafe_tests
+    def test_append_sequential_tests
       unsafe_groups = [
         TestGroup.new([[TA, nil], [TB, :test_2]])
       ]
 
-      result = @subject.strategize some_tests, [], unsafe_groups, []
+      result = @subject.strategize some_tests, [], unsafe_groups, Config.new(prepend_paths: [])
 
+      assert result.parallel?
+      assert_equal some_tests, result.all_tests
       assert_equal some_tests - [
         Test.new(TA, :test_1),
         Test.new(TA, :test_2),
@@ -121,17 +147,17 @@ class TLDR
         Test.new(TA, :test_1),
         Test.new(TA, :test_2),
         Test.new(TB, :test_2)
-      ], result.thread_unsafe_tests
+      ], result.append_sequential_tests
     end
 
-    def test_thread_unsafe_tests_with_prepend
+    def test_append_sequential_tests_with_prepend
       unsafe_groups = [
         TestGroup.new([[TA, nil], [TB, :test_2]])
       ]
 
-      result = @subject.strategize some_tests, [], unsafe_groups, ["tests/strategizer_test.rb:18"]
+      result = @subject.strategize some_tests, [], unsafe_groups, Config.new(prepend_paths: ["tests/strategizer_test.rb:18"])
 
-      assert_equal [Test.new(TB, :test_2)], result.prepend_thread_unsafe_tests
+      assert_equal [Test.new(TB, :test_2)], result.prepend_sequential_tests
       assert_equal some_tests - [
         Test.new(TA, :test_1),
         Test.new(TA, :test_2),
@@ -140,7 +166,7 @@ class TLDR
       assert_equal [
         Test.new(TA, :test_1),
         Test.new(TA, :test_2)
-      ], result.thread_unsafe_tests
+      ], result.append_sequential_tests
     end
 
     def test_grouped_tests_that_arent_selected_by_the_runner
@@ -155,14 +181,19 @@ class TLDR
       result = @subject.strategize [
         Test.new(TA, :test_1),
         Test.new(TC, :test_2)
-      ], some_groups, unsafe_groups, []
+      ], some_groups, unsafe_groups, Config.new(prepend_paths: [])
 
+      assert result.parallel?
+      assert_equal [
+        Test.new(TA, :test_1),
+        Test.new(TC, :test_2)
+      ], result.all_tests
       assert_equal [
         Test.new(TA, :test_1)
       ], result.parallel_tests_and_groups
       assert_equal [
         Test.new(TC, :test_2)
-      ], result.thread_unsafe_tests
+      ], result.append_sequential_tests
     end
 
     private

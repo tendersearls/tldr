@@ -3,7 +3,8 @@ require "irb"
 class TLDR
   class Runner
     def initialize
-      @parallelizer = Parallelizer.new
+      @strategizer = Strategizer.new
+      @executor = Executor.new
       @wip = Concurrent::Array.new
       @results = Concurrent::Array.new
       @run_aborted = Concurrent::AtomicBoolean.new false
@@ -12,8 +13,14 @@ class TLDR
     def run config, plan
       @wip.clear
       @results.clear
-      reporter = config.reporter.new config
-      reporter.before_suite plan.tests
+      reporter = config.reporter.new(config)
+      strategy = @strategizer.strategize(
+        plan.tests,
+        GROUPED_TESTS,
+        THREAD_UNSAFE_TESTS,
+        config
+      )
+      reporter.before_suite(plan.tests)
 
       time_bomb = Thread.new {
         explode = proc do
@@ -34,34 +41,8 @@ class TLDR
         end
       }
 
-      results = @parallelizer.parallelize(plan.tests, config) { |test|
-        e = nil
-        start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC, :microsecond)
-        wip_test = WIPTest.new test, start_time
-        @wip << wip_test
-        runtime = time_it(start_time) do
-          instance = test.klass.new
-          instance.setup if instance.respond_to? :setup
-          if instance.respond_to? :around
-            did_run = false
-            instance.around {
-              did_run = true
-              instance.send(test.method)
-            }
-            raise Error, "#{test.klass}#around failed to yield or call the passed test block" unless did_run
-          else
-            instance.send(test.method)
-          end
-          instance.teardown if instance.respond_to? :teardown
-        rescue Skip, Failure, StandardError => e
-        end
-        TestResult.new(test, e, runtime).tap do |result|
-          next if @run_aborted.true?
-          @results << result
-          @wip.delete wip_test
-          reporter.after_test result
-          fail_fast reporter, plan, result if result.failing? && config.fail_fast
-        end
+      results = @executor.execute(strategy) { |test|
+        run_test(test, config, plan, reporter)
       }.tap do
         time_bomb.kill
       end
@@ -73,6 +54,36 @@ class TLDR
     end
 
     private
+
+    def run_test test, config, plan, reporter
+      e = nil
+      start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC, :microsecond)
+      wip_test = WIPTest.new test, start_time
+      @wip << wip_test
+      runtime = time_it(start_time) do
+        instance = test.klass.new
+        instance.setup if instance.respond_to? :setup
+        if instance.respond_to? :around
+          did_run = false
+          instance.around {
+            did_run = true
+            instance.send(test.method)
+          }
+          raise Error, "#{test.klass}#around failed to yield or call the passed test block" unless did_run
+        else
+          instance.send(test.method)
+        end
+        instance.teardown if instance.respond_to? :teardown
+      rescue Skip, Failure, StandardError => e
+      end
+      TestResult.new(test, e, runtime).tap do |result|
+        next if @run_aborted.true?
+        @results << result
+        @wip.delete wip_test
+        reporter.after_test result
+        fail_fast reporter, plan, result if result.failing? && config.fail_fast
+      end
+    end
 
     def fail_fast reporter, plan, fast_failed_result
       unless @run_aborted.true?

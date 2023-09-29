@@ -1,6 +1,8 @@
 class TLDR
   class Strategizer
-    Strategy = Struct.new :prepend_thread_unsafe_tests, :parallel_tests_and_groups, :thread_unsafe_tests
+    Strategy = Struct.new :parallel?, :all_tests, :prepend_sequential_tests,
+      :parallel_tests_and_groups, :append_sequential_tests,
+      keyword_init: true
 
     # Combine all discovered test methods with any methods grouped by run_these_together!
     #
@@ -8,13 +10,15 @@ class TLDR
     #   - Map over tests to build out groups in order to retain shuffle order
     #     (group will run in position of first test in the group)
     #   - If a test is in multiple groups, only run it once
-    def strategize all_tests, run_these_together_groups, thread_unsafe_test_groups, prepend_paths
-      thread_unsafe_tests, thread_safe_tests = partition_unsafe(all_tests, thread_unsafe_test_groups)
-      prepend_thread_unsafe_tests, thread_unsafe_tests = partition_prepend(thread_unsafe_tests, prepend_paths)
+    def strategize all_tests, run_these_together_groups, thread_unsafe_test_groups, config
+      return Strategy.new(parallel?: false, all_tests:) if run_sequentially?(all_tests, config)
 
-      grouped_tests = prepare_run_together_groups run_these_together_groups, thread_safe_tests, thread_unsafe_tests
+      thread_unsafe_tests, thread_safe_tests = partition_unsafe(all_tests, thread_unsafe_test_groups)
+      prepend_sequential_tests, append_sequential_tests = partition_prepend(thread_unsafe_tests, config)
+
+      grouped_tests = prepare_run_together_groups run_these_together_groups, thread_safe_tests, append_sequential_tests
       already_included_groups = []
-      Strategy.new prepend_thread_unsafe_tests, thread_safe_tests.map { |test|
+      parallel_tests_and_groups = thread_safe_tests.map { |test|
         if (group = grouped_tests.find { |group| group.tests.include? test })
           if already_included_groups.include? group
             next
@@ -28,10 +32,21 @@ class TLDR
         else
           test
         end
-      }.compact, thread_unsafe_tests
+      }.compact
+      Strategy.new(
+        parallel?: true,
+        all_tests:,
+        prepend_sequential_tests:,
+        parallel_tests_and_groups:,
+        append_sequential_tests:
+      )
     end
 
     private
+
+    def run_sequentially? all_tests, config
+      all_tests.size < 2 || !config.parallel
+    end
 
     def partition_unsafe tests, thread_unsafe_test_groups
       tests.partition { |test|
@@ -41,7 +56,8 @@ class TLDR
 
     # Sadly duplicative with Planner.rb, necessitating the extraction of PathUtil
     # Suboptimal, but we do indeed need to do this work in two places ¯\_(ツ)_/¯
-    def partition_prepend thread_unsafe_tests, prepend_paths
+    def partition_prepend thread_unsafe_tests, config
+      prepend_paths = config.no_prepend ? [] : config.prepend_paths
       locations = PathUtil.expand_paths prepend_paths
 
       thread_unsafe_tests.partition { |test|

@@ -1,26 +1,20 @@
 class TLDR
-  class Parallelizer
+  class Executor
     def initialize
-      @strategizer = Strategizer.new
       @thread_pool = Concurrent::ThreadPoolExecutor.new(
         name: "tldr",
         auto_terminate: true
       )
     end
 
-    def parallelize all_tests, config, &blk
-      return run_in_sequence(all_tests, &blk) if all_tests.size < 2 || !config.parallel
-
-      strategy = @strategizer.strategize(
-        all_tests,
-        GROUPED_TESTS,
-        THREAD_UNSAFE_TESTS,
-        (config.no_prepend ? [] : config.prepend_paths)
-      )
-
-      run_in_sequence(strategy.prepend_thread_unsafe_tests, &blk) +
-        run_in_parallel(strategy.parallel_tests_and_groups, &blk) +
-        run_in_sequence(strategy.thread_unsafe_tests, &blk)
+    def execute strategy, &blk
+      if strategy.parallel?
+        run_in_sequence(strategy.prepend_sequential_tests, &blk) +
+          run_in_parallel(strategy.parallel_tests_and_groups, &blk) +
+          run_in_sequence(strategy.append_sequential_tests, &blk)
+      else
+        run_in_sequence(strategy.all_tests, &blk)
+      end
     end
 
     private
