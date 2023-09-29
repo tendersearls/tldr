@@ -1,3 +1,5 @@
+## [0.6.0]
+
 * When `dont_run_these_in_parallel!` and `run_these_together!` are called from a
 super class, gather subclasses' methods as well when the method is `nil`
 * Stop shelling out to `tldr` from our Rake task. Rescue `SystemExit` instead
