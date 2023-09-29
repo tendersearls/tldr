@@ -3,7 +3,6 @@ require "irb"
 class TLDR
   class Runner
     def initialize
-      @strategizer = Strategizer.new
       @executor = Executor.new
       @wip = Concurrent::Array.new
       @results = Concurrent::Array.new
@@ -14,12 +13,6 @@ class TLDR
       @wip.clear
       @results.clear
       reporter = config.reporter.new(config)
-      strategy = @strategizer.strategize(
-        plan.tests,
-        GROUPED_TESTS,
-        THREAD_UNSAFE_TESTS,
-        config
-      )
       reporter.before_suite(plan.tests)
 
       time_bomb = Thread.new {
@@ -41,7 +34,7 @@ class TLDR
         end
       }
 
-      results = @executor.execute(strategy) { |test|
+      results = @executor.execute(plan) { |test|
         run_test(test, config, plan, reporter)
       }.tap do
         time_bomb.kill

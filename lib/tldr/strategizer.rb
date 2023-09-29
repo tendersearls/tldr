@@ -1,6 +1,6 @@
 class TLDR
   class Strategizer
-    Strategy = Struct.new :parallel?, :all_tests, :prepend_sequential_tests,
+    Strategy = Struct.new :parallel?, :prepend_sequential_tests,
       :parallel_tests_and_groups, :append_sequential_tests,
       keyword_init: true
 
@@ -11,7 +11,7 @@ class TLDR
     #     (group will run in position of first test in the group)
     #   - If a test is in multiple groups, only run it once
     def strategize all_tests, run_these_together_groups, thread_unsafe_test_groups, config
-      return Strategy.new(parallel?: false, all_tests:) if run_sequentially?(all_tests, config)
+      return Strategy.new(parallel?: false) if run_sequentially?(all_tests, config)
 
       thread_unsafe_tests, thread_safe_tests = partition_unsafe(all_tests, thread_unsafe_test_groups)
       prepend_sequential_tests, append_sequential_tests = partition_prepend(thread_unsafe_tests, config)
@@ -35,7 +35,6 @@ class TLDR
       }.compact
       Strategy.new(
         parallel?: true,
-        all_tests:,
         prepend_sequential_tests:,
         parallel_tests_and_groups:,
         append_sequential_tests:

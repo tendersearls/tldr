@@ -1,3 +1,9 @@
+## [0.6.1]
+
+* Correctly report the number of test classes that run
+* Finish planning the test run before starting the clock on the timer (that's
+a millisecond or two in savings!)
+
 ## [0.6.0]
 
 * When `dont_run_these_in_parallel!` and `run_these_together!` are called from a

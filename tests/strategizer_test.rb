@@ -34,7 +34,6 @@ class TLDR
       result = @subject.strategize some_tests, [], [], Config.new(prepend_paths: [])
 
       assert result.parallel?
-      assert_equal some_tests, result.all_tests
       assert_equal some_tests, result.parallel_tests_and_groups
       assert_equal [], result.append_sequential_tests
     end
@@ -45,14 +44,12 @@ class TLDR
       result = @subject.strategize tests, [], [], Config.new(prepend_paths: [])
 
       refute result.parallel?
-      assert_equal tests, result.all_tests
     end
 
     def test_parallel_disabled
       result = @subject.strategize some_tests, [], [], Config.new(prepend_paths: [], parallel: false)
 
       refute result.parallel?
-      assert_equal some_tests, result.all_tests
     end
 
     def test_basic_group
@@ -63,7 +60,6 @@ class TLDR
       result = @subject.strategize some_tests, some_groups, [], Config.new(prepend_paths: [])
 
       assert result.parallel?
-      assert_equal some_tests, result.all_tests
       assert_equal [
         Test.new(TA, :test_1),
         Test.new(TA, :test_2),
@@ -86,7 +82,6 @@ class TLDR
       result = @subject.strategize some_tests, some_groups, [], Config.new(prepend_paths: [])
 
       assert result.parallel?
-      assert_equal some_tests, result.all_tests
       assert_equal [
         Test.new(TB, :test_2),
         Test.new(TA, :test_1),
@@ -115,7 +110,6 @@ class TLDR
       result = @subject.strategize some_tests, some_groups, unsafe_groups, Config.new(prepend_paths: [])
 
       assert result.parallel?
-      assert_equal some_tests, result.all_tests
       assert_equal 2, result.parallel_tests_and_groups.size
       assert_equal [
         Test.new(TA, :test_1),
@@ -137,7 +131,6 @@ class TLDR
       result = @subject.strategize some_tests, [], unsafe_groups, Config.new(prepend_paths: [])
 
       assert result.parallel?
-      assert_equal some_tests, result.all_tests
       assert_equal some_tests - [
         Test.new(TA, :test_1),
         Test.new(TA, :test_2),
@@ -184,10 +177,6 @@ class TLDR
       ], some_groups, unsafe_groups, Config.new(prepend_paths: [])
 
       assert result.parallel?
-      assert_equal [
-        Test.new(TA, :test_1),
-        Test.new(TC, :test_2)
-      ], result.all_tests
       assert_equal [
         Test.new(TA, :test_1)
       ], result.parallel_tests_and_groups

@@ -2,6 +2,10 @@ require "pathname"
 
 class TLDR
   class Planner
+    def initialize
+      @strategizer = Strategizer.new
+    end
+
     def plan config
       $VERBOSE = config.warnings
       search_locations = PathUtil.expand_paths config.paths, globs: false
@@ -12,8 +16,7 @@ class TLDR
 
       tests = gather_tests
       config.update_after_gathering_tests! tests
-
-      Plan.new prepend(
+      tests_to_run = prepend(
         shuffle(
           exclude_by_path(
             exclude_by_name(
@@ -29,6 +32,15 @@ class TLDR
         ),
         config
       )
+
+      strategy = @strategizer.strategize(
+        tests_to_run,
+        GROUPED_TESTS,
+        THREAD_UNSAFE_TESTS,
+        config
+      )
+
+      Plan.new tests_to_run, strategy
     end
 
     private

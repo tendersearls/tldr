@@ -7,13 +7,13 @@ class TLDR
       )
     end
 
-    def execute strategy, &blk
-      if strategy.parallel?
-        run_in_sequence(strategy.prepend_sequential_tests, &blk) +
-          run_in_parallel(strategy.parallel_tests_and_groups, &blk) +
-          run_in_sequence(strategy.append_sequential_tests, &blk)
+    def execute plan, &blk
+      if plan.strategy.parallel?
+        run_in_sequence(plan.strategy.prepend_sequential_tests, &blk) +
+          run_in_parallel(plan.strategy.parallel_tests_and_groups, &blk) +
+          run_in_sequence(plan.strategy.append_sequential_tests, &blk)
       else
-        run_in_sequence(strategy.all_tests, &blk)
+        run_in_sequence(plan.tests, &blk)
       end
     end
 
