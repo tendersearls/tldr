@@ -68,7 +68,7 @@ class TLDR
 
       tests.reject { |test|
         name_excludes.any? { |filter|
-          filter === test.method.to_s || filter === "#{test.klass}##{test.method}"
+          filter === test.method_name.to_s || filter === "#{test.test_class}##{test.method_name}"
         }
       }
     end
@@ -89,7 +89,7 @@ class TLDR
 
       tests.select { |test|
         name_filters.any? { |filter|
-          filter === test.method.to_s || filter === "#{test.klass}##{test.method}"
+          filter === test.method_name.to_s || filter === "#{test.test_class}##{test.method_name}"
         }
       }
     end

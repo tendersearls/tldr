@@ -61,17 +61,17 @@ class TLDR
       wip_test = WIPTest.new test, start_time
       @wip << wip_test
       runtime = time_it(start_time) do
-        instance = test.klass.new
+        instance = test.test_class.new
         instance.setup if instance.respond_to? :setup
         if instance.respond_to? :around
           did_run = false
           instance.around {
             did_run = true
-            instance.send(test.method)
+            instance.send(test.method_name)
           }
-          raise Error, "#{test.klass}#around failed to yield or call the passed test block" unless did_run
+          raise Error, "#{test.test_class}#around failed to yield or call the passed test block" unless did_run
         else
-          instance.send(test.method)
+          instance.send(test.method_name)
         end
         instance.teardown if instance.respond_to? :teardown
       rescue Skip, Failure, StandardError => e

@@ -87,7 +87,7 @@ class TLDR
         @out.print "Finished in #{duration}ms."
 
         @out.print "\n\n"
-        class_count = test_results.uniq { |result| result.test.class }.size
+        class_count = test_results.uniq { |result| result.test.test_class }.size
         test_count = test_results.size
         @out.print [
           plural(class_count, "test class", "test classes"),
@@ -127,7 +127,7 @@ class TLDR
       end
 
       def describe test, location = test.location
-        "#{test.klass}##{test.method} [#{location.locator}]"
+        "#{test.test_class}##{test.method_name} [#{location.locator}]"
       end
 
       def plural count, singular, plural = "#{singular}s"
