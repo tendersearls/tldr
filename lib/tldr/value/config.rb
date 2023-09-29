@@ -16,6 +16,7 @@ class TLDR
     exclude_names: "--exclude-name",
     base_path: "--base-path",
     no_dotfile: "--no-dotfile",
+    warnings: "--[no-]warnings",
     paths: nil
   }.freeze
 
@@ -25,7 +26,7 @@ class TLDR
     :paths, :seed, :no_helper, :verbose, :reporter,
     :helper_paths, :load_paths, :parallel, :names, :fail_fast, :no_emoji,
     :prepend_paths, :no_prepend, :exclude_paths, :exclude_names, :base_path,
-    :no_dotfile,
+    :no_dotfile, :warnings,
     # Internal properties
     :config_intended_for_merge_only, :seed_set_intentionally, :cli_defaults
   ].freeze
@@ -62,7 +63,8 @@ class TLDR
         no_prepend: false,
         exclude_paths: [],
         exclude_names: [],
-        base_path: nil
+        base_path: nil,
+        warnings: true
       }
 
       if cli_defaults
@@ -99,7 +101,7 @@ class TLDR
       end
 
       # Booleans
-      [:no_helper, :verbose, :fail_fast, :no_emoji, :no_prepend].each do |key|
+      [:no_helper, :verbose, :fail_fast, :no_emoji, :no_prepend, :warnings].each do |key|
         merged_args[key] = defaults[key] if merged_args[key].nil?
       end
 
@@ -178,6 +180,8 @@ class TLDR
             "--parallel"
           end
           next val
+        elsif key == :warnings && defaults[:warnings] != self[:warnings]
+          next warnings ? "--warnings" : "--no-warnings"
         end
 
         if defaults[key] == self[key]

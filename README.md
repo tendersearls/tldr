@@ -112,8 +112,8 @@ Usage: tldr [options] some_tests/**/*.rb some/path.rb:13 ...
     -n, --name PATTERN               One or more names or /patterns/ of tests to run (like: foo_test, /test_foo.*/, Foo#foo_test)
         --exclude-name PATTERN       One or more names or /patterns/ NOT to run
         --exclude-path PATH          One or more paths NOT to run (like: foo.rb, "test/bar/**", baz.rb:3)
-        --helper HELPER              Path to a test helper to load before any tests (Default: "test/helper.rb")
-        --no-helper                  Don't try loading a test helper before the tests
+        --helper PATH                One or more paths to a helper that is required before any tests (Default: "test/helper.rb")
+        --no-helper                  Don't require any test helpers
         --prepend PATH               Prepend one or more paths to run before the rest (Default: most recently modified test)
         --no-prepend                 Don't prepend any tests before the rest of the suite
     -l, --load-path PATH             Add one or more paths to the $LOAD_PATH (Default: ["test"])
@@ -122,6 +122,7 @@ Usage: tldr [options] some_tests/**/*.rb some/path.rb:13 ...
         --no-dotfile                 Disable loading .tldr.yml dotfile
         --no-emoji                   Disable emoji in the output
     -v, --verbose                    Print stack traces for errors
+        --[no-]warnings              Print Ruby warnings (Default: true)
         --comment COMMENT            No-op comment, used internally for multi-line execution instructions
 ```
 

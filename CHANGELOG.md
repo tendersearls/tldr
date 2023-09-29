@@ -2,6 +2,7 @@
 super class, gather subclasses' methods as well when the method is `nil`
 * Stop shelling out to `tldr` from our Rake task. Rescue `SystemExit` instead
 * Rename `Config#helper` to `Config#helper_paths`, which YAML config keys
+* Print Ruby warnings by default (disable with --no-warnings)
 
 ## [0.5.0]
 

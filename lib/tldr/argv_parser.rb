@@ -78,6 +78,10 @@ class TLDR
           options[:verbose] = verbose
         end
 
+        opts.on CONFLAGS[:warnings], "Print Ruby warnings (Default: true)" do |warnings|
+          options[:warnings] = warnings
+        end
+
         opts.on "--comment COMMENT", String, "No-op comment, used internally for multi-line execution instructions" do
           # See "--comment" in lib/tldr/reporters/default.rb for an example of how this is used internally
         end

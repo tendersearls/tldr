@@ -3,6 +3,7 @@ require "pathname"
 class TLDR
   class Planner
     def plan config
+      $VERBOSE = config.warnings
       search_locations = PathUtil.expand_paths config.paths, globs: false
 
       prepend_load_paths config
