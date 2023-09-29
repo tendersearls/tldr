@@ -173,6 +173,12 @@ class AssertionsTest < AssertionTestCase
     end
   end
 
+  class Matchless
+    if instance_methods.include?(:=~)
+      undef_method :=~
+    end
+  end
+
   def test_assert_match
     @subject.assert_match(/foo/, "food")
     result = @subject.assert_match("foo", "food")
@@ -180,8 +186,8 @@ class AssertionsTest < AssertionTestCase
     should_fail "Expected \"drink\" to match /foo/" do
       @subject.assert_match(/foo/, "drink")
     end
-    should_fail(/Expected #<Object:0x.*> \(Object\) to respond to :=~/) do
-      @subject.assert_match Object.new, "stuff"
+    should_fail(/Expected #<AssertionsTest::Matchless:0x.*> \(AssertionsTest::Matchless\) to respond to :=~/) do
+      @subject.assert_match Matchless.new, "stuff"
     end
   end
 
@@ -190,8 +196,8 @@ class AssertionsTest < AssertionTestCase
     should_fail "Expected \"food\" to not match /foo/" do
       @subject.refute_match(/foo/, "food")
     end
-    should_fail(/Expected #<Object:0x.*> \(Object\) to respond to :=~/) do
-      @subject.refute_match Object.new, "stuff"
+    should_fail(/Expected #<AssertionsTest::Matchless:0x.*> \(AssertionsTest::Matchless\) to respond to :=~/) do
+      @subject.refute_match Matchless.new, "stuff"
     end
   end
 

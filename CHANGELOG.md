@@ -1,3 +1,7 @@
+## [0.6.2]
+
+* Since TLDR runs fine on 3.1, reduce the gem requirement
+
 ## [0.6.1]
 
 * Correctly report the number of test classes that run

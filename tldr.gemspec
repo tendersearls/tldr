@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.summary = "TLDR will run your tests, but only for 1.8 seconds."
   spec.homepage = "https://github.com/tenderlove/tldr"
   spec.license = "MIT"
-  spec.required_ruby_version = ">= 3.2.0"
+  spec.required_ruby_version = ">= 3.1"
 
   spec.metadata["homepage_uri"] = spec.homepage
   spec.metadata["source_code_uri"] = spec.homepage
