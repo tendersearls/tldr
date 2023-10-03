@@ -1,7 +1,11 @@
-## Unreleased
+## [0.7.0]
 
 * Add a `tldt` alias for folks who have another executable named `tldr` on their
 paths
+* BREAKING: Reverse decision in 0.1.1 to capture_io on every TLDR subclass;
+moving back to the MinitestCompatibility mixin
+* Fix `assert_in_delta` defaultarg to retain Minitest compatibility
+* Add `mu_pp` to the MinitestCompatibility mixin
 
 ## [0.6.2]
 
