@@ -319,6 +319,14 @@ TLDR will run all your tests in CI without the time bomb going off. If
 `tldr` is run in a non-interactive shell and a `CI` environment variable is set
 (as it is on virtually every CI service), then the bomb will be defused.
 
+### What if I already have another `tldr` executable on my path?
+
+There's a [command-line utility named tldr](https://tldr.sh) that might conflict
+with this gem's binary in your PATH. If that's the case you could change your
+path, invoke `bundle exec tldr`, run [with Rake](#running-tldr-with-rake), or
+use the `tldt` ("too long; didn't test") executable alias that ships with this
+gem.
+
 ### Is there a plugin system?
 
 There is not.

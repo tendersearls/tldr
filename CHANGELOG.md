@@ -1,3 +1,8 @@
+## Unreleased
+
+* Add a `tldt` alias for folks who have another executable named `tldr` on their
+paths
+
 ## [0.6.2]
 
 * Since TLDR runs fine on 3.1, reduce the gem requirement
