@@ -33,6 +33,23 @@ class TLDR
 
         assert receiver.__send__(method, *args), message
       end
+
+      def capture_io(&blk)
+        Assertions.capture_io(&blk)
+      end
+
+      def mu_pp obj
+        s = obj.inspect.encode(Encoding.default_external)
+
+        if String === obj && (obj.encoding != Encoding.default_external ||
+                              !obj.valid_encoding?)
+          enc = "# encoding: #{obj.encoding}"
+          val = "#    valid: #{obj.valid_encoding?}"
+          "#{enc}\n#{val}\n#{s}"
+        else
+          s
+        end
+      end
     end
   end
 end

@@ -28,7 +28,7 @@ class TLDR
       SuperDiff::EqualityMatchers::Main.call(expected:, actual:)
     end
 
-    def capture_io
+    def self.capture_io
       captured_stdout, captured_stderr = StringIO.new, StringIO.new
 
       original_stdout, original_stderr = $stdout, $stderr
@@ -85,7 +85,7 @@ class TLDR
       refute expected == actual, message
     end
 
-    def assert_in_delta expected, actual, delta, message = nil
+    def assert_in_delta expected, actual, delta = 0.001, message = nil
       difference = (expected - actual).abs
       message = Assertions.msg(message) {
         "Expected |#{expected} - #{actual}| (#{difference}) to be within #{delta}"
@@ -204,7 +204,7 @@ class TLDR
     def assert_output expected_stdout, expected_stderr, message = nil, &block
       assert_block "assert_output requires a block to capture output" unless block
 
-      actual_stdout, actual_stderr = capture_io(&block)
+      actual_stdout, actual_stderr = Assertions.capture_io(&block)
 
       if Regexp === expected_stderr
         assert_match expected_stderr, actual_stderr, "In stderr"

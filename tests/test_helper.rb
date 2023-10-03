@@ -106,3 +106,29 @@ module TLDRunner
     )
   end
 end
+
+class AssertionTestCase < Minitest::Test
+  def setup
+    SuperDiff.configure do |config|
+      config.color_enabled = false
+    end
+  end
+
+  protected
+
+  def should_fail(message = nil)
+    e = assert_raises(TLDR::Failure) {
+      yield
+    }
+
+    if message.is_a?(String)
+      assert_includes e.message, message
+    elsif message.is_a?(Regexp)
+      assert_match message, e.message
+    elsif !message.nil?
+      fail "Unknown message type: #{message.inspect}"
+    end
+
+    e
+  end
+end
