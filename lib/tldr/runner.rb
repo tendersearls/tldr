@@ -12,8 +12,8 @@ class TLDR
     def run config, plan
       @wip.clear
       @results.clear
-      reporter = config.reporter.new(config)
-      reporter.before_suite(plan.tests)
+      reporter = config.reporter.new config
+      reporter.before_suite plan.tests
 
       time_bomb = Thread.new {
         explode = proc do
@@ -35,7 +35,7 @@ class TLDR
       }
 
       results = @executor.execute(plan) { |test|
-        run_test(test, config, plan, reporter)
+        run_test test, config, plan, reporter
       }.tap do
         time_bomb.kill
       end
@@ -50,21 +50,21 @@ class TLDR
 
     def run_test test, config, plan, reporter
       e = nil
-      start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC, :microsecond)
+      start_time = Process.clock_gettime Process::CLOCK_MONOTONIC, :microsecond
       wip_test = WIPTest.new test, start_time
       @wip << wip_test
-      runtime = time_it(start_time) do
+      runtime = time_it start_time do
         instance = test.test_class.new
         instance.setup if instance.respond_to? :setup
         if instance.respond_to? :around
           did_run = false
           instance.around {
             did_run = true
-            instance.send(test.method_name)
+            instance.send test.method_name
           }
           raise Error, "#{test.test_class}#around failed to yield or call the passed test block" unless did_run
         else
-          instance.send(test.method_name)
+          instance.send test.method_name
         end
         instance.teardown if instance.respond_to? :teardown
       rescue Skip, Failure, StandardError => e
@@ -94,7 +94,7 @@ class TLDR
       end
     end
 
-    def time_it(start)
+    def time_it start
       yield
       ((Process.clock_gettime(Process::CLOCK_MONOTONIC, :microsecond) - start) / 1000.0).round
     end
