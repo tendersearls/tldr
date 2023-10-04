@@ -29,25 +29,25 @@ class TLDR
 
   module Run
     def self.cli argv
-      config = ArgvParser.new.parse argv
-      tests config
+      config = ArgvParser.new.parse(argv)
+      tests(config)
     end
 
     def self.tests config = Config.new
-      Runner.new.run config, Planner.new.plan(config)
+      Runner.new.run(config, Planner.new.plan(config))
     end
 
     @@at_exit_registered = false
     def self.at_exit! config = Config.new
       # Ignore at_exit when running tldr CLI, since that will run any tests
-      return if $PROGRAM_NAME.end_with? "tldr"
+      return if $PROGRAM_NAME.end_with?("tldr")
       # Also ignore if we're running from within our rake task
-      return if caller.any? { |line| line.include? "lib/tldr/rake.rb" }
+      return if caller.any? { |line| line.include?("lib/tldr/rake.rb") }
       # Ignore at_exit when we've already registered an at_exit hook
       return if @@at_exit_registered
 
       Kernel.at_exit do
-        Run.tests config
+        Run.tests(config)
       end
 
       @@at_exit_registered = true

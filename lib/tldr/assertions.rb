@@ -74,7 +74,7 @@ class TLDR
     end
 
     def assert_equal expected, actual, message = nil
-      message = Assertions.msg(message) { Assertions.diff expected, actual }
+      message = Assertions.msg(message) { Assertions.diff(expected, actual) }
       assert expected == actual, message
     end
 
@@ -158,7 +158,7 @@ class TLDR
         "Expected #{Assertions.h(actual)} to match #{Assertions.h(matcher)}"
       }
       assert_respond_to matcher, :=~
-      matcher = Regexp.new Regexp.escape matcher if String === matcher
+      matcher = Regexp.new(Regexp.escape(matcher)) if String === matcher
       assert matcher =~ actual, message
       Regexp.last_match
     end
@@ -294,7 +294,7 @@ class TLDR
             "---Backtrace---",
             TLDR.filter_backtrace(e.backtrace).join("\n"),
             "---------------"
-          ].compact.join "\n"
+          ].compact.join("\n")
         }
       end
 

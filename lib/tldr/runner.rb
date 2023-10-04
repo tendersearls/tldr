@@ -6,7 +6,7 @@ class TLDR
       @executor = Executor.new
       @wip = Concurrent::Array.new
       @results = Concurrent::Array.new
-      @run_aborted = Concurrent::AtomicBoolean.new false
+      @run_aborted = Concurrent::AtomicBoolean.new(false)
     end
 
     def run config, plan
@@ -20,11 +20,11 @@ class TLDR
           next if ENV["CI"] && !$stderr.tty?
           next if @run_aborted.true?
           @run_aborted.make_true
-          reporter.after_tldr plan.tests, @wip.dup, @results.dup
-          exit! 3
+          reporter.after_tldr(plan.tests, @wip.dup, @results.dup)
+          exit!(3)
         end
 
-        sleep 1.8
+        sleep(1.8)
         # Don't hard-kill the runner if user is debugging, it'll
         # screw up their terminal slash be a bad time
         if IRB.CurrentContext
@@ -41,8 +41,8 @@ class TLDR
       end
 
       unless @run_aborted.true?
-        reporter.after_suite results
-        exit exit_code results
+        reporter.after_suite(results)
+        exit(exit_code(results))
       end
     end
 
@@ -51,12 +51,12 @@ class TLDR
     def run_test test, config, plan, reporter
       e = nil
       start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC, :microsecond)
-      wip_test = WIPTest.new test, start_time
+      wip_test = WIPTest.new(test, start_time)
       @wip << wip_test
       runtime = time_it(start_time) do
         instance = test.test_class.new
-        instance.setup if instance.respond_to? :setup
-        if instance.respond_to? :around
+        instance.setup if instance.respond_to?(:setup)
+        if instance.respond_to?(:around)
           did_run = false
           instance.around {
             did_run = true
@@ -66,15 +66,15 @@ class TLDR
         else
           instance.send(test.method_name)
         end
-        instance.teardown if instance.respond_to? :teardown
+        instance.teardown if instance.respond_to?(:teardown)
       rescue Skip, Failure, StandardError => e
       end
       TestResult.new(test, e, runtime).tap do |result|
         next if @run_aborted.true?
         @results << result
-        @wip.delete wip_test
-        reporter.after_test result
-        fail_fast reporter, plan, result if result.failing? && config.fail_fast
+        @wip.delete(wip_test)
+        reporter.after_test(result)
+        fail_fast(reporter, plan, result) if result.failing? && config.fail_fast
       end
     end
 
@@ -82,8 +82,8 @@ class TLDR
       unless @run_aborted.true?
         @run_aborted.make_true
         abort = proc do
-          reporter.after_fail_fast plan.tests, @wip.dup, @results.dup, fast_failed_result
-          exit! exit_code([fast_failed_result])
+          reporter.after_fail_fast(plan.tests, @wip.dup, @results.dup, fast_failed_result)
+          exit!(exit_code([fast_failed_result]))
         end
 
         if IRB.CurrentContext
@@ -94,7 +94,7 @@ class TLDR
       end
     end
 
-    def time_it(start)
+    def time_it start
       yield
       ((Process.clock_gettime(Process::CLOCK_MONOTONIC, :microsecond) - start) / 1000.0).round
     end

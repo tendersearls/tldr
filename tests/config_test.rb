@@ -9,7 +9,7 @@ class ConfigTest < Minitest::Test
   end
 
   def test_cli_defaults
-    config = TLDR::Config.new cli_defaults: true
+    config = TLDR::Config.new(cli_defaults: true)
 
     # Won't work unless we change dir to example/a and it'll create pollution
     # assert_equal ["test/add_test.rb", "test/test_subtract.rb"], config.paths
@@ -20,7 +20,7 @@ class ConfigTest < Minitest::Test
   end
 
   def test_non_cli_defaults
-    config = TLDR::Config.new cli_defaults: false
+    config = TLDR::Config.new(cli_defaults: false)
 
     assert_equal [], config.paths
     assert_equal [], config.helper_paths
@@ -146,7 +146,7 @@ class ConfigTest < Minitest::Test
     config = TLDR::Config.new(no_emoji: true, prepend_paths: ["a.rb:1"], paths: ["a.rb"])
     other = TLDR::Config.new(no_emoji: false, seed: 1, prepend_paths: ["a.rb:2"], config_intended_for_merge_only: true)
 
-    result = config.merge other
+    result = config.merge(other)
 
     refute_same result, config
     refute result.config_intended_for_merge_only

@@ -2,7 +2,7 @@ require "test_helper"
 
 class BasePathTest < Minitest::Test
   def test_configuring_base_path
-    result = TLDRunner.run_command "bundle exec tldr --seed 1 --no-prepend --base-path example/a"
+    result = TLDRunner.run_command("bundle exec tldr --seed 1 --no-prepend --base-path example/a")
 
     assert_empty result.stderr
     assert_includes result.stdout, <<~MSG

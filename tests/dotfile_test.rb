@@ -2,7 +2,7 @@ require "test_helper"
 
 class DotfileTest < Minitest::Test
   def test_a_dotfile
-    result = TLDRunner.run_command "bundle exec tldr --seed 1 --no-prepend --base-path example/c"
+    result = TLDRunner.run_command("bundle exec tldr --seed 1 --no-prepend --base-path example/c")
 
     assert_empty result.stderr
     assert_includes result.stdout, <<~MSG
@@ -17,7 +17,7 @@ class DotfileTest < Minitest::Test
   end
 
   def test_no_dotfile_doesnt_load_those_settings
-    result = TLDRunner.run_command "bundle exec tldr --seed 1 --no-prepend --no-dotfile --base-path example/c"
+    result = TLDRunner.run_command("bundle exec tldr --seed 1 --no-prepend --no-dotfile --base-path example/c")
 
     assert_empty result.stderr
     assert_includes result.stdout, <<~MSG
@@ -27,7 +27,7 @@ class DotfileTest < Minitest::Test
   end
 
   def test_a_lot_of_values_in_a_dotfile
-    result = TLDRunner.run_command "bundle exec tldr --base-path example/d"
+    result = TLDRunner.run_command("bundle exec tldr --base-path example/d")
 
     assert_empty result.stderr
     assert_includes result.stdout, <<~MSG
@@ -36,7 +36,7 @@ class DotfileTest < Minitest::Test
   end
 
   def test_overriding_a_lot_of_values_in_a_dotfile
-    result = TLDRunner.run_command "bundle exec tldr --base-path example/d --seed 5 --load-path foo --no-parallel --name test_stuff --prepend nope --exclude-path nada --exclude-name test_b_2"
+    result = TLDRunner.run_command("bundle exec tldr --base-path example/d --seed 5 --load-path foo --no-parallel --name test_stuff --prepend nope --exclude-path nada --exclude-name test_b_2")
 
     assert_empty result.stderr
     assert_includes result.stdout, <<~MSG

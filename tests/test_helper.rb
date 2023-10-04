@@ -1,4 +1,4 @@
-$LOAD_PATH.unshift File.expand_path("../lib", __dir__)
+$LOAD_PATH.unshift(File.expand_path("../lib", __dir__))
 require "tldr"
 require "open3"
 
@@ -13,13 +13,13 @@ class Minitest::Test
   private
 
   def assert_includes_all haystack, needles
-    unless needles.all? { |needle| haystack.include? needle }
+    unless needles.all? { |needle| haystack.include?(needle) }
       raise Minitest::Assertion, "Expected all of #{needles.inspect} to be found in in:\n\n---\n#{haystack}\n---"
     end
   end
 
   def assert_includes_none haystack, needles
-    unless needles.none? { |needle| haystack.include? needle }
+    unless needles.none? { |needle| haystack.include?(needle) }
       raise Minitest::Assertion, "Expected none of #{needles.inspect} to be found in in:\n\n---\n#{haystack}\n---"
     end
   end
@@ -96,7 +96,7 @@ module TLDRunner
   end
 
   def self.run_command command
-    stdout, stderr, status = Open3.capture3 command
+    stdout, stderr, status = Open3.capture3(command)
 
     Result.new(
       stdout: stdout.chomp,
@@ -116,7 +116,7 @@ class AssertionTestCase < Minitest::Test
 
   protected
 
-  def should_fail(message = nil)
+  def should_fail message = nil
     e = assert_raises(TLDR::Failure) {
       yield
     }

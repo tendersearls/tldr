@@ -1,7 +1,7 @@
 class TLDR
   module Reporters
     class Base
-      def initialize(config, out = $stdout, err = $stderr)
+      def initialize config, out = $stdout, err = $stderr
         out.sync = true
         err.sync = true
 

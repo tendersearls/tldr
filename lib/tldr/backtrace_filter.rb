@@ -14,19 +14,19 @@ class TLDR
     private
 
     def trim_leading_frames backtrace
-      if (trimmed = backtrace.take_while { |frame| meaningful? frame }).any?
+      if (trimmed = backtrace.take_while { |frame| meaningful?(frame) }).any?
         trimmed
       end
     end
 
     def trim_internal_frames backtrace
-      if (trimmed = backtrace.select { |frame| meaningful? frame }).any?
+      if (trimmed = backtrace.select { |frame| meaningful?(frame) }).any?
         trimmed
       end
     end
 
     def meaningful? frame
-      !internal? frame
+      !internal?(frame)
     end
 
     def internal? frame
@@ -35,6 +35,6 @@ class TLDR
   end
 
   def self.filter_backtrace backtrace
-    BacktraceFilter.new.filter backtrace
+    BacktraceFilter.new.filter(backtrace)
   end
 end

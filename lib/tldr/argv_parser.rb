@@ -4,7 +4,7 @@ class TLDR
   class ArgvParser
     PATTERN_FRIENDLY_SPLITTER = /,(?=(?:[^\/]*\/[^\/]*\/)*[^\/]*$)/
 
-    def parse(args, options = {cli_defaults: true})
+    def parse args, options = {cli_defaults: true}
       OptionParser.new do |opts|
         opts.banner = "Usage: tldr [options] some_tests/**/*.rb some/path.rb:13 ..."
 
@@ -22,12 +22,12 @@ class TLDR
 
         opts.on "-n", "#{CONFLAGS[:names]} PATTERN", "One or more names or /patterns/ of tests to run (like: foo_test, /test_foo.*/, Foo#foo_test)" do |name|
           options[:names] ||= []
-          options[:names] += name.split PATTERN_FRIENDLY_SPLITTER
+          options[:names] += name.split(PATTERN_FRIENDLY_SPLITTER)
         end
 
         opts.on "#{CONFLAGS[:exclude_names]} PATTERN", "One or more names or /patterns/ NOT to run" do |exclude_name|
           options[:exclude_names] ||= []
-          options[:exclude_names] += exclude_name.split PATTERN_FRIENDLY_SPLITTER
+          options[:exclude_names] += exclude_name.split(PATTERN_FRIENDLY_SPLITTER)
         end
 
         opts.on "#{CONFLAGS[:exclude_paths]} PATH", Array, "One or more paths NOT to run (like: foo.rb, \"test/bar/**\", baz.rb:3)" do |path|

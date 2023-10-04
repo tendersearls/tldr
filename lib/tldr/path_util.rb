@@ -1,7 +1,7 @@
 class TLDR
   module PathUtil
     def self.expand_paths path_strings, globs: true
-      path_strings = expand_globs path_strings if globs
+      path_strings = expand_globs(path_strings) if globs
 
       path_strings.flat_map { |path_string|
         File.directory?(path_string) ? Dir["#{path_string}/**/*.rb"] : path_string
@@ -10,7 +10,7 @@ class TLDR
         line_numbers = path_string.scan(/:(\d+)/).flatten.map(&:to_i)
 
         if line_numbers.any?
-          line_numbers.map { |line_number| Location.new absolute_path, line_number }
+          line_numbers.map { |line_number| Location.new(absolute_path, line_number) }
         else
           [Location.new(absolute_path, nil)]
         end

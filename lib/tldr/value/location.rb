@@ -1,5 +1,5 @@
 class TLDR
-  Location = Struct.new :file, :line do
+  Location = Struct.new(:file, :line) do
     def relative
       if file.start_with?(Dir.pwd)
         file[Dir.pwd.length + 1..]

@@ -2,7 +2,7 @@ require "test_helper"
 
 class ArgvParserTest < Minitest::Test
   def test_parsing_argv
-    result = TLDR::ArgvParser.new.parse [
+    result = TLDR::ArgvParser.new.parse([
       "bar.rb",
       "--seed", "42",
       "-v",
@@ -17,7 +17,7 @@ class ArgvParserTest < Minitest::Test
       "--load-path", "app",
       "-n", "bar,baz",
       "--yes-i-know"
-    ]
+    ])
 
     assert_equal ["bar.rb", "foo.rb:3"], result.paths
     assert_equal 42, result.seed
@@ -32,7 +32,7 @@ class ArgvParserTest < Minitest::Test
   end
 
   def test_defaults
-    result = TLDR::ArgvParser.new.parse []
+    result = TLDR::ArgvParser.new.parse([])
 
     assert_equal Dir["test/**/*_test.rb", "test/**/test_*.rb"], result.paths
     assert_includes 0..10_000, result.seed

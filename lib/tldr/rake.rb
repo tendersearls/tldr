@@ -7,7 +7,7 @@ class TLDR
   class Task
     include Rake::DSL
 
-    def initialize(name: "tldr", config: Config.new)
+    def initialize name: "tldr", config: Config.new
       define name, config
     end
 

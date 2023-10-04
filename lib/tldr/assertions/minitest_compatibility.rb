@@ -34,7 +34,7 @@ class TLDR
         assert receiver.__send__(method, *args), message
       end
 
-      def capture_io(&blk)
+      def capture_io &blk
         Assertions.capture_io(&blk)
       end
 

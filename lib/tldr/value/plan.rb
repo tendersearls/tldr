@@ -1,3 +1,3 @@
 class TLDR
-  Plan = Struct.new :tests, :strategy
+  Plan = Struct.new(:tests, :strategy)
 end

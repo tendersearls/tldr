@@ -1,5 +1,5 @@
 require "tldr"
-TLDR::Run.at_exit! TLDR::Config.new(fail_fast: true)
+TLDR::Run.at_exit!(TLDR::Config.new(fail_fast: true))
 
 require "helper"
 

@@ -31,7 +31,7 @@ class TLDR
     end
 
     def test_no_groups
-      result = @subject.strategize some_tests, [], [], Config.new(prepend_paths: [])
+      result = @subject.strategize(some_tests, [], [], Config.new(prepend_paths: []))
 
       assert result.parallel?
       assert_equal some_tests, result.parallel_tests_and_groups
@@ -41,13 +41,13 @@ class TLDR
     def test_one_test
       tests = [Test.new(TA, :test_1)]
 
-      result = @subject.strategize tests, [], [], Config.new(prepend_paths: [])
+      result = @subject.strategize(tests, [], [], Config.new(prepend_paths: []))
 
       refute result.parallel?
     end
 
     def test_parallel_disabled
-      result = @subject.strategize some_tests, [], [], Config.new(prepend_paths: [], parallel: false)
+      result = @subject.strategize(some_tests, [], [], Config.new(prepend_paths: [], parallel: false))
 
       refute result.parallel?
     end
@@ -57,7 +57,7 @@ class TLDR
         TestGroup.new([[TB, :test_2], ["TLDR::StrategizerTest::TC", :test_1]])
       ]
 
-      result = @subject.strategize some_tests, some_groups, [], Config.new(prepend_paths: [])
+      result = @subject.strategize(some_tests, some_groups, [], Config.new(prepend_paths: []))
 
       assert result.parallel?
       assert_equal [
@@ -79,7 +79,7 @@ class TLDR
         TestGroup.new([["TLDR::StrategizerTest::TB", :test_2], [TA, :test_1]])
       ]
 
-      result = @subject.strategize some_tests, some_groups, [], Config.new(prepend_paths: [])
+      result = @subject.strategize(some_tests, some_groups, [], Config.new(prepend_paths: []))
 
       assert result.parallel?
       assert_equal [
@@ -107,7 +107,7 @@ class TLDR
         TestGroup.new([[TB, :test_1]])
       ]
 
-      result = @subject.strategize some_tests, some_groups, unsafe_groups, Config.new(prepend_paths: [])
+      result = @subject.strategize(some_tests, some_groups, unsafe_groups, Config.new(prepend_paths: []))
 
       assert result.parallel?
       assert_equal 2, result.parallel_tests_and_groups.size
@@ -128,7 +128,7 @@ class TLDR
         TestGroup.new([[TA, nil], [TB, :test_2]])
       ]
 
-      result = @subject.strategize some_tests, [], unsafe_groups, Config.new(prepend_paths: [])
+      result = @subject.strategize(some_tests, [], unsafe_groups, Config.new(prepend_paths: []))
 
       assert result.parallel?
       assert_equal some_tests - [
@@ -148,7 +148,7 @@ class TLDR
         TestGroup.new([[TA, nil], [TB, :test_2]])
       ]
 
-      result = @subject.strategize some_tests, [], unsafe_groups, Config.new(prepend_paths: ["tests/strategizer_test.rb:18"])
+      result = @subject.strategize(some_tests, [], unsafe_groups, Config.new(prepend_paths: ["tests/strategizer_test.rb:18"]))
 
       assert_equal [Test.new(TB, :test_2)], result.prepend_sequential_tests
       assert_equal some_tests - [
@@ -171,10 +171,10 @@ class TLDR
         TestGroup.new([[TC, nil]])
       ]
 
-      result = @subject.strategize [
+      result = @subject.strategize([
         Test.new(TA, :test_1),
         Test.new(TC, :test_2)
-      ], some_groups, unsafe_groups, Config.new(prepend_paths: [])
+      ], some_groups, unsafe_groups, Config.new(prepend_paths: []))
 
       assert result.parallel?
       assert_equal [

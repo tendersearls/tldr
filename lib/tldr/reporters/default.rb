@@ -1,13 +1,13 @@
 class TLDR
   module Reporters
     class Default < Base
-      def initialize(config, out = $stdout, err = $stderr)
+      def initialize config, out = $stdout, err = $stderr
         super
         @icons = @config.no_emoji ? IconProvider::Base.new : IconProvider::Emoji.new
       end
 
       def before_suite tests
-        @suite_start_time = Process.clock_gettime Process::CLOCK_MONOTONIC, :microsecond
+        @suite_start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC, :microsecond)
         @out.print <<~MSG
           Command: #{tldr_command} #{@config.to_full_args}
           #{@icons.seed} #{CONFLAGS[:seed]} #{@config.seed}
@@ -32,7 +32,7 @@ class TLDR
       end
 
       def after_tldr planned_tests, wip_tests, test_results
-        stop_time = Process.clock_gettime Process::CLOCK_MONOTONIC, :microsecond
+        stop_time = Process.clock_gettime(Process::CLOCK_MONOTONIC, :microsecond)
 
         @out.print @icons.tldr
         @err.print "\n\n"
@@ -45,7 +45,7 @@ class TLDR
               "too long; didn't run!",
               "#{@icons.run} Completed #{test_results.size} of #{planned_tests.size} tests (#{((test_results.size.to_f / planned_tests.size) * 100).round}%) before running out of time.",
               (<<~WIP.chomp if wip_tests.any?),
-                #{@icons.wip} #{plural wip_tests.size, "test was", "tests were"} cancelled in progress:
+                #{@icons.wip} #{plural(wip_tests.size, "test was", "tests were")} cancelled in progress:
                 #{wip_tests.map { |wip_test| "  #{time_diff(wip_test.start_time, stop_time)}ms - #{describe(wip_test.test)}" }.join("\n")}
               WIP
               (<<~SLOW.chomp if test_results.any?),
@@ -58,7 +58,7 @@ class TLDR
           end
         end
 
-        after_suite test_results
+        after_suite(test_results)
       end
 
       def after_fail_fast planned_tests, wip_tests, test_results, last_result
@@ -68,17 +68,17 @@ class TLDR
         wrap_in_horizontal_rule do
           @err.print [
             "Failing fast after #{describe(last_result.test, last_result.relevant_location)} #{last_result.error? ? "errored" : "failed"}.",
-            ("#{@icons.wip} #{plural wip_tests.size, "test was", "tests were"} cancelled in progress." if wip_tests.any?),
-            ("#{@icons.not_run} #{plural unrun_tests.size, "test was", "tests were"} not run at all." if unrun_tests.any?),
+            ("#{@icons.wip} #{plural(wip_tests.size, "test was", "tests were")} cancelled in progress." if wip_tests.any?),
+            ("#{@icons.not_run} #{plural(unrun_tests.size, "test was", "tests were")} not run at all." if unrun_tests.any?),
             describe_tests_that_didnt_finish(planned_tests, test_results)
           ].compact.join("\n\n")
         end
 
-        after_suite test_results
+        after_suite(test_results)
       end
 
       def after_suite test_results
-        duration = time_diff @suite_start_time
+        duration = time_diff(@suite_start_time)
         test_results = test_results.sort_by { |result| [result.test.location.file, result.test.location.line] }
 
         @err.print summarize_failures(test_results).join("\n\n")
@@ -112,7 +112,7 @@ class TLDR
         failures = results.select { |result| result.failing? }
         return failures if failures.empty?
 
-        ["\n\nFailing tests:"] + failures.map.with_index { |result, i| summarize_result result, i }
+        ["\n\nFailing tests:"] + failures.map.with_index { |result, i| summarize_result(result, i) }
       end
 
       def summarize_result result, index
@@ -151,15 +151,15 @@ class TLDR
         unrun = planned_tests - test_results.map(&:test)
         return if unrun.empty?
 
-        unrun_locators = consolidate unrun
+        unrun_locators = consolidate(unrun)
         failed = test_results.select(&:failing?).map(&:test)
-        failed_locators = consolidate failed, exclude: unrun_locators
+        failed_locators = consolidate(failed, exclude: unrun_locators)
         suggested_locators = unrun_locators + [
-          ("--comment \"Also include #{plural failed.size, "test"} that failed:\"" if failed_locators.any?)
+          ("--comment \"Also include #{plural(failed.size, "test")} that failed:\"" if failed_locators.any?)
         ].compact + failed_locators
         <<~MSG
-          #{@icons.rock_on} Run the #{plural unrun.size, "test"} that didn't finish:
-            #{tldr_command} #{@config.to_full_args exclude: [:paths]} #{suggested_locators.join(" \\\n    ")}
+          #{@icons.rock_on} Run the #{plural(unrun.size, "test")} that didn't finish:
+            #{tldr_command} #{@config.to_full_args(exclude: [:paths])} #{suggested_locators.join(" \\\n    ")}
         MSG
       end
 

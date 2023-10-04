@@ -131,14 +131,14 @@ class TLDR
 
       self.prepend_paths = prepend_paths.map { |path|
         if path == MOST_RECENTLY_MODIFIED_TAG
-          most_recently_modified_test_file tests
+          most_recently_modified_test_file(tests)
         else
           path
         end
       }.compact
     end
 
-    def to_full_args(exclude: [])
+    def to_full_args exclude: []
       to_cli_argv(
         CONFLAGS.keys -
         exclude - [
@@ -147,7 +147,7 @@ class TLDR
       ).join(" ")
     end
 
-    def to_single_path_args(path)
+    def to_single_path_args path
       argv = to_cli_argv(CONFLAGS.keys - [
         :seed, :parallel, :names, :fail_fast, :paths, :prepend_paths,
         :no_prepend, :exclude_paths
@@ -212,7 +212,7 @@ class TLDR
       end
     end
 
-    def most_recently_modified_test_file(tests)
+    def most_recently_modified_test_file tests
       return if tests.empty?
 
       tests.max_by { |test| File.mtime(test.file) }.file
@@ -222,11 +222,11 @@ class TLDR
     # ASAP, even before globbing to find default paths of tests. If there is
     # a way to change all of our Dir.glob calls to be relative to base_path
     # without a loss in accuracy, would love to not have to use Dir.chdir!
-    def change_working_directory_because_i_am_bad_and_i_should_feel_bad!(base_path)
+    def change_working_directory_because_i_am_bad_and_i_should_feel_bad! base_path
       Dir.chdir(base_path) unless base_path.nil?
     end
 
-    def merge_dotfile_args(args)
+    def merge_dotfile_args args
       return args if args[:no_dotfile] || !File.exist?(".tldr.yml")
       require "yaml"
 

@@ -39,7 +39,7 @@ class DefaultReporterTest < Minitest::Test
     assert_equal "😁", @io.string
     @io.clear
 
-    subject.after_tldr [test_a, test_b, test_c], [test_b_wip], [test_a_result]
+    subject.after_tldr([test_a, test_b, test_c], [test_b_wip], [test_a_result])
     assert_equal <<~MSG, scrub_time(@io.string)
       🥵
 
@@ -71,7 +71,7 @@ class DefaultReporterTest < Minitest::Test
 
     # Warning! Mutating config because lazy.
     config.yes_i_know = true
-    subject.after_tldr [test_a, test_b, test_c], [test_b_wip], [test_a_result]
+    subject.after_tldr([test_a, test_b, test_c], [test_b_wip], [test_a_result])
     assert_equal <<~MSG, scrub_time(@io.string)
       🥵
 
@@ -85,7 +85,7 @@ class DefaultReporterTest < Minitest::Test
 
   private
 
-  def scrub_time(string)
+  def scrub_time string
     string.gsub(/(\d+)ms/, "XXXms")
   end
 

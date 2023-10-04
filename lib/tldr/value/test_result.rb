@@ -1,5 +1,5 @@
 class TLDR
-  TestResult = Struct.new :test, :error, :runtime do
+  TestResult = Struct.new(:test, :error, :runtime) do
     attr_reader :type, :error_location
 
     def initialize(*args)

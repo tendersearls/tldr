@@ -1,8 +1,8 @@
 class TLDR
   class Strategizer
-    Strategy = Struct.new :parallel?, :prepend_sequential_tests,
+    Strategy = Struct.new(:parallel?, :prepend_sequential_tests,
       :parallel_tests_and_groups, :append_sequential_tests,
-      keyword_init: true
+      keyword_init: true)
 
     # Combine all discovered test methods with any methods grouped by run_these_together!
     #
@@ -16,11 +16,11 @@ class TLDR
       thread_unsafe_tests, thread_safe_tests = partition_unsafe(all_tests, thread_unsafe_test_groups)
       prepend_sequential_tests, append_sequential_tests = partition_prepend(thread_unsafe_tests, config)
 
-      grouped_tests = prepare_run_together_groups run_these_together_groups, thread_safe_tests, append_sequential_tests
+      grouped_tests = prepare_run_together_groups(run_these_together_groups, thread_safe_tests, append_sequential_tests)
       already_included_groups = []
       parallel_tests_and_groups = thread_safe_tests.map { |test|
-        if (group = grouped_tests.find { |group| group.tests.include? test })
-          if already_included_groups.include? group
+        if (group = grouped_tests.find { |group| group.tests.include?(test) })
+          if already_included_groups.include?(group)
             next
           elsif (other = already_included_groups.find { |other| (group.tests & other.tests).any? })
             other.tests |= group.tests
@@ -49,7 +49,7 @@ class TLDR
 
     def partition_unsafe tests, thread_unsafe_test_groups
       tests.partition { |test|
-        thread_unsafe_test_groups.any? { |group| group.tests.include? test }
+        thread_unsafe_test_groups.any? { |group| group.tests.include?(test) }
       }
     end
 
@@ -57,10 +57,10 @@ class TLDR
     # Suboptimal, but we do indeed need to do this work in two places ¯\_(ツ)_/¯
     def partition_prepend thread_unsafe_tests, config
       prepend_paths = config.no_prepend ? [] : config.prepend_paths
-      locations = PathUtil.expand_paths prepend_paths
+      locations = PathUtil.expand_paths(prepend_paths)
 
       thread_unsafe_tests.partition { |test|
-        PathUtil.locations_include_test? locations, test
+        PathUtil.locations_include_test?(locations, test)
       }
     end
 
