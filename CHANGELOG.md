@@ -1,3 +1,7 @@
+## [0.9.2]
+
+* Don't redundantly print out dotfile config values for re-run instructions
+
 ## [0.9.1]
 
 * Correctly clear the screen between runs
