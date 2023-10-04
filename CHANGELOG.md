@@ -1,3 +1,4 @@
+## [0.9.1]
 
 * Correctly clear the screen between runs
 
