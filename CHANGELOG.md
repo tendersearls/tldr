@@ -1,3 +1,8 @@
+## [0.8.0]
+
+* Add a `--yes-i-know` flag that will suppress the large warning when your test
+suite runs over the 1.8s limit
+
 ## [0.7.0]
 
 * Add a `tldt` alias for folks who have another executable named `tldr` on their

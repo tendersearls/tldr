@@ -123,7 +123,8 @@ Usage: tldr [options] some_tests/**/*.rb some/path.rb:13 ...
         --no-emoji                   Disable emoji in the output
     -v, --verbose                    Print stack traces for errors
         --[no-]warnings              Print Ruby warnings (Default: true)
-        --comment COMMENT            No-op comment, used internally for multi-line execution instructions
+        --yes-i-know                 Suppress TLDR report when suite runs over 1.8s
+        --comment COMMENT            No-op; used for multi-line execution instructions
 ```
 
 After being parsed, all the CLI options are converted into a
@@ -336,11 +337,25 @@ with the `--reporter` command line option. It can be set to any fully-qualified
 class name that extends from
 [TLDR::Reporters::Base](/lib/tldr/reporters/base.rb).
 
+### I know my tests are over 1.8s, how do I suppress the huge output?
+
+Plenty of test suites are over 1.8s and having TLDR repeatedly print out the
+huge summary at the end of each test run can be distracting and make it harder
+to spot test failures. If you know your test suite is too slow, you can simply
+add the `--yes-i-know` flag
+
 ### What about mocking?
 
 TLDR is laser-focused on running tests, so it doesn't provide a built-in mocking
 facility. Might we interest you in a refreshing
 [mocktail](https://github.com/testdouble/mocktail), instead?
+
+### Contributing to TLDR
+
+If you want to submit PRs on this repo, please know that the code style is
+[Kirkland-style Ruby](https://mastodon.social/@searls/111137666157318482), where
+method definitions have parentheses omitted but parentheses are generally
+expected for method invocations.
 
 ## Acknowledgements
 

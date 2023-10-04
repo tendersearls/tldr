@@ -82,7 +82,7 @@ class TLDR
           options[:warnings] = warnings
         end
 
-        opts.on CONFLAGS[:yes_i_know], "Suppress TLDR report" do
+        opts.on CONFLAGS[:yes_i_know], "Suppress TLDR report when suite runs over 1.8s" do
           options[:yes_i_know] = true
         end
 
