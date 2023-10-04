@@ -39,7 +39,7 @@ class DefaultReporterTest < Minitest::Test
     @io.clear
 
     subject.after_tldr [test_a, test_b, test_c], [test_b_wip], [test_a_result]
-    assert_equal <<~MSG, @io.string
+    assert_equal <<~MSG, scrub_time(@io.string)
       🥵
 
       🚨==================== ABORTED RUN ====================🚨
@@ -49,10 +49,10 @@ class DefaultReporterTest < Minitest::Test
       🏃 Completed 1 of 3 tests (33%) before running out of time.
 
       🙅 1 test was cancelled in progress:
-        1800ms - DefaultReporterTest::SomeTest#test_b [tests/default_reporter_test.rb:8]
+        XXXms - DefaultReporterTest::SomeTest#test_b [tests/default_reporter_test.rb:8]
 
       🐢 Your 1 slowest completed tests:
-        500ms - DefaultReporterTest::SomeTest#test_a [tests/default_reporter_test.rb:5]
+        XXXms - DefaultReporterTest::SomeTest#test_a [tests/default_reporter_test.rb:5]
 
       🤘 Run the 2 tests that didn't finish:
         bundle exec tldr --seed 42 "tests/default_reporter_test.rb:8:11"
@@ -62,10 +62,16 @@ class DefaultReporterTest < Minitest::Test
 
 
 
-      Finished in 0ms.
+      Finished in XXXms.
 
       1 test class, 1 test method, 0 failures, 0 errors, 0 skips
     MSG
+  end
+
+  private
+
+  def scrub_time(string)
+    string.gsub(/(\d+)ms/, "XXXms")
   end
 
   class SillyIO < StringIO
