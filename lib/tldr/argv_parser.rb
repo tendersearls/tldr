@@ -82,7 +82,11 @@ class TLDR
           options[:warnings] = warnings
         end
 
-        opts.on "--comment COMMENT", String, "No-op comment, used internally for multi-line execution instructions" do
+        opts.on CONFLAGS[:yes_i_know], "Suppress TLDR report" do
+          options[:yes_i_know] = true
+        end
+
+        opts.on "--comment COMMENT", String, "No-op; used for multi-line execution instructions" do
           # See "--comment" in lib/tldr/reporters/default.rb for an example of how this is used internally
         end
       end.parse!(args)

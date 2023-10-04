@@ -36,20 +36,26 @@ class TLDR
 
         @out.print @icons.tldr
         @err.print "\n\n"
-        wrap_in_horizontal_rule do
-          @err.print [
-            "too long; didn't run!",
-            "#{@icons.run} Completed #{test_results.size} of #{planned_tests.size} tests (#{((test_results.size.to_f / planned_tests.size) * 100).round}%) before running out of time.",
-            (<<~WIP.chomp if wip_tests.any?),
-              #{@icons.wip} #{plural wip_tests.size, "test was", "tests were"} cancelled in progress:
-              #{wip_tests.map { |wip_test| "  #{time_diff(wip_test.start_time, stop_time)}ms - #{describe(wip_test.test)}" }.join("\n")}
-            WIP
-            (<<~SLOW.chomp if test_results.any?),
-              #{@icons.slow} Your #{[10, test_results.size].min} slowest completed tests:
-              #{test_results.sort_by(&:runtime).last(10).reverse.map { |result| "  #{result.runtime}ms - #{describe(result.test)}" }.join("\n")}
-            SLOW
-            describe_tests_that_didnt_finish(planned_tests, test_results)
-          ].compact.join("\n\n")
+
+        if @config.yes_i_know
+          @err.print "🚨 TLDR! Display summary by omitting --yes-i-know"
+        else
+          wrap_in_horizontal_rule do
+            @err.print [
+              "too long; didn't run!",
+              "#{@icons.run} Completed #{test_results.size} of #{planned_tests.size} tests (#{((test_results.size.to_f / planned_tests.size) * 100).round}%) before running out of time.",
+              (<<~WIP.chomp if wip_tests.any?),
+                #{@icons.wip} #{plural wip_tests.size, "test was", "tests were"} cancelled in progress:
+                #{wip_tests.map { |wip_test| "  #{time_diff(wip_test.start_time, stop_time)}ms - #{describe(wip_test.test)}" }.join("\n")}
+              WIP
+              (<<~SLOW.chomp if test_results.any?),
+                #{@icons.slow} Your #{[10, test_results.size].min} slowest completed tests:
+                #{test_results.sort_by(&:runtime).last(10).reverse.map { |result| "  #{result.runtime}ms - #{describe(result.test)}" }.join("\n")}
+              SLOW
+              describe_tests_that_didnt_finish(planned_tests, test_results),
+              "🙈 Suppress this summary with --yes-i-know"
+            ].compact.join("\n\n")
+          end
         end
 
         after_suite test_results
@@ -138,7 +144,7 @@ class TLDR
         rule = @icons.alarm + "=" * 20 + " ABORTED RUN " + "=" * 20 + @icons.alarm
         @err.print "#{rule}\n\n"
         yield
-        @err.print "\n\n#{rule}\n\n"
+        @err.print "\n\n#{rule}"
       end
 
       def describe_tests_that_didnt_finish planned_tests, test_results

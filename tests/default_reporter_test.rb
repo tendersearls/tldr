@@ -17,7 +17,8 @@ class DefaultReporterTest < Minitest::Test
   end
 
   def test_parallel_output
-    subject = TLDR::Reporters::Default.new(TLDR::Config.new(seed: 42), @io, @io)
+    config = TLDR::Config.new(seed: 42)
+    subject = TLDR::Reporters::Default.new(config, @io, @io)
     test_a = TLDR::Test.new(SomeTest, :test_a)
     test_b = TLDR::Test.new(SomeTest, :test_b)
     test_c = TLDR::Test.new(SomeTest, :test_c)
@@ -58,9 +59,23 @@ class DefaultReporterTest < Minitest::Test
         bundle exec tldr --seed 42 "tests/default_reporter_test.rb:8:11"
 
 
+      🙈 Suppress this summary with --yes-i-know
+
       🚨==================== ABORTED RUN ====================🚨
 
+      Finished in XXXms.
 
+      1 test class, 1 test method, 0 failures, 0 errors, 0 skips
+    MSG
+    @io.clear
+
+    # Warning! Mutating config because lazy.
+    config.yes_i_know = true
+    subject.after_tldr [test_a, test_b, test_c], [test_b_wip], [test_a_result]
+    assert_equal <<~MSG, scrub_time(@io.string)
+      🥵
+
+      🚨 TLDR! Display summary by omitting --yes-i-know
 
       Finished in XXXms.
 

@@ -56,15 +56,16 @@ class ConfigTest < Minitest::Test
       paths: ["a.rb:3", "b.rb"],
       exclude_paths: ["c.rb:4"],
       exclude_names: ["test_b_1"],
-      warnings: false
+      warnings: false,
+      yes_i_know: true
     )
 
     assert_equal <<~MSG.chomp, config.to_full_args
-      --seed 42 --verbose --reporter TLDR::Reporters::Base --helper "test_helper.rb" --load-path "app" --load-path "lib" --parallel --name "/test_*/" --name "test_it" --fail-fast --prepend "a.rb:3" --exclude-path "c.rb:4" --exclude-name "test_b_1" --no-warnings "a.rb:3" "b.rb"
+      --seed 42 --verbose --reporter TLDR::Reporters::Base --helper "test_helper.rb" --load-path "app" --load-path "lib" --parallel --name "/test_*/" --name "test_it" --fail-fast --prepend "a.rb:3" --exclude-path "c.rb:4" --exclude-name "test_b_1" --no-warnings --yes-i-know "a.rb:3" "b.rb"
     MSG
 
     assert_equal <<~MSG.chomp, config.to_single_path_args("lol.rb")
-      --verbose --reporter TLDR::Reporters::Base --helper "test_helper.rb" --load-path "app" --load-path "lib" --exclude-name "test_b_1" --no-warnings "lol.rb"
+      --verbose --reporter TLDR::Reporters::Base --helper "test_helper.rb" --load-path "app" --load-path "lib" --exclude-name "test_b_1" --no-warnings --yes-i-know "lol.rb"
     MSG
   end
 

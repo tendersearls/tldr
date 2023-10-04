@@ -15,7 +15,8 @@ class ArgvParserTest < Minitest::Test
       "--no-parallel",
       "--name", "foo",
       "--load-path", "app",
-      "-n", "bar,baz"
+      "-n", "bar,baz",
+      "--yes-i-know"
     ]
 
     assert_equal ["bar.rb", "foo.rb:3"], result.paths
@@ -27,6 +28,7 @@ class ArgvParserTest < Minitest::Test
     assert_equal ["lib", "vendor", "spec", "app"], result.load_paths
     refute result.parallel
     assert_equal ["foo", "bar", "baz"], result.names
+    assert result.yes_i_know
   end
 
   def test_defaults
@@ -41,5 +43,6 @@ class ArgvParserTest < Minitest::Test
     assert_equal ["test"], result.load_paths
     assert result.parallel
     assert_equal [], result.names
+    refute result.yes_i_know
   end
 end
