@@ -53,7 +53,7 @@ class TLDR
           options[:no_prepend] = true
         end
 
-        opts.on "-l", "#{CONFLAGS[:load_paths]} PATH", Array, "Add one or more paths to the $LOAD_PATH (Default: [\"test\"])" do |load_path|
+        opts.on "-l", "#{CONFLAGS[:load_paths]} PATH", Array, "Add one or more paths to the $LOAD_PATH (Default: [\"lib\", \"test\"])" do |load_path|
           options[:load_paths] ||= []
           options[:load_paths] += load_path
         end
@@ -82,11 +82,19 @@ class TLDR
           options[:warnings] = warnings
         end
 
+        opts.on CONFLAGS[:watch], "Run your tests continuously on file save (requires 'fswatch' to be installed)" do
+          options[:watch] = true
+        end
+
         opts.on CONFLAGS[:yes_i_know], "Suppress TLDR report when suite runs over 1.8s" do
           options[:yes_i_know] = true
         end
 
-        opts.on "--comment COMMENT", String, "No-op; used for multi-line execution instructions" do
+        opts.on CONFLAGS[:i_am_being_watched], "[INTERNAL] Signals to tldr it is being invoked under --watch mode" do
+          options[:i_am_being_watched] = true
+        end
+
+        opts.on "--comment COMMENT", String, "[INTERNAL] No-op; used for multi-line execution instructions" do
           # See "--comment" in lib/tldr/reporters/default.rb for an example of how this is used internally
         end
       end.parse!(args)

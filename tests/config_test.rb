@@ -14,7 +14,7 @@ class ConfigTest < Minitest::Test
     # Won't work unless we change dir to example/a and it'll create pollution
     # assert_equal ["test/add_test.rb", "test/test_subtract.rb"], config.paths
     assert_equal ["test/helper.rb"], config.helper_paths
-    assert_equal ["test"], config.load_paths
+    assert_equal ["lib", "test"], config.load_paths
     assert_equal [TLDR::MOST_RECENTLY_MODIFIED_TAG], config.prepend_paths
     assert config.warnings
   end
@@ -57,7 +57,8 @@ class ConfigTest < Minitest::Test
       exclude_paths: ["c.rb:4"],
       exclude_names: ["test_b_1"],
       warnings: false,
-      yes_i_know: true
+      yes_i_know: true,
+      i_am_being_watched: true
     )
 
     assert_equal <<~MSG.chomp, config.to_full_args
@@ -66,6 +67,10 @@ class ConfigTest < Minitest::Test
 
     assert_equal <<~MSG.chomp, config.to_single_path_args("lol.rb")
       --verbose --reporter TLDR::Reporters::Base --helper "test_helper.rb" --load-path "app" --load-path "lib" --exclude-name "test_b_1" --no-warnings --yes-i-know "lol.rb"
+    MSG
+
+    assert_equal <<~MSG.chomp, config.to_full_args(ensure_args: ["--i-am-being-watched"])
+      --seed 42 --verbose --reporter TLDR::Reporters::Base --helper "test_helper.rb" --load-path "app" --load-path "lib" --parallel --name "/test_*/" --name "test_it" --fail-fast --prepend "a.rb:3" --exclude-path "c.rb:4" --exclude-name "test_b_1" --no-warnings --yes-i-know "a.rb:3" "b.rb" --i-am-being-watched
     MSG
   end
 

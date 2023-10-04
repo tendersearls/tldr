@@ -116,15 +116,17 @@ Usage: tldr [options] some_tests/**/*.rb some/path.rb:13 ...
         --no-helper                  Don't require any test helpers
         --prepend PATH               Prepend one or more paths to run before the rest (Default: most recently modified test)
         --no-prepend                 Don't prepend any tests before the rest of the suite
-    -l, --load-path PATH             Add one or more paths to the $LOAD_PATH (Default: ["test"])
+    -l, --load-path PATH             Add one or more paths to the $LOAD_PATH (Default: ["lib", "test"])
     -r, --reporter REPORTER          Set a custom reporter class (Default: "TLDR::Reporters::Default")
         --base-path PATH             Change the working directory for all relative paths (Default: current working directory)
         --no-dotfile                 Disable loading .tldr.yml dotfile
         --no-emoji                   Disable emoji in the output
     -v, --verbose                    Print stack traces for errors
         --[no-]warnings              Print Ruby warnings (Default: true)
+        --watch                      Run your tests continuously on file save (requires 'fswatch' to be installed)
         --yes-i-know                 Suppress TLDR report when suite runs over 1.8s
-        --comment COMMENT            No-op; used for multi-line execution instructions
+        --i-am-being-watched         [INTERNAL] Signals to tldr it is being invoked under --watch mode
+        --comment COMMENT            [INTERNAL] No-op; used for multi-line execution instructions
 ```
 
 After being parsed, all the CLI options are converted into a
@@ -160,6 +162,17 @@ with these caveats:
   deprecated `assert_send`, just `include
   TLDR::Assertions::MinitestCompatibility` into the `TLDR` base class or
   individual test classesJust set it
+
+### Running tests continuously with --watch
+
+The `tldr` CLI includes a `--watch` option which will watch for changes in any
+of the configured load paths (`["test", "lib"]` by default) and then execute
+your tests each time a file is changed. To keep the output up-to-date and easy
+to scan, it will also clear your console before each run.
+
+Here's what that might look like:
+
+![tldr-watch](https://github.com/tendersearls/tldr/assets/79303/364f0e52-5596-49ce-a470-5eaeddd11f03)
 
 ### Running TLDR with Rake
 
@@ -240,8 +253,9 @@ encountered multiple times, only the first hook will be registered. If the
 
 #### Setting up the load path
 
-When running TLDR from a Ruby script, one thing the framework can't help you with
-is setting up load paths for you.
+By default, the `tldr` CLI adds `test` and `lib` directories to the load path
+for you, but when running TLDR from a Ruby script, it doesn't set those up for
+you.
 
 If you want to require code in `test/` or `lib/` without using
 `require_relative`, you'll need to add those directories to the load path. You
@@ -350,7 +364,7 @@ TLDR is laser-focused on running tests, so it doesn't provide a built-in mocking
 facility. Might we interest you in a refreshing
 [mocktail](https://github.com/testdouble/mocktail), instead?
 
-### Contributing to TLDR
+## Contributing to TLDR
 
 If you want to submit PRs on this repo, please know that the code style is
 [Kirkland-style Ruby](https://mastodon.social/@searls/111137666157318482), where

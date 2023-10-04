@@ -40,7 +40,7 @@ class ArgvParserTest < Minitest::Test
     refute result.verbose
     assert_equal TLDR::Reporters::Default, result.reporter
     assert_equal ["test/helper.rb"], result.helper_paths
-    assert_equal ["test"], result.load_paths
+    assert_equal ["lib", "test"], result.load_paths
     assert result.parallel
     assert_equal [], result.names
     refute result.yes_i_know

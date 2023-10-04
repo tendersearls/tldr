@@ -17,7 +17,9 @@ class TLDR
     base_path: "--base-path",
     no_dotfile: "--no-dotfile",
     warnings: "--[no-]warnings",
+    watch: "--watch",
     yes_i_know: "--yes-i-know",
+    i_am_being_watched: "--i-am-being-watched",
     paths: nil
   }.freeze
 
@@ -27,7 +29,7 @@ class TLDR
     :paths, :seed, :no_helper, :verbose, :reporter,
     :helper_paths, :load_paths, :parallel, :names, :fail_fast, :no_emoji,
     :prepend_paths, :no_prepend, :exclude_paths, :exclude_names, :base_path,
-    :no_dotfile, :warnings, :yes_i_know,
+    :no_dotfile, :warnings, :watch, :yes_i_know, :i_am_being_watched,
     # Internal properties
     :config_intended_for_merge_only, :seed_set_intentionally, :cli_defaults
   ].freeze
@@ -66,14 +68,16 @@ class TLDR
         exclude_names: [],
         base_path: nil,
         warnings: true,
-        yes_i_know: false
+        watch: false,
+        yes_i_know: false,
+        i_am_being_watched: false
       }
 
       if cli_defaults
         common.merge(
           paths: Dir["test/**/*_test.rb", "test/**/test_*.rb"],
           helper_paths: ["test/helper.rb"],
-          load_paths: ["test"],
+          load_paths: ["lib", "test"],
           prepend_paths: [MOST_RECENTLY_MODIFIED_TAG]
         )
       else
@@ -103,7 +107,7 @@ class TLDR
       end
 
       # Booleans
-      [:no_helper, :verbose, :fail_fast, :no_emoji, :no_prepend, :warnings, :yes_i_know].each do |key|
+      [:no_helper, :verbose, :fail_fast, :no_emoji, :no_prepend, :warnings, :yes_i_know, :i_am_being_watched].each do |key|
         merged_args[key] = defaults[key] if merged_args[key].nil?
       end
 
@@ -138,19 +142,27 @@ class TLDR
       }.compact
     end
 
-    def to_full_args exclude: []
-      to_cli_argv(
+    def to_full_args exclude: [], ensure_args: []
+      argv = to_cli_argv(
         CONFLAGS.keys -
         exclude - [
-          (:seed unless seed_set_intentionally)
+          (:seed unless seed_set_intentionally),
+          :watch,
+          :i_am_being_watched
         ]
-      ).join(" ")
+      )
+
+      ensure_args.each do |arg|
+        argv << arg unless argv.include?(arg)
+      end
+
+      argv.join(" ")
     end
 
     def to_single_path_args path
       argv = to_cli_argv(CONFLAGS.keys - [
         :seed, :parallel, :names, :fail_fast, :paths, :prepend_paths,
-        :no_prepend, :exclude_paths
+        :no_prepend, :exclude_paths, :watch, :i_am_being_watched
       ])
 
       (argv + [stringify(:paths, path)]).join(" ")

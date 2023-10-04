@@ -16,6 +16,7 @@ require_relative "tldr/sorbet_compatibility"
 require_relative "tldr/strategizer"
 require_relative "tldr/value"
 require_relative "tldr/version"
+require_relative "tldr/watcher"
 
 class TLDR
   include Assertions
@@ -34,7 +35,11 @@ class TLDR
     end
 
     def self.tests config = Config.new
-      Runner.new.run(config, Planner.new.plan(config))
+      if config.watch
+        Watcher.new.watch(config)
+      else
+        Runner.new.run(config, Planner.new.plan(config))
+      end
     end
 
     @@at_exit_registered = false

@@ -7,6 +7,7 @@ class TLDR
       end
 
       def before_suite tests
+        clear_screen_if_being_watched!
         @suite_start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC, :microsecond)
         @out.print <<~MSG
           Command: #{tldr_command} #{@config.to_full_args}
@@ -171,6 +172,12 @@ class TLDR
 
       def tldr_command
         "#{"bundle exec " if defined?(Bundler)}tldr"
+      end
+
+      def clear_screen_if_being_watched!
+        if @config.i_am_being_watched
+          @out.print "\e[2J\e[f"
+        end
       end
     end
   end

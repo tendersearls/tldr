@@ -1,3 +1,7 @@
+* Add a `--watch` option that will spawn fswatch | xargs and clear the screen
+between runs (requires fswatch to gbe installed)
+* Add "lib" as a default load path along with "test"
+
 ## [0.8.0]
 
 * Add a `--yes-i-know` flag that will suppress the large warning when your test
