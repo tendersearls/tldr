@@ -5,14 +5,14 @@ class TLDR
       tldr_command = "#{"bundle exec " if defined?(Bundler)}tldr #{config.to_full_args(ensure_args: ["--i-am-being-watched"])}"
       command = "fswatch -o #{config.load_paths.reverse.join(" ")} | xargs -n1 -I{} #{tldr_command}"
 
-      puts <<~MSG
-
-        Watching for changes in #{config.load_paths.map(&:inspect).join(", ")}...
+      print <<~MSG.chomp
+        Waiting for changes in --load-path directories: #{config.load_paths.map(&:inspect).join(", ")}
 
         When a file changes, TLDR will run this command:
 
         $ #{tldr_command}
 
+        Watching...
       MSG
 
       exec command
