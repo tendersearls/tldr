@@ -31,10 +31,6 @@ class TLDR
         end
       end
 
-      def time_diff start, stop = Process.clock_gettime(Process::CLOCK_MONOTONIC, :microsecond)
-        ((stop - start) / 1000.0).round
-      end
-
       def after_tldr planned_tests, wip_tests, test_results
         stop_time = Process.clock_gettime Process::CLOCK_MONOTONIC, :microsecond
 
@@ -102,6 +98,10 @@ class TLDR
 
       private
 
+      def time_diff start, stop = Process.clock_gettime(Process::CLOCK_MONOTONIC, :microsecond)
+        ((stop - start) / 1000.0).round
+      end
+
       def summarize_failures results
         failures = results.select { |result| result.failing? }
         return failures if failures.empty?
@@ -150,7 +150,7 @@ class TLDR
         failed_locators = consolidate failed, exclude: unrun_locators
         suggested_locators = unrun_locators + [
           ("--comment \"Also include #{plural failed.size, "test"} that failed:\"" if failed_locators.any?)
-        ] + failed_locators
+        ].compact + failed_locators
         <<~MSG
           #{@icons.rock_on} Run the #{plural unrun.size, "test"} that didn't finish:
             #{tldr_command} #{@config.to_full_args exclude: [:paths]} #{suggested_locators.join(" \\\n    ")}
