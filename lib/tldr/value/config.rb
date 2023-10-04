@@ -18,6 +18,7 @@ class TLDR
     no_dotfile: "--no-dotfile",
     warnings: "--[no-]warnings",
     yes_i_know: "--yes-i-know",
+    potential_flake: "--potential-flake",
     paths: nil
   }.freeze
 
@@ -27,7 +28,7 @@ class TLDR
     :paths, :seed, :no_helper, :verbose, :reporter,
     :helper_paths, :load_paths, :parallel, :names, :fail_fast, :no_emoji,
     :prepend_paths, :no_prepend, :exclude_paths, :exclude_names, :base_path,
-    :no_dotfile, :warnings, :yes_i_know,
+    :no_dotfile, :warnings, :yes_i_know, :potential_flake,
     # Internal properties
     :config_intended_for_merge_only, :seed_set_intentionally, :cli_defaults
   ].freeze
@@ -66,7 +67,8 @@ class TLDR
         exclude_names: [],
         base_path: nil,
         warnings: true,
-        yes_i_know: false
+        yes_i_know: false,
+        potential_flake: false
       }
 
       if cli_defaults
@@ -103,7 +105,7 @@ class TLDR
       end
 
       # Booleans
-      [:no_helper, :verbose, :fail_fast, :no_emoji, :no_prepend, :warnings, :yes_i_know].each do |key|
+      [:no_helper, :verbose, :fail_fast, :no_emoji, :no_prepend, :warnings, :yes_i_know, :potential_flake].each do |key|
         merged_args[key] = defaults[key] if merged_args[key].nil?
       end
 
@@ -142,16 +144,20 @@ class TLDR
       to_cli_argv(
         CONFLAGS.keys -
         exclude - [
-          (:seed unless seed_set_intentionally)
+          (:seed unless seed_set_intentionally),
+          :potential_flake
         ]
       ).join(" ")
     end
 
-    def to_single_path_args path
+    def to_single_path_args path, ensure_args: []
       argv = to_cli_argv(CONFLAGS.keys - [
         :seed, :parallel, :names, :fail_fast, :paths, :prepend_paths,
-        :no_prepend, :exclude_paths
+        :no_prepend, :exclude_paths, :potential_flake
       ])
+      ensure_args.each do |arg|
+        argv << arg unless argv.include?(arg)
+      end
 
       (argv + [stringify(:paths, path)]).join(" ")
     end

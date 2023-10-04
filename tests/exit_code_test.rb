@@ -12,6 +12,22 @@ class ExitCodeTest < Minitest::Test
     assert_match(/🌱 --seed \d+/, result.stdout)
   end
 
+  def test_multiple
+    result = TLDRunner.should_fail ["success.rb", "fail.rb"]
+
+    assert_includes result.stdout, "😡"
+    assert_includes result.stderr, <<~MSG.chomp
+      Failing tests:
+
+      1) FailTest#test_fails [tests/fixture/fail.rb:3] failed:
+      Expected false to be truthy
+
+        Re-run this test:
+          bundle exec tldr --potential-flake "tests/fixture/fail.rb:2"
+    MSG
+    assert_equal 1, result.exit_code
+  end
+
   def test_failure
     result = TLDRunner.should_fail "fail.rb"
 

@@ -25,7 +25,7 @@ class DefaultReporterTest < Minitest::Test
     test_a_result = TLDR::TestResult.new(test_a, nil, 500)
     test_b_wip = TLDR::WIPTest.new(test_b, Process.clock_gettime(Process::CLOCK_MONOTONIC, :microsecond) - 1_800_000)
 
-    subject.before_suite([test_a])
+    subject.before_suite([test_a, test_b, test_c])
     assert_equal <<~MSG, @io.string
       Command: bundle exec tldr --seed 42
       🌱 --seed 42
@@ -76,6 +76,26 @@ class DefaultReporterTest < Minitest::Test
       🥵
 
       🚨 TLDR! Display summary by omitting --yes-i-know
+
+      Finished in XXXms.
+
+      1 test class, 1 test method, 0 failures, 0 errors, 0 skips
+    MSG
+  end
+
+  def test_potential_flake
+    config = TLDR::Config.new(seed: 42, potential_flake: true)
+    subject = TLDR::Reporters::Default.new(config, @io, @io)
+    test_a = TLDR::Test.new(SomeTest, :test_a)
+    test_a_result = TLDR::TestResult.new(test_a, nil, 500)
+
+    subject.before_suite([test_a])
+    @io.clear
+
+    subject.after_suite([test_a_result])
+    puts @io.string
+    assert_equal <<~MSG, scrub_time(@io.string)
+
 
       Finished in XXXms.
 

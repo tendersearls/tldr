@@ -85,6 +85,8 @@ class TLDR
 
         @out.print summarize_skips(test_results).join("\n")
 
+        @out.print warn_of_potential_flakes(test_results).join("\n")
+
         @out.print "\n\n"
         @out.print "Finished in #{duration}ms."
 
@@ -112,15 +114,15 @@ class TLDR
         failures = results.select { |result| result.failing? }
         return failures if failures.empty?
 
-        ["\n\nFailing tests:"] + failures.map.with_index { |result, i| summarize_result(result, i) }
+        ["\n\nFailing tests:"] + failures.map.with_index { |result, i| summarize_failure(results, result, i) }
       end
 
-      def summarize_result result, index
+      def summarize_failure results, result, index
         [
           "#{index + 1}) #{describe(result.test, result.relevant_location)} #{result.failure? ? "failed" : "errored"}:",
           result.error.message.chomp,
           "\n  Re-run this test:",
-          "    #{tldr_command} #{@config.to_single_path_args(result.test.location.locator)}",
+          "    #{tldr_command} #{@config.to_single_path_args(result.test.location.locator, ensure_args: (results.size > 1) ? [CONFLAGS[:potential_flake]] : [])}",
           (TLDR.filter_backtrace(result.error.backtrace).join("\n") if @config.verbose)
         ].compact.reject(&:empty?).join("\n").strip
       end
@@ -130,6 +132,12 @@ class TLDR
         return skips if skips.empty?
 
         ["\n\nSkipped tests:\n"] + skips.map { |result| "  - #{describe(result.test)}" }
+      end
+
+      def warn_of_potential_flakes results
+        return [] unless @config.potential_flake || results.none?(&:success?)
+
+        ["\n\nPotential flakes:\n"] + results.select(&:success?).map { |result| "  - #{describe(result.test)}" }
       end
 
       def describe test, location = test.location

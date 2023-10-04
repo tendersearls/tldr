@@ -57,7 +57,8 @@ class ConfigTest < Minitest::Test
       exclude_paths: ["c.rb:4"],
       exclude_names: ["test_b_1"],
       warnings: false,
-      yes_i_know: true
+      yes_i_know: true,
+      potential_flake: true
     )
 
     assert_equal <<~MSG.chomp, config.to_full_args
@@ -66,6 +67,10 @@ class ConfigTest < Minitest::Test
 
     assert_equal <<~MSG.chomp, config.to_single_path_args("lol.rb")
       --verbose --reporter TLDR::Reporters::Base --helper "test_helper.rb" --load-path "app" --load-path "lib" --exclude-name "test_b_1" --no-warnings --yes-i-know "lol.rb"
+    MSG
+
+    assert_equal <<~MSG.chomp, config.to_single_path_args("lol.rb", ensure_args: ["--potential-flake"])
+      --verbose --reporter TLDR::Reporters::Base --helper "test_helper.rb" --load-path "app" --load-path "lib" --exclude-name "test_b_1" --no-warnings --yes-i-know --potential-flake "lol.rb"
     MSG
   end
 

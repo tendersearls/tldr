@@ -86,6 +86,10 @@ class TLDR
           options[:yes_i_know] = true
         end
 
+        opts.on CONFLAGS[:potential_flake], "Print advice when a potentially flaky test is run in isolation" do
+          options[:potential_flake] = true
+        end
+
         opts.on "--comment COMMENT", String, "No-op; used for multi-line execution instructions" do
           # See "--comment" in lib/tldr/reporters/default.rb for an example of how this is used internally
         end
