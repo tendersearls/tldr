@@ -1,3 +1,6 @@
+
+* Correctly clear the screen between runs
+
 ## [0.9.0]
 
 * Add a `--watch` option that will spawn fswatch | xargs and clear the screen
