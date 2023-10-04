@@ -170,6 +170,9 @@ of the configured load paths (`["test", "lib"]` by default) and then execute
 your tests each time a file is changed. To keep the output up-to-date and easy
 to scan, it will also clear your console before each run.
 
+Note that this feature requires you have
+[fswatch](https://github.com/emcrisostomo/fswatch) installed and on your `PATH`
+
 Here's what that might look like:
 
 ![tldr-watch](https://github.com/tendersearls/tldr/assets/79303/364f0e52-5596-49ce-a470-5eaeddd11f03)
