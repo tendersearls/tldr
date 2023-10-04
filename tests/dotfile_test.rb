@@ -29,18 +29,25 @@ class DotfileTest < Minitest::Test
   def test_a_lot_of_values_in_a_dotfile
     result = TLDRunner.run_command("bundle exec tldr --base-path example/d")
 
-    assert_empty result.stderr
+    refute result.success?
     assert_includes result.stdout, <<~MSG
-      Command: bundle exec tldr --seed 42 --verbose --helper "test_helper.rb" --load-path "app" --load-path "lib" --parallel --name "/test_*/" --name "test_it" --fail-fast --prepend "a.rb:3" --exclude-path "c.rb:4" --exclude-name "test_b_1" --base-path "example/d"
+      Command: bundle exec tldr --seed 42 --verbose --helper "test_helper.rb" --load-path "app" --load-path "lib" --parallel --name "/test_*/" --name "test_it" --fail-fast --prepend "a.rb:3" --exclude-path "c.rb:4" --exclude-name "test_b_1" --base-path "example/d" "b.rb"
+    MSG
+    assert_includes result.stderr, <<~MSG
+      1) BTest#test_b_2 [b.rb:7] errored:
+      wups
+
+        Re-run this test:
+          bundle exec tldr --base-path "example/d" "b.rb:6"
     MSG
   end
 
   def test_overriding_a_lot_of_values_in_a_dotfile
     result = TLDRunner.run_command("bundle exec tldr --base-path example/d --seed 5 --load-path foo --no-parallel --name test_stuff --prepend nope --exclude-path nada --exclude-name test_b_2")
 
-    assert_empty result.stderr
+    assert result.success?
     assert_includes result.stdout, <<~MSG
-      Command: bundle exec tldr --seed 5 --verbose --helper "test_helper.rb" --load-path "foo" --name "test_stuff" --fail-fast --prepend "nope" --exclude-path "nada" --exclude-name "test_b_2" --base-path "example/d"
+      Command: bundle exec tldr --seed 5 --verbose --helper "test_helper.rb" --load-path "foo" --name "test_stuff" --fail-fast --prepend "nope" --exclude-path "nada" --exclude-name "test_b_2" --base-path "example/d" "b.rb"
     MSG
   end
 end

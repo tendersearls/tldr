@@ -142,14 +142,14 @@ class TLDR
       }.compact
     end
 
-    def to_full_args exclude: [], ensure_args: []
+    def to_full_args exclude: [], ensure_args: [], exclude_dotfile_matches: false
       argv = to_cli_argv(
-        CONFLAGS.keys -
-        exclude - [
+        CONFLAGS.keys - exclude - [
           (:seed unless seed_set_intentionally),
           :watch,
           :i_am_being_watched
-        ]
+        ],
+        exclude_dotfile_matches:
       )
 
       ensure_args.each do |arg|
@@ -159,19 +159,20 @@ class TLDR
       argv.join(" ")
     end
 
-    def to_single_path_args path
+    def to_single_path_args path, exclude_dotfile_matches: false
       argv = to_cli_argv(CONFLAGS.keys - [
         :seed, :parallel, :names, :fail_fast, :paths, :prepend_paths,
         :no_prepend, :exclude_paths, :watch, :i_am_being_watched
-      ])
+      ], exclude_dotfile_matches:)
 
       (argv + [stringify(:paths, path)]).join(" ")
     end
 
     private
 
-    def to_cli_argv options = CONFLAGS.keys
+    def to_cli_argv options = CONFLAGS.keys, exclude_dotfile_matches:
       defaults = Config.build_defaults(cli_defaults: true)
+      defaults = defaults.merge(dotfile_args) if exclude_dotfile_matches
       options.map { |key|
         flag = CONFLAGS[key]
 
@@ -239,12 +240,14 @@ class TLDR
     end
 
     def merge_dotfile_args args
-      return args if args[:no_dotfile] || !File.exist?(".tldr.yml")
+      return args if args[:no_dotfile]
 
       dotfile_args.merge(args)
     end
 
     def dotfile_args
+      return {} unless File.exist?(".tldr.yml")
+
       require "yaml"
       @dotfile_args ||= YAML.load_file(".tldr.yml").transform_keys { |k| k.to_sym }.tap do |dotfile_args|
         # Since we don't have shell expansion, we have to glob any paths ourselves

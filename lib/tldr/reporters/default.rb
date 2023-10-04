@@ -121,7 +121,7 @@ class TLDR
           "#{index + 1}) #{describe(result.test, result.relevant_location)} #{result.failure? ? "failed" : "errored"}:",
           result.error.message.chomp,
           "\n  Re-run this test:",
-          "    #{tldr_command} #{@config.to_single_path_args(result.test.location.locator)}",
+          "    #{tldr_command} #{@config.to_single_path_args(result.test.location.locator, exclude_dotfile_matches: true)}\n",
           (TLDR.filter_backtrace(result.error.backtrace).join("\n") if @config.verbose)
         ].compact.reject(&:empty?).join("\n").strip
       end
@@ -160,7 +160,7 @@ class TLDR
         ].compact + failed_locators
         <<~MSG
           #{@icons.rock_on} Run the #{plural(unrun.size, "test")} that didn't finish:
-            #{tldr_command} #{@config.to_full_args(exclude: [:paths])} #{suggested_locators.join(" \\\n    ")}
+            #{tldr_command} #{@config.to_full_args(exclude: [:paths], exclude_dotfile_matches: true)} #{suggested_locators.join(" \\\n    ")}
         MSG
       end
 
