@@ -1,3 +1,5 @@
+* Print how many tests ran vs. didn't even when suppressing TLDR summary
+
 ## [0.9.2]
 
 * Don't redundantly print out dotfile config values for re-run instructions

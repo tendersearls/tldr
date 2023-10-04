@@ -75,7 +75,7 @@ class DefaultReporterTest < Minitest::Test
     assert_equal <<~MSG, scrub_time(@io.string)
       🥵
 
-      🚨 TLDR! Display summary by omitting --yes-i-know
+      🚨 TLDR after completing 1 of 3 tests! Print full summary by omitting --yes-i-know
 
       Finished in XXXms.
 

@@ -39,7 +39,7 @@ class TLDR
         @err.print "\n\n"
 
         if @config.yes_i_know
-          @err.print "🚨 TLDR! Display summary by omitting --yes-i-know"
+          @err.print "🚨 TLDR after completing #{test_results.size} of #{planned_tests.size} tests! Print full summary by omitting --yes-i-know"
         else
           wrap_in_horizontal_rule do
             @err.print [
