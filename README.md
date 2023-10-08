@@ -8,12 +8,12 @@ We initially meant this as a joke [while
 pairin'](https://www.youtube.com/live/bmi-SWeH4MA?si=p5g1j1FQZrbYEOCg&t=63), but
 in addition to being funny, it was also a pretty good idea. So we fleshed out
 `tldr` to be a full-featured, mostly
-[Minitest-compatible](#minitest-compatibility), and downright pleasant test
+[Minitest-compatible](#minitest-compatibility), and dare-we-say pleasant test
 framework for Ruby.
 
 The "big idea" here is TLDR is designed for users to run the `tldr` command
 repeatedly as they work—as opposed to only running the tests for whatever is
-being worked on. Even if the suite run over the 1.8 second time limit. Because
+being worked on. Even if the suite runs over the 1.8 second time limit. Because
 TLDR shuffles and runs in parallel and is guaranteed to take less than two
 seconds,
 **you'll actually wind up running _all_ of your tests quite often as you work**,
