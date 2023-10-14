@@ -44,4 +44,20 @@ class RakeTaskTest < Minitest::Test
       😁
     MSG
   end
+
+  def test_running_default_base_path_when_custom_also_exists
+    result = TLDRunner.run_command("cd example/c && TLDR_OPTS=\"--seed 1\" bundle exec rake tldr")
+
+    assert_empty result.stderr
+    assert result.success?
+    assert_includes result.stdout, <<~MSG
+      👓
+      Command: bundle exec tldr --seed 1 --helper "spec/spec_helper.rb" "spec/math_spec.rb"
+      🌱 --seed 1
+
+      🏃 Running:
+
+      😁
+    MSG
+  end
 end
