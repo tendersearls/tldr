@@ -32,7 +32,7 @@ class RakeTaskTest < Minitest::Test
   end
 
   def test_running_custom_base_path
-    result = TLDRunner.run_command("cd example/c && TLDR_OPTS=\"--seed 1\" bundle exec rake b_tests")
+    result = TLDRunner.run_command("cd example/c && BUNDLE_GEMFILE=\"../b/Gemfile\" TLDR_OPTS=\"--seed 1\" bundle exec rake b_tests")
 
     assert_includes result.stdout, <<~MSG
       neat!

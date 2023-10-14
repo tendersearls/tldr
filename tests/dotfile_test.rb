@@ -2,7 +2,7 @@ require "test_helper"
 
 class DotfileTest < Minitest::Test
   def test_a_dotfile
-    result = TLDRunner.run_command("bundle exec tldr --seed 1 --no-prepend --base-path example/c")
+    result = TLDRunner.run_command("BUNDLE_GEMFILE=\"example/c/Gemfile\" bundle exec tldr --seed 1 --no-prepend --base-path example/c")
 
     assert_empty result.stderr
     assert_includes result.stdout, <<~MSG
