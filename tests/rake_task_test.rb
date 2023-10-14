@@ -2,8 +2,10 @@ require "test_helper"
 
 class RakeTaskTest < Minitest::Test
   def test_running_rake
-    result = TLDRunner.run_command("cd example/b && TLDR_OPTS=\"--seed 1\" bundle exec rake")
+    result = TLDRunner.run_command("cd example/b && BUNDLE_GEMFILE=\"Gemfile\" TLDR_OPTS=\"--seed 1\" bundle exec rake")
 
+    assert_empty result.stderr
+    assert result.success?
     assert_includes result.stdout, <<~MSG
       neat!
       Command: bundle exec tldr --seed 1
@@ -46,7 +48,7 @@ class RakeTaskTest < Minitest::Test
   end
 
   def test_running_default_base_path_when_custom_also_exists
-    result = TLDRunner.run_command("cd example/c && TLDR_OPTS=\"--seed 1\" bundle exec rake tldr")
+    result = TLDRunner.run_command("cd example/c && BUNDLE_GEMFILE=\"Gemfile\" TLDR_OPTS=\"--seed 1\" bundle exec rake tldr")
 
     assert_empty result.stderr
     assert result.success?
