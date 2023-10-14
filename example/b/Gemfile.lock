@@ -11,10 +11,15 @@ GEM
     attr_extras (7.1.0)
     concurrent-ruby (1.2.2)
     diff-lcs (1.5.0)
+    mocktail (2.0.0)
+      sorbet-eraser (~> 0.3.1)
+      sorbet-runtime (~> 0.5.9204)
     optimist (3.1.0)
     patience_diff (1.2.0)
       optimist (~> 3.0)
     rake (13.0.6)
+    sorbet-eraser (0.3.1)
+    sorbet-runtime (0.5.11074)
     super_diff (0.10.0)
       attr_extras (>= 6.2.4)
       diff-lcs
@@ -25,6 +30,7 @@ PLATFORMS
   arm64-darwin-23
 
 DEPENDENCIES
+  mocktail
   rake
   tldr!
 
