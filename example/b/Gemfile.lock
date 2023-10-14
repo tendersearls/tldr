@@ -1,7 +1,7 @@
 PATH
   remote: ../..
   specs:
-    tldr (0.9.3)
+    tldr (0.9.4)
       concurrent-ruby (~> 1.2)
       super_diff (~> 0.10)
 

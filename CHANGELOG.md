@@ -1,3 +1,10 @@
+
+## [0.9.4]
+
+* Fix Sorbet compatibility [#5](https://github.com/tendersearls/tldr/issues/5)
+
+## [0.9.3]
+
 * Print how many tests ran vs. didn't even when suppressing TLDR summary
 
 ## [0.9.2]
