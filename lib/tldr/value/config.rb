@@ -36,6 +36,7 @@ class TLDR
 
   Config = Struct.new(*CONFIG_ATTRIBUTES, keyword_init: true) do
     def initialize(**args)
+      original_base_path = Dir.pwd
       unless args[:config_intended_for_merge_only]
         change_working_directory_because_i_am_bad_and_i_should_feel_bad!(args[:base_path])
         args = merge_dotfile_args(args) unless args[:no_dotfile]
@@ -43,6 +44,7 @@ class TLDR
       args = undefault_parallel_if_seed_set(args)
       unless args[:config_intended_for_merge_only]
         args = merge_defaults(args)
+        revert_working_directory_change_because_itll_ruin_everything!(original_base_path)
       end
 
       super(**args)
@@ -237,6 +239,10 @@ class TLDR
     # without a loss in accuracy, would love to not have to use Dir.chdir!
     def change_working_directory_because_i_am_bad_and_i_should_feel_bad! base_path
       Dir.chdir(base_path) unless base_path.nil?
+    end
+
+    def revert_working_directory_change_because_itll_ruin_everything! original_base_path
+      Dir.chdir(original_base_path) unless Dir.pwd == original_base_path
     end
 
     def merge_dotfile_args args

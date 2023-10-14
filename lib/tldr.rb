@@ -38,7 +38,9 @@ class TLDR
       if config.watch
         Watcher.new.watch(config)
       else
-        Runner.new.run(config, Planner.new.plan(config))
+        PathUtil.chdir_maybe(config.base_path) do
+          Runner.new.run(config, Planner.new.plan(config))
+        end
       end
     end
 

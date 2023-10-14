@@ -39,5 +39,13 @@ class TLDR
         location.file == test.file && (location.line.nil? || test.covers_line?(location.line))
       }
     end
+
+    def self.chdir_maybe path
+      if path.nil?
+        yield
+      else
+        Dir.chdir(path) { yield }
+      end
+    end
   end
 end
