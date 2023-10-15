@@ -1,3 +1,6 @@
+## [0.9.5]
+
+* Fix warning when defining `setup`/`teardown` on TLDR class itself [#7](https://github.com/tendersearls/tldr/issues/7)
 
 ## [0.9.4]
 
