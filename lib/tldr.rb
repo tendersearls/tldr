@@ -6,6 +6,7 @@ require_relative "tldr/backtrace_filter"
 require_relative "tldr/class_util"
 require_relative "tldr/error"
 require_relative "tldr/executor"
+require_relative "tldr/hooks"
 require_relative "tldr/parallel_controls"
 require_relative "tldr/path_util"
 require_relative "tldr/planner"
@@ -21,12 +22,7 @@ require_relative "tldr/watcher"
 class TLDR
   include Assertions
   include Skippable
-
-  def setup
-  end
-
-  def teardown
-  end
+  include Hooks
 
   module Run
     def self.cli argv
