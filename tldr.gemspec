@@ -7,7 +7,7 @@ Gem::Specification.new do |spec|
   spec.email = ["searls@gmail.com", "tenderlove@ruby-lang.org"]
 
   spec.summary = "TLDR will run your tests, but only for 1.8 seconds."
-  spec.homepage = "https://github.com/tenderlove/tldr"
+  spec.homepage = "https://github.com/tendersearls/tldr"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 3.1"
 
