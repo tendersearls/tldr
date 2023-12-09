@@ -37,7 +37,7 @@ class TLDR
         @err.print "\n\n"
 
         if @config.yes_i_know
-          @err.print "{@icons.alarm} TLDR after completing #{test_results.size} of #{planned_tests.size} tests! Print full summary by omitting --yes-i-know"
+          @err.print "#{@icons.alarm} TLDR after completing #{test_results.size} of #{planned_tests.size} tests! Print full summary by omitting --yes-i-know"
         else
           wrap_in_horizontal_rule do
             @err.print [
@@ -52,7 +52,7 @@ class TLDR
                 #{test_results.sort_by(&:runtime).last(10).reverse.map { |result| "  #{result.runtime}ms - #{describe(result.test)}" }.join("\n")}
               SLOW
               describe_tests_that_didnt_finish(planned_tests, test_results),
-              "{@icons.not_run} Suppress this summary with --yes-i-know"
+              "#{@icons.not_run} Suppress this summary with --yes-i-know"
             ].compact.join("\n\n")
           end
         end
