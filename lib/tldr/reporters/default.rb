@@ -1,6 +1,8 @@
 class TLDR
   module Reporters
     class Default < Base
+      include Timer
+      
       def initialize config, out = $stdout, err = $stderr
         super
         @icons = @config.no_emoji ? IconProvider::Base.new : IconProvider::Emoji.new
@@ -8,7 +10,7 @@ class TLDR
 
       def before_suite tests
         clear_screen_if_being_watched!
-        @suite_start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC, :microsecond)
+        @suite_start_time = time
         @out.print <<~MSG
           Command: #{tldr_command} #{@config.to_full_args}
           #{@icons.seed} #{CONFLAGS[:seed]} #{@config.seed}
@@ -33,7 +35,7 @@ class TLDR
       end
 
       def after_tldr planned_tests, wip_tests, test_results
-        stop_time = Process.clock_gettime(Process::CLOCK_MONOTONIC, :microsecond)
+        stop_time = time
 
         @out.print @icons.tldr
         @err.print "\n\n"
@@ -104,10 +106,6 @@ class TLDR
       end
 
       private
-
-      def time_diff start, stop = Process.clock_gettime(Process::CLOCK_MONOTONIC, :microsecond)
-        ((stop - start) / 1000.0).round
-      end
 
       def summarize_failures results
         failures = results.select { |result| result.failing? }
