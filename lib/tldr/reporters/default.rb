@@ -21,12 +21,8 @@ class TLDR
       end
 
       def after_test result
-        output = case result.type
-        when :success then @icons.success
-        when :skip then @icons.skip
-        when :failure then @icons.failure
-        when :error then @icons.error
-        end
+        output = @icons.public_send result.type
+
         if @config.verbose
           @out.puts "#{output} #{result.type.capitalize} - #{describe(result.test, result.relevant_location)}"
         else
