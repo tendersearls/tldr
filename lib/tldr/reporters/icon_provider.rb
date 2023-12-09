@@ -1,4 +1,8 @@
 module IconProvider
+  def self.get no_emoji = false
+    no_emoji ? Base.new : Emoji.new
+  end
+  
   class Base
     def success
       "."

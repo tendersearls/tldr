@@ -5,7 +5,7 @@ class TLDR
       
       def initialize config, out = $stdout, err = $stderr
         super
-        @icons = @config.no_emoji ? IconProvider::Base.new : IconProvider::Emoji.new
+        @icons = IconProvider.get @config.no_emoji
       end
 
       def before_suite tests
