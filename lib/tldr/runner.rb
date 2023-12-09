@@ -2,6 +2,8 @@ require "irb"
 
 class TLDR
   class Runner
+    include Timer
+    
     def initialize
       @executor = Executor.new
       @wip = Concurrent::Array.new
@@ -50,7 +52,7 @@ class TLDR
 
     def run_test test, config, plan, reporter
       e = nil
-      start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC, :microsecond)
+      start_time = time
       wip_test = WIPTest.new(test, start_time)
       @wip << wip_test
       runtime = time_it(start_time) do
@@ -92,11 +94,6 @@ class TLDR
           abort.call
         end
       end
-    end
-
-    def time_it start
-      yield
-      ((Process.clock_gettime(Process::CLOCK_MONOTONIC, :microsecond) - start) / 1000.0).round
     end
 
     def exit_code results
