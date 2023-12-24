@@ -248,17 +248,17 @@ class AssertionsTest < AssertionTestCase
 
   def test_assert_pattern
     @subject.assert_pattern { [1, 2, 3] => [Integer, Integer, Integer] }
-    should_fail "Expected pattern match: [1, \"two\", 3]: Integer === \"two\" does not return true" do
+    should_fail "Expected pattern to match, but NoMatchingPatternError was raised: [1, \"two\", 3]: Integer === \"two\" does not return true" do
       @subject.assert_pattern { [1, "two", 3] => [Integer, Integer, Integer] }
     end
-    should_fail "Custom\nExpected pattern match: [1, \"two\", 3]: Integer === \"two\" does not return true" do
+    should_fail "Custom\nExpected pattern to match, but NoMatchingPatternError was raised: [1, \"two\", 3]: Integer === \"two\" does not return true" do
       @subject.assert_pattern("Custom") { [1, "two", 3] => [Integer, Integer, Integer] }
     end
   end
 
   def test_refute_pattern
     @subject.refute_pattern { [1, "two", 3] => [Integer, Integer, Integer] }
-    should_fail "Expected pattern not to match, but NoMatchingPatternError was raised" do
+    should_fail "Expected pattern not to match, but NoMatchingPatternError was not raised" do
       @subject.refute_pattern { [1, 2, 3] => [Integer, Integer, Integer] }
     end
   end
