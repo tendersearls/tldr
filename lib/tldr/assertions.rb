@@ -241,7 +241,7 @@ class TLDR
       begin
         yield
       rescue NoMatchingPatternError => e
-        assert false, Assertions.msg(message) { "Expected pattern match: #{e.message}" }
+        assert false, Assertions.msg(message) { "Expected pattern to match, but NoMatchingPatternError was raised: #{e.message}" }
       end
     end
 
@@ -250,7 +250,7 @@ class TLDR
 
       begin
         yield
-        refute true, Assertions.msg(message) { "Expected pattern not to match, but NoMatchingPatternError was raised" }
+        refute true, Assertions.msg(message) { "Expected pattern not to match, but NoMatchingPatternError was not raised" }
       rescue NoMatchingPatternError
       end
     end
