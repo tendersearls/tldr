@@ -3,6 +3,7 @@ class TLDR
     seed: "--seed",
     no_helper: "--no-helper",
     verbose: "--verbose",
+    verbose_cancelled_trace: "--verbose-cancelled-trace",
     reporter: "--reporter",
     helper_paths: "--helper",
     load_paths: "--load-path",
@@ -26,7 +27,7 @@ class TLDR
   PATH_FLAGS = [:paths, :helper_paths, :load_paths, :prepend_paths, :exclude_paths].freeze
   MOST_RECENTLY_MODIFIED_TAG = "MOST_RECENTLY_MODIFIED".freeze
   CONFIG_ATTRIBUTES = [
-    :paths, :seed, :no_helper, :verbose, :reporter,
+    :paths, :seed, :no_helper, :verbose, :verbose_cancelled_trace, :reporter,
     :helper_paths, :load_paths, :parallel, :names, :fail_fast, :no_emoji,
     :prepend_paths, :no_prepend, :exclude_paths, :exclude_names, :base_path,
     :no_dotfile, :warnings, :watch, :yes_i_know, :i_am_being_watched,
@@ -60,6 +61,7 @@ class TLDR
         seed: rand(10_000),
         no_helper: false,
         verbose: false,
+        verbose_cancelled_trace: false,
         reporter: Reporters::Default,
         parallel: true,
         names: [],
@@ -109,7 +111,7 @@ class TLDR
       end
 
       # Booleans
-      [:no_helper, :verbose, :fail_fast, :no_emoji, :no_prepend, :warnings, :yes_i_know, :i_am_being_watched].each do |key|
+      [:no_helper, :verbose, :verbose_cancelled_trace, :fail_fast, :no_emoji, :no_prepend, :warnings, :yes_i_know, :i_am_being_watched].each do |key|
         merged_args[key] = defaults[key] if merged_args[key].nil?
       end
 
