@@ -23,11 +23,19 @@ class WipTestTest < Minitest::Test
     wip_test.capture_backtrace_at_exit
     test_thread.exit
 
+    test_thread_sleep_location = "#{__FILE__}:#{sleep_line}"
+    loop_location = if RUBY_VERSION.delete(".").to_i >= 330
+      # This is different in 3.3.0 and 3.4.0-dev, so handle the difference here.
+      "<internal:kernel>:187"
+    else
+      test_thread_sleep_location
+    end
+
     assert_equal [
-      "#{__FILE__}:#{sleep_line}:in `sleep'",
-      "#{__FILE__}:#{sleep_line}:in `block (2 levels) in test_backtrace_at_exit'",
-      "#{__FILE__}:#{sleep_line}:in `loop'",
-      "#{__FILE__}:#{sleep_line}:in `block in test_backtrace_at_exit'"
+      "#{test_thread_sleep_location}:in `sleep'",
+      "#{test_thread_sleep_location}:in `block (2 levels) in test_backtrace_at_exit'",
+      "#{loop_location}:in `loop'",
+      "#{test_thread_sleep_location}:in `block in test_backtrace_at_exit'"
     ], wip_test.backtrace_at_exit
   end
 
