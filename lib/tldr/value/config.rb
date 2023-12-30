@@ -203,7 +203,7 @@ class TLDR
           next warnings ? "--warnings" : "--no-warnings"
         end
 
-        if defaults[key] == self[key]
+        if defaults[key] == self[key] && (key != :seed || !seed_set_intentionally)
           next
         elsif self[key].is_a?(Array)
           self[key].map { |value| [flag, stringify(key, value)] }
