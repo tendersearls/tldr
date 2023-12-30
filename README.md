@@ -122,6 +122,7 @@ Usage: tldr [options] some_tests/**/*.rb some/path.rb:13 ...
         --no-dotfile                 Disable loading .tldr.yml dotfile
         --no-emoji                   Disable emoji in the output
     -v, --verbose                    Print stack traces for errors
+        --verbose-cancelled-trace    Print stack traces for cancelled tests
         --[no-]warnings              Print Ruby warnings (Default: true)
         --watch                      Run your tests continuously on file save (requires 'fswatch' to be installed)
         --yes-i-know                 Suppress TLDR report when suite runs over 1.8s

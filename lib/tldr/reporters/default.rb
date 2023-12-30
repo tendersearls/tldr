@@ -47,7 +47,7 @@ class TLDR
               "#{@icons.run} Completed #{test_results.size} of #{planned_tests.size} tests (#{((test_results.size.to_f / planned_tests.size) * 100).round}%) before running out of time.",
               (<<~WIP.chomp if wip_tests.any?),
                 #{@icons.wip} #{plural(wip_tests.size, "test was", "tests were")} cancelled in progress:
-                #{wip_tests.map { |wip_test| "  #{time_diff(wip_test.start_time, stop_time)}ms - #{describe(wip_test.test)}" }.join("\n")}
+                #{wip_tests.map { |wip_test| "  #{time_diff(wip_test.start_time, stop_time)}ms - #{describe(wip_test.test)}#{print_wip_backtrace(wip_test, indent: "    ") if @config.verbose_cancelled_trace}" }.join("\n")}
               WIP
               (<<~SLOW.chomp if test_results.any?),
                 #{@icons.slow} Your #{[10, test_results.size].min} slowest completed tests:
@@ -135,6 +135,12 @@ class TLDR
 
       def describe test, location = test.location
         "#{test.test_class}##{test.method_name} [#{location.locator}]"
+      end
+
+      def print_wip_backtrace wip_test, indent: ""
+        return unless wip_test.backtrace_at_exit
+
+        "\n#{indent}Backtrace at the point of cancellation:\n#{indent}#{wip_test.backtrace_at_exit.join("\n#{indent}")}"
       end
 
       def plural count, singular, plural = "#{singular}s"

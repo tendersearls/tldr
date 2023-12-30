@@ -48,8 +48,8 @@ end
 module TLDRunner
   Result = Struct.new(:stdout, :stderr, :exit_code, :success?, keyword_init: true)
 
-  def self.should_succeed files, options = nil
-    run(files, options).tap do |result|
+  def self.should_succeed files, options = nil, ensure_time_bomb: false
+    run(files, options, ensure_time_bomb: ensure_time_bomb).tap do |result|
       if !result.success?
         raise <<~MSG
           Ran #{files.inspect} and expected success, but exited code #{result.exit_code}
@@ -64,8 +64,8 @@ module TLDRunner
     end
   end
 
-  def self.should_fail files, options = nil
-    run(files, options).tap do |result|
+  def self.should_fail files, options = nil, ensure_time_bomb: false
+    run(files, options, ensure_time_bomb: ensure_time_bomb).tap do |result|
       if result.success?
         raise <<~MSG
           Ran #{files.inspect} and expected failure, but exited code #{result.exit_code}
@@ -80,11 +80,11 @@ module TLDRunner
     end
   end
 
-  def self.run files, options
+  def self.run files, options, ensure_time_bomb: false
     files = Array(files).map { |file| File.expand_path("fixture/#{file}", __dir__) }
 
     stdout, stderr, status = Open3.capture3 <<~CMD
-      bundle exec tldr #{files.join(" ")} #{options}
+      #{"unset CI;" if ensure_time_bomb} bundle exec tldr #{files.join(" ")} #{options}
     CMD
 
     Result.new(
