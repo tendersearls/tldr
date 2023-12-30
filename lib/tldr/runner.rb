@@ -52,8 +52,7 @@ class TLDR
     def run_test test, config, plan, reporter
       e = nil
       start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC, :microsecond)
-      wip_test = WIPTest.new(test, start_time)
-      wip_test.thread = Thread.current if config.verbose_cancelled_trace
+      wip_test = WIPTest.new(test, start_time, Thread.current)
       @wip << wip_test
       runtime = time_it(start_time) do
         instance = test.test_class.new
