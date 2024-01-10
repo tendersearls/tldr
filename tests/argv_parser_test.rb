@@ -6,7 +6,7 @@ class ArgvParserTest < Minitest::Test
       "bar.rb",
       "--seed", "42",
       "-v",
-      "--verbose-cancelled-trace",
+      "--print-interrupted-test-backtraces",
       "foo.rb:3",
       "--reporter", "TLDR::Reporters::Base",
       "--no-helper",
@@ -39,7 +39,7 @@ class ArgvParserTest < Minitest::Test
     assert_includes 0..10_000, result.seed
     refute result.no_helper
     refute result.verbose
-    refute result.verbose_cancelled_trace
+    refute result.print_interrupted_test_backtraces
     assert_equal TLDR::Reporters::Default, result.reporter
     assert_equal ["test/helper.rb"], result.helper_paths
     assert_equal ["lib", "test"], result.load_paths

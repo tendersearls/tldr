@@ -70,7 +70,7 @@ class DefaultReporterTest < Minitest::Test
     MSG
     @io.clear
 
-    config.verbose_cancelled_trace = true
+    config.print_interrupted_test_backtraces = true
     subject.after_tldr([test_a, test_b, test_c], [test_b_wip], [test_a_result])
     assert_equal <<~MSG, scrub_time(@io.string)
       🥵
@@ -92,7 +92,7 @@ class DefaultReporterTest < Minitest::Test
         XXXms - DefaultReporterTest::SomeTest#test_a [tests/default_reporter_test.rb:5]
 
       🤘 Run the 2 tests that didn't finish:
-        bundle exec tldr --seed 42 --verbose-cancelled-trace "tests/default_reporter_test.rb:8:11"
+        bundle exec tldr --seed 42 --print-interrupted-test-backtraces "tests/default_reporter_test.rb:8:11"
 
 
       🙈 Suppress this summary with --yes-i-know

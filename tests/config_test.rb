@@ -46,7 +46,7 @@ class ConfigTest < Minitest::Test
     config = TLDR::Config.new(
       seed: 42,
       verbose: true,
-      verbose_cancelled_trace: true,
+      print_interrupted_test_backtraces: true,
       reporter: TLDR::Reporters::Base,
       helper_paths: ["test_helper.rb"],
       load_paths: ["app", "lib"],
@@ -63,15 +63,15 @@ class ConfigTest < Minitest::Test
     )
 
     assert_equal <<~MSG.chomp, config.to_full_args
-      --seed 42 --verbose --verbose-cancelled-trace --reporter TLDR::Reporters::Base --helper "test_helper.rb" --load-path "app" --load-path "lib" --parallel --name "/test_*/" --name "test_it" --fail-fast --prepend "a.rb:3" --exclude-path "c.rb:4" --exclude-name "test_b_1" --no-warnings --yes-i-know "a.rb:3" "b.rb"
+      --seed 42 --verbose --print-interrupted-test-backtraces --reporter TLDR::Reporters::Base --helper "test_helper.rb" --load-path "app" --load-path "lib" --parallel --name "/test_*/" --name "test_it" --fail-fast --prepend "a.rb:3" --exclude-path "c.rb:4" --exclude-name "test_b_1" --no-warnings --yes-i-know "a.rb:3" "b.rb"
     MSG
 
     assert_equal <<~MSG.chomp, config.to_single_path_args("lol.rb")
-      --verbose --verbose-cancelled-trace --reporter TLDR::Reporters::Base --helper "test_helper.rb" --load-path "app" --load-path "lib" --exclude-name "test_b_1" --no-warnings --yes-i-know "lol.rb"
+      --verbose --print-interrupted-test-backtraces --reporter TLDR::Reporters::Base --helper "test_helper.rb" --load-path "app" --load-path "lib" --exclude-name "test_b_1" --no-warnings --yes-i-know "lol.rb"
     MSG
 
     assert_equal <<~MSG.chomp, config.to_full_args(ensure_args: ["--i-am-being-watched"])
-      --seed 42 --verbose --verbose-cancelled-trace --reporter TLDR::Reporters::Base --helper "test_helper.rb" --load-path "app" --load-path "lib" --parallel --name "/test_*/" --name "test_it" --fail-fast --prepend "a.rb:3" --exclude-path "c.rb:4" --exclude-name "test_b_1" --no-warnings --yes-i-know "a.rb:3" "b.rb" --i-am-being-watched
+      --seed 42 --verbose --print-interrupted-test-backtraces --reporter TLDR::Reporters::Base --helper "test_helper.rb" --load-path "app" --load-path "lib" --parallel --name "/test_*/" --name "test_it" --fail-fast --prepend "a.rb:3" --exclude-path "c.rb:4" --exclude-name "test_b_1" --no-warnings --yes-i-know "a.rb:3" "b.rb" --i-am-being-watched
     MSG
   end
 
