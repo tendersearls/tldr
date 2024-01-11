@@ -1,3 +1,7 @@
+## [0.10.0]
+
+* Add an option to print the stack traces of interrupted tests [#13](https://github.com/tendersearls/tldr/pull/13) by [@henrahmagix](https://github.com/henrahmagix)
+
 ## [0.9.5]
 
 * Fix warning when defining `setup`/`teardown` on TLDR class itself [#7](https://github.com/tendersearls/tldr/issues/7)
