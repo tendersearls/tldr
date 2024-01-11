@@ -3,6 +3,7 @@ class TLDR
     seed: "--seed",
     no_helper: "--no-helper",
     verbose: "--verbose",
+    print_interrupted_test_backtraces: "--print-interrupted-test-backtraces",
     reporter: "--reporter",
     helper_paths: "--helper",
     load_paths: "--load-path",
@@ -26,7 +27,7 @@ class TLDR
   PATH_FLAGS = [:paths, :helper_paths, :load_paths, :prepend_paths, :exclude_paths].freeze
   MOST_RECENTLY_MODIFIED_TAG = "MOST_RECENTLY_MODIFIED".freeze
   CONFIG_ATTRIBUTES = [
-    :paths, :seed, :no_helper, :verbose, :reporter,
+    :paths, :seed, :no_helper, :verbose, :print_interrupted_test_backtraces, :reporter,
     :helper_paths, :load_paths, :parallel, :names, :fail_fast, :no_emoji,
     :prepend_paths, :no_prepend, :exclude_paths, :exclude_names, :base_path,
     :no_dotfile, :warnings, :watch, :yes_i_know, :i_am_being_watched,
@@ -60,6 +61,7 @@ class TLDR
         seed: rand(10_000),
         no_helper: false,
         verbose: false,
+        print_interrupted_test_backtraces: false,
         reporter: Reporters::Default,
         parallel: true,
         names: [],
@@ -109,7 +111,7 @@ class TLDR
       end
 
       # Booleans
-      [:no_helper, :verbose, :fail_fast, :no_emoji, :no_prepend, :warnings, :yes_i_know, :i_am_being_watched].each do |key|
+      [:no_helper, :verbose, :print_interrupted_test_backtraces, :fail_fast, :no_emoji, :no_prepend, :warnings, :yes_i_know, :i_am_being_watched].each do |key|
         merged_args[key] = defaults[key] if merged_args[key].nil?
       end
 
@@ -201,7 +203,7 @@ class TLDR
           next warnings ? "--warnings" : "--no-warnings"
         end
 
-        if defaults[key] == self[key]
+        if defaults[key] == self[key] && (key != :seed || !seed_set_intentionally)
           next
         elsif self[key].is_a?(Array)
           self[key].map { |value| [flag, stringify(key, value)] }

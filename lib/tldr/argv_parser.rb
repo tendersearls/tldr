@@ -78,6 +78,10 @@ class TLDR
           options[:verbose] = verbose
         end
 
+        opts.on CONFLAGS[:print_interrupted_test_backtraces], "Print stack traces for interrupted tests" do |print_interrupted_test_backtraces|
+          options[:print_interrupted_test_backtraces] = print_interrupted_test_backtraces
+        end
+
         opts.on CONFLAGS[:warnings], "Print Ruby warnings (Default: true)" do |warnings|
           options[:warnings] = warnings
         end
