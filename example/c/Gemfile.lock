@@ -1,7 +1,7 @@
 PATH
   remote: ../..
   specs:
-    tldr (0.9.5)
+    tldr (0.10.0)
       concurrent-ruby (~> 1.2)
       super_diff (~> 0.10)
 
@@ -59,6 +59,7 @@ GEM
 PLATFORMS
   arm64-darwin-22
   arm64-darwin-23
+  arm64-darwin-24
 
 DEPENDENCIES
   rake
