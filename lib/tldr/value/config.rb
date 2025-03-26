@@ -1,22 +1,24 @@
 class TLDR
   CONFLAGS = {
-    seed: "--seed",
-    no_helper: "--no-helper",
-    verbose: "--verbose",
-    print_interrupted_test_backtraces: "--print-interrupted-test-backtraces",
-    reporter: "--reporter",
-    helper_paths: "--helper",
-    load_paths: "--load-path",
-    parallel: "--[no-]parallel",
-    names: "--name",
     fail_fast: "--fail-fast",
-    no_emoji: "--no-emoji",
+    seed: "--seed",
+    parallel: "--[no-]parallel",
+    timer: "--[no-]timer",
+    timeout: "--timeout",
+    names: "--name",
+    exclude_names: "--exclude-name",
+    exclude_paths: "--exclude-path",
+    helper_paths: "--helper",
+    no_helper: "--no-helper",
     prepend_paths: "--prepend",
     no_prepend: "--no-prepend",
-    exclude_paths: "--exclude-path",
-    exclude_names: "--exclude-name",
+    load_paths: "--load-path",
+    reporter: "--reporter",
     base_path: "--base-path",
     no_dotfile: "--no-dotfile",
+    no_emoji: "--no-emoji",
+    verbose: "--verbose",
+    print_interrupted_test_backtraces: "--print-interrupted-test-backtraces",
     warnings: "--[no-]warnings",
     watch: "--watch",
     yes_i_know: "--yes-i-know",
@@ -27,10 +29,11 @@ class TLDR
   PATH_FLAGS = [:paths, :helper_paths, :load_paths, :prepend_paths, :exclude_paths].freeze
   MOST_RECENTLY_MODIFIED_TAG = "MOST_RECENTLY_MODIFIED".freeze
   CONFIG_ATTRIBUTES = [
-    :paths, :seed, :no_helper, :verbose, :print_interrupted_test_backtraces, :reporter,
-    :helper_paths, :load_paths, :parallel, :names, :fail_fast, :no_emoji,
-    :prepend_paths, :no_prepend, :exclude_paths, :exclude_names, :base_path,
-    :no_dotfile, :warnings, :watch, :yes_i_know, :i_am_being_watched,
+    :fail_fast, :seed, :parallel, :timer, :timeout, :names, :exclude_names,
+    :exclude_paths, :helper_paths, :no_helper, :prepend_paths, :no_prepend,
+    :load_paths, :reporter, :base_path, :no_dotfile, :no_emoji, :verbose,
+    :print_interrupted_test_backtraces, :warnings, :watch, :yes_i_know,
+    :i_am_being_watched, :paths,
     # Internal properties
     :config_intended_for_merge_only, :seed_set_intentionally, :cli_defaults
   ].freeze
@@ -58,19 +61,22 @@ class TLDR
 
     def self.build_defaults cli_defaults: true
       common = {
+        fail_fast: false,
         seed: rand(10_000),
+        parallel: true,
+        timer: !(ENV["CI"] && !$stderr.tty?),
+        timeout: 1.8,
+        names: [],
+        exclude_names: [],
+        exclude_paths: [],
         no_helper: false,
+        no_prepend: false,
+        reporter: Reporters::Default,
+        base_path: nil,
+        no_dotfile: false,
+        no_emoji: false,
         verbose: false,
         print_interrupted_test_backtraces: false,
-        reporter: Reporters::Default,
-        parallel: true,
-        names: [],
-        fail_fast: false,
-        no_emoji: false,
-        no_prepend: false,
-        exclude_paths: [],
-        exclude_names: [],
-        base_path: nil,
         warnings: true,
         watch: false,
         yes_i_know: false,
@@ -79,17 +85,17 @@ class TLDR
 
       if cli_defaults
         common.merge(
-          paths: Dir["test/**/*_test.rb", "test/**/test_*.rb"],
           helper_paths: ["test/helper.rb"],
+          prepend_paths: [MOST_RECENTLY_MODIFIED_TAG],
           load_paths: ["lib", "test"],
-          prepend_paths: [MOST_RECENTLY_MODIFIED_TAG]
+          paths: Dir["test/**/*_test.rb", "test/**/test_*.rb"]
         )
       else
         common.merge(
-          paths: [],
           helper_paths: [],
+          prepend_paths: [],
           load_paths: [],
-          prepend_paths: []
+          paths: []
         )
       end
     end
@@ -106,17 +112,17 @@ class TLDR
       defaults = Config.build_defaults(cli_defaults: merged_args[:cli_defaults])
 
       # Arrays
-      [:paths, :helper_paths, :load_paths, :names, :prepend_paths, :exclude_paths, :exclude_names].each do |key|
+      [:names, :exclude_names, :exclude_paths, :helper_paths, :prepend_paths, :load_paths, :paths].each do |key|
         merged_args[key] = defaults[key] if merged_args[key].nil? || merged_args[key].empty?
       end
 
       # Booleans
-      [:no_helper, :verbose, :print_interrupted_test_backtraces, :fail_fast, :no_emoji, :no_prepend, :warnings, :yes_i_know, :i_am_being_watched].each do |key|
+      [:fail_fast, :parallel, :timer, :no_helper, :no_prepend, :no_dotfile, :no_emoji, :verbose, :print_interrupted_test_backtraces, :warnings, :watch, :yes_i_know, :i_am_being_watched].each do |key|
         merged_args[key] = defaults[key] if merged_args[key].nil?
       end
 
       # Values
-      [:seed, :reporter].each do |key|
+      [:seed, :timeout, :reporter, :base_path].each do |key|
         merged_args[key] ||= defaults[key]
       end
 

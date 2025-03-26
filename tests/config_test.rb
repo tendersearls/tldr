@@ -63,15 +63,15 @@ class ConfigTest < Minitest::Test
     )
 
     assert_equal <<~MSG.chomp, config.to_full_args
-      --seed 42 --verbose --print-interrupted-test-backtraces --reporter TLDR::Reporters::Base --helper "test_helper.rb" --load-path "app" --load-path "lib" --parallel --name "/test_*/" --name "test_it" --fail-fast --prepend "a.rb:3" --exclude-path "c.rb:4" --exclude-name "test_b_1" --no-warnings --yes-i-know "a.rb:3" "b.rb"
+      --fail-fast --seed 42 --parallel --name "/test_*/" --name "test_it" --exclude-name "test_b_1" --exclude-path "c.rb:4" --helper "test_helper.rb" --prepend "a.rb:3" --load-path "app" --load-path "lib" --reporter TLDR::Reporters::Base --verbose --print-interrupted-test-backtraces --no-warnings --yes-i-know "a.rb:3" "b.rb"
     MSG
 
     assert_equal <<~MSG.chomp, config.to_single_path_args("lol.rb")
-      --verbose --print-interrupted-test-backtraces --reporter TLDR::Reporters::Base --helper "test_helper.rb" --load-path "app" --load-path "lib" --exclude-name "test_b_1" --no-warnings --yes-i-know "lol.rb"
+      --exclude-name "test_b_1" --helper "test_helper.rb" --load-path "app" --load-path "lib" --reporter TLDR::Reporters::Base --verbose --print-interrupted-test-backtraces --no-warnings --yes-i-know "lol.rb"
     MSG
 
     assert_equal <<~MSG.chomp, config.to_full_args(ensure_args: ["--i-am-being-watched"])
-      --seed 42 --verbose --print-interrupted-test-backtraces --reporter TLDR::Reporters::Base --helper "test_helper.rb" --load-path "app" --load-path "lib" --parallel --name "/test_*/" --name "test_it" --fail-fast --prepend "a.rb:3" --exclude-path "c.rb:4" --exclude-name "test_b_1" --no-warnings --yes-i-know "a.rb:3" "b.rb" --i-am-being-watched
+      --fail-fast --seed 42 --parallel --name "/test_*/" --name "test_it" --exclude-name "test_b_1" --exclude-path "c.rb:4" --helper "test_helper.rb" --prepend "a.rb:3" --load-path "app" --load-path "lib" --reporter TLDR::Reporters::Base --verbose --print-interrupted-test-backtraces --no-warnings --yes-i-know "a.rb:3" "b.rb" --i-am-being-watched
     MSG
   end
 
@@ -117,7 +117,7 @@ class ConfigTest < Minitest::Test
     )
 
     assert_equal <<~MSG.chomp, config.to_full_args
-      --seed 1 --helper "test_helper.rb" --load-path "app" --load-path "/lol/ok/lib" --prepend "foo.rb" --exclude-path "bar.rb" "baz.rb"
+      --seed 1 --exclude-path "bar.rb" --helper "test_helper.rb" --prepend "foo.rb" --load-path "app" --load-path "/lol/ok/lib" "baz.rb"
     MSG
 
     assert_equal <<~MSG.chomp, config.to_single_path_args("#{Dir.pwd}/baz.rb")

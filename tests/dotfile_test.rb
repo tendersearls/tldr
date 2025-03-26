@@ -31,7 +31,7 @@ class DotfileTest < Minitest::Test
 
     refute result.success?
     assert_includes result.stdout, <<~MSG
-      Command: bundle exec tldr --seed 42 --verbose --helper "test_helper.rb" --load-path "app" --load-path "lib" --parallel --name "/test_*/" --name "test_it" --fail-fast --prepend "a.rb:3" --exclude-path "c.rb:4" --exclude-name "test_b_1" --base-path "example/d" "b.rb"
+      Command: bundle exec tldr --fail-fast --seed 42 --parallel --name "/test_*/" --name "test_it" --exclude-name "test_b_1" --exclude-path "c.rb:4" --helper "test_helper.rb" --prepend "a.rb:3" --load-path "app" --load-path "lib" --base-path "example/d" --verbose "b.rb"
     MSG
     assert_includes result.stderr, <<~MSG
       1) BTest#test_b_2 [b.rb:7] errored:
@@ -47,7 +47,7 @@ class DotfileTest < Minitest::Test
 
     assert result.success?
     assert_includes result.stdout, <<~MSG
-      Command: bundle exec tldr --seed 5 --verbose --helper "test_helper.rb" --load-path "foo" --name "test_stuff" --fail-fast --prepend "nope" --exclude-path "nada" --exclude-name "test_b_2" --base-path "example/d" "b.rb"
+      Command: bundle exec tldr --fail-fast --seed 5 --name "test_stuff" --exclude-name "test_b_2" --exclude-path "nada" --helper "test_helper.rb" --prepend "nope" --load-path "foo" --base-path "example/d" --verbose "b.rb"
     MSG
   end
 end

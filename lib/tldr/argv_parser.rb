@@ -20,6 +20,14 @@ class TLDR
           options[:parallel] = parallel
         end
 
+        opts.on CONFLAGS[:timer], "Abort the test run after timeout expires (Default: 'true', unless non-interactive shell or CI env var is set)" do |timer|
+          options[:timer] = timer
+        end
+
+        opts.on CONFLAGS[:timeout], Numeric, "Timeout (in seconds) before timer aborts the run (Default: '1.8')" do |timeout|
+          options[:timeout] = timeout
+        end
+
         opts.on "-n", "#{CONFLAGS[:names]} PATTERN", "One or more names or /patterns/ of tests to run (like: foo_test, /test_foo.*/, Foo#foo_test)" do |name|
           options[:names] ||= []
           options[:names] += name.split(PATTERN_FRIENDLY_SPLITTER)
