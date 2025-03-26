@@ -21,8 +21,8 @@ class SuiteSummaryTest < Minitest::Test
       🙅 1 test was cancelled in progress:
         XXXms - T2#test_2_1 [tests/fixture/suite_summary_too_slow.rb:8]
           Backtrace at the point of cancellation:
-          /path/to/tldr/tests/fixture/suite_summary_too_slow.rb:9:in `sleep'
-          /path/to/tldr/tests/fixture/suite_summary_too_slow.rb:9:in `test_2_1'
+          /path/to/tldr/tests/fixture/suite_summary_too_slow.rb:9:in #{TLDR::RubyUtil.parsing_with_prism? ? "'Kernel#sleep'" : "`sleep'"}
+          /path/to/tldr/tests/fixture/suite_summary_too_slow.rb:9:in #{TLDR::RubyUtil.parsing_with_prism? ? "'T2#test_2_1'" : "`test_2_1'"}
     MSG
   end
 
