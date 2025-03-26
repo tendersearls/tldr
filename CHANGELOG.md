@@ -1,3 +1,7 @@
+## [0.10.1]
+
+* Fix 3.4 / Prism [#17](https://github.com/tendersearls/tldr/pull/17)
+
 ## [0.10.0]
 
 * Add an option to print the stack traces of interrupted tests [#13](https://github.com/tendersearls/tldr/pull/13) by [@henrahmagix](https://github.com/henrahmagix)
