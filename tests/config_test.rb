@@ -1,4 +1,4 @@
-require "test_helper"
+require_relative "test_helper"
 
 class ConfigTest < Minitest::Test
   def test_pre_defaults

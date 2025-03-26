@@ -1,4 +1,4 @@
-require "test_helper"
+require_relative "test_helper"
 
 class NoEmojiTest < Minitest::Test
   def test_no_emoji

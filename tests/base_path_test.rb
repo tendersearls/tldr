@@ -1,4 +1,4 @@
-require "test_helper"
+require_relative "test_helper"
 
 class BasePathTest < Minitest::Test
   def test_configuring_base_path

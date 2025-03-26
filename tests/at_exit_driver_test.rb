@@ -1,4 +1,4 @@
-require "test_helper"
+require_relative "test_helper"
 
 class AtExitDriverTest < Minitest::Test
   def test_running_at_exit

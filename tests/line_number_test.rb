@@ -1,4 +1,4 @@
-require "test_helper"
+require_relative "test_helper"
 
 class LineNumberTest < Minitest::Test
   def test_line_number_exact_hit

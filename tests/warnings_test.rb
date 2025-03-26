@@ -1,4 +1,4 @@
-require "test_helper"
+require_relative "test_helper"
 
 class WarningsTest < Minitest::Test
   def test_warnings

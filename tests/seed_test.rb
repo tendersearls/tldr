@@ -1,4 +1,4 @@
-require "test_helper"
+require_relative "test_helper"
 
 class SeedTest < Minitest::Test
   def test_order_1

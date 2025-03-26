@@ -1,4 +1,4 @@
-require "test_helper"
+require_relative "test_helper"
 
 class DotfileTest < Minitest::Test
   def test_a_dotfile

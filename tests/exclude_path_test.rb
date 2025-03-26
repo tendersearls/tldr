@@ -1,4 +1,4 @@
-require "test_helper"
+require_relative "test_helper"
 
 class ExcludePathTest < Minitest::Test
   def test_a_simple_exclude_path
