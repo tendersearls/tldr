@@ -1,11 +1,11 @@
 class TLDR
   module RubyUtil
     def self.version
-      Gem::Version.new(RUBY_VERSION)
+      @version ||= Gem::Version.new(RUBY_VERSION)
     end
 
     def self.parsing_with_prism?
-      RubyVM::InstructionSequence.compile("").to_a[4][:parser] == :prism
+      @parsing_with_prism ||= RubyVM::InstructionSequence.compile("").to_a[4][:parser] == :prism
     end
 
     def self.find_prism_def_node_for(method)
