@@ -21,7 +21,7 @@ class WipTestTest < Minitest::Test
     wip_test.capture_backtrace_at_exit
     test_thread.exit
 
-    if TLDR::RubyUtil.parsing_with_prism?
+    if TLDR::RubyUtil.version >= "3.4"
       assert_match("wip_test_test.rb:15:in 'Kernel#sleep'", wip_test.backtrace_at_exit[0])
       assert_match(":in 'block (2 levels) in WipTestTest#test_backtrace_at_exit'", wip_test.backtrace_at_exit[1])
       assert_match(":in 'Kernel#loop'", wip_test.backtrace_at_exit[2])

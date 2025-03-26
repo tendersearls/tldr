@@ -17,12 +17,13 @@ class SuiteSummaryTest < Minitest::Test
     assert_includes result.stdout, <<~MSG.chomp
       1 test class, 1 test method, 0 failures, 0 errors, 0 skips
     MSG
+
     assert_includes scrub_time(normalise_abs_paths(result.stderr)), <<~MSG.chomp
       🙅 1 test was cancelled in progress:
         XXXms - T2#test_2_1 [tests/fixture/suite_summary_too_slow.rb:8]
           Backtrace at the point of cancellation:
-          /path/to/tldr/tests/fixture/suite_summary_too_slow.rb:9:in #{TLDR::RubyUtil.parsing_with_prism? ? "'Kernel#sleep'" : "`sleep'"}
-          /path/to/tldr/tests/fixture/suite_summary_too_slow.rb:9:in #{TLDR::RubyUtil.parsing_with_prism? ? "'T2#test_2_1'" : "`test_2_1'"}
+          /path/to/tldr/tests/fixture/suite_summary_too_slow.rb:9:in #{(TLDR::RubyUtil.version >= "3.4") ? "'Kernel#sleep'" : "`sleep'"}
+          /path/to/tldr/tests/fixture/suite_summary_too_slow.rb:9:in #{(TLDR::RubyUtil.version >= "3.4") ? "'T2#test_2_1'" : "`test_2_1'"}
     MSG
   end
 
