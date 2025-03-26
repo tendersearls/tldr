@@ -1,4 +1,4 @@
-require "test_helper"
+require_relative "test_helper"
 
 class DontRunTheseInParallelTest < Minitest::Test
   def test_not_running_in_parallel

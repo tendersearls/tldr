@@ -48,7 +48,7 @@ class TLDR
         revert_working_directory_change_because_itll_ruin_everything!(original_base_path)
       end
 
-      super(**args)
+      super
     end
 
     # These are for internal tracking and resolved at initialization-time

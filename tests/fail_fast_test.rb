@@ -1,4 +1,4 @@
-require "test_helper"
+require_relative "test_helper"
 
 class FailFastTest < Minitest::Test
   def test_fails_fast

@@ -1,4 +1,4 @@
-require "test_helper"
+require_relative "test_helper"
 
 class HooksTest < Minitest::Test
   def test_hooks
