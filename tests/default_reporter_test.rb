@@ -28,7 +28,7 @@ class DefaultReporterTest < Minitest::Test
 
     subject.before_suite([test_a])
     assert_equal <<~MSG, @io.string
-      Command: bundle exec tldr --seed 42
+      Command: #{"bundle exec " if defined?(Bundler)}tldr --seed 42
       🌱 --seed 42
 
       🏃 Running:
@@ -57,7 +57,7 @@ class DefaultReporterTest < Minitest::Test
         XXXms - DefaultReporterTest::SomeTest#test_a [tests/default_reporter_test.rb:5]
 
       🤘 Run the 2 tests that didn't finish:
-        bundle exec tldr --seed 42 "tests/default_reporter_test.rb:8:11"
+        #{"bundle exec " if defined?(Bundler)}tldr --seed 42 "tests/default_reporter_test.rb:8:11"
 
 
       🙈 Suppress this summary with --yes-i-know
@@ -92,7 +92,7 @@ class DefaultReporterTest < Minitest::Test
         XXXms - DefaultReporterTest::SomeTest#test_a [tests/default_reporter_test.rb:5]
 
       🤘 Run the 2 tests that didn't finish:
-        bundle exec tldr --seed 42 --print-interrupted-test-backtraces "tests/default_reporter_test.rb:8:11"
+        #{"bundle exec " if defined?(Bundler)}tldr --seed 42 --print-interrupted-test-backtraces "tests/default_reporter_test.rb:8:11"
 
 
       🙈 Suppress this summary with --yes-i-know
