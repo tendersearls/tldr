@@ -1,3 +1,7 @@
+## unreleased
+
+* **BREAKING** change the `--no-dotfile` flag and `no_dotfile` YAML option to `--no-config` and `no_config`, respectively
+
 ## [0.10.1]
 
 * Fix 3.4 / Prism [#17](https://github.com/tendersearls/tldr/pull/17)

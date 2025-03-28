@@ -11,7 +11,7 @@ class SuiteSummaryTest < Minitest::Test
   end
 
   def test_verbose_summary_too_slow
-    result = TLDRunner.should_fail "suite_summary_too_slow.rb", "--print-interrupted-test-backtraces --timer"
+    result = TLDRunner.should_fail "suite_summary_too_slow.rb", "--print-interrupted-test-backtraces"
 
     assert_match(/Finished in \d+ms./, result.stdout)
     assert_includes result.stdout, <<~MSG.chomp

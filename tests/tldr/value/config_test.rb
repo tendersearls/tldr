@@ -1,4 +1,4 @@
-require_relative "test_helper"
+require_relative "../../test_helper"
 
 class ConfigTest < Minitest::Test
   def test_pre_defaults
@@ -164,5 +164,13 @@ class ConfigTest < Minitest::Test
     assert_equal ["a.rb"], result.paths
     assert_equal ["a.rb:2"], result.prepend_paths
     refute result.no_emoji
+  end
+
+  def test_yaml_file_precedence
+    yaml = <<~YAML
+      no_timeout: true
+    YAML
+    with_temp_file "foo.yml", yaml do |yaml_path|
+    end
   end
 end

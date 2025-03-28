@@ -86,18 +86,32 @@ $ tldr test/this/one/in/particular.rb
 Or specify the line numbers of tests to run by appending them after a `:`
 
 ```
-$ tldr test/fixture/line_number.rb:3:10
+# Runs any test method covered by line 7
+$ tldr test/fixture/line_number.rb:7
+
+# Runs all test method(s) covered by either line 7 or 22
+$ tldr test/fixture/line_number.rb:7:22
 ```
 
-And filter which tests run by name or pattern with one or more `--name` or `-n`
-flags:
+You can also filter which tests run by name or pattern with one or more `--name` or `-n`
+flags, which can be expressed in a number of ways:
 
 ```
-$ tldr --name FooTest#test_foo -n test_bar,test_baz -n /_qux/
-```
+# Run any test method named `test_post`
+$ tldr --name test_readme
 
-(The above will translate to this array of name filters internally:
- `["FooTest#test_foo", "test_bar", "test_baz", "/_qux/"]`.)
+# Run any instance method `test_post` belonging to a class named `BlogTest`
+$ tldr --name BlogTest#test_post
+
+# Run all test methods named `test_tag` or `test_comment`
+$ tldr -n test_tag,test_comment
+
+# Run any test methods matching the regular expression (e.g. `test_blog`, `test_blog_post`)
+$ tldr -n /_blog/
+
+# Run all of the above, where multiple `--name` and `-n` will be agglomerated into an array:
+$ tldr --name test_readme --name BlogTest#test_post -n test_tag,test_comment -n /_blog/
+```
 
 ### Options
 
@@ -356,12 +370,24 @@ with the `--reporter` command line option. It can be set to any fully-qualified
 class name that extends from
 [TLDR::Reporters::Base](/lib/tldr/reporters/base.rb).
 
-### I know my tests are over 1.8s, how do I suppress the huge output?
+### I know my tests run longer than the timeout, why would I want to enable it?
 
-Plenty of test suites are over 1.8s and having TLDR repeatedly print out the
-huge summary at the end of each test run can be distracting and make it harder
-to spot test failures. If you know your test suite is too slow, you can simply
-add the `--yes-i-know` flag
+Even if your test suite runs longer than your timeout, it can still be very
+useful to enforce a timeout anyway, because fast feedback is often more critical
+to productivity than completeness. Running a subset of a test suite extremely
+frequently (whether manually or using `--watch` mode) will likely lead to more
+tests being execute more often than only periodically running the whole thing.
+This will, in turn, reduce your Mean time to Oops (MttO) metric, as you'll be
+finding unexpected behavior and bugs closer to their point of introduction,
+which makes them easier to fix.
+
+### Okay, I'm constantly hitting the timeout—how do I suppress the huge output?
+
+When the suite is aborted due to the timeout being hit, you'll see a large
+amount of output explaining which tests were cancelled in progress. If you know
+you're over the limit and you're sick of seeing this, you can enable the
+`--yes-i-know` flag, or toss `yes_i_know: true` in a `.tldr.yml` file in the
+base of your project.
 
 ### What about mocking?
 

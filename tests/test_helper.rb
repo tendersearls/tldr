@@ -1,6 +1,7 @@
 $LOAD_PATH.unshift(File.expand_path("../lib", __dir__))
 require "tldr"
 require "open3"
+require "tmpdir"
 
 require "minitest/autorun"
 
@@ -11,6 +12,14 @@ class Minitest::Test
   protected
 
   private
+
+  def with_temp_file(name, contents, &blk)
+    Dir.mktmpdir do |dir|
+      path = File.join(dir, name)
+      File.write(path, contents)
+      yield File.absolute_path(path)
+    end
+  end
 
   def assert_includes_all haystack, needles
     unless needles.all? { |needle| haystack.include?(needle) }

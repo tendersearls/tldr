@@ -3,8 +3,8 @@ class TLDR
     fail_fast: "--fail-fast",
     seed: "--seed",
     parallel: "--[no-]parallel",
-    timer: "--[no-]timer",
     timeout: "--timeout",
+    no_timeout: "--no-timeout",
     names: "--name",
     exclude_names: "--exclude-name",
     exclude_paths: "--exclude-path",
@@ -29,7 +29,7 @@ class TLDR
   PATH_FLAGS = [:paths, :helper_paths, :load_paths, :prepend_paths, :exclude_paths].freeze
   MOST_RECENTLY_MODIFIED_TAG = "MOST_RECENTLY_MODIFIED".freeze
   CONFIG_ATTRIBUTES = [
-    :fail_fast, :seed, :parallel, :timer, :timeout, :names, :exclude_names,
+    :fail_fast, :seed, :parallel, :timeout, :no_timeout, :names, :exclude_names,
     :exclude_paths, :helper_paths, :no_helper, :prepend_paths, :no_prepend,
     :load_paths, :reporter, :base_path, :no_dotfile, :no_emoji, :verbose,
     :print_interrupted_test_backtraces, :warnings, :watch, :yes_i_know,
@@ -64,8 +64,7 @@ class TLDR
         fail_fast: false,
         seed: rand(10_000),
         parallel: true,
-        timer: !(ENV["CI"] && !$stderr.tty?),
-        timeout: 1.8,
+        timeout: (ENV["CI"] && !$stderr.tty?) ? -1 : 1.8,
         names: [],
         exclude_names: [],
         exclude_paths: [],
@@ -117,7 +116,7 @@ class TLDR
       end
 
       # Booleans
-      [:fail_fast, :parallel, :timer, :no_helper, :no_prepend, :no_dotfile, :no_emoji, :verbose, :print_interrupted_test_backtraces, :warnings, :watch, :yes_i_know, :i_am_being_watched].each do |key|
+      [:fail_fast, :parallel, :no_helper, :no_prepend, :no_dotfile, :no_emoji, :verbose, :print_interrupted_test_backtraces, :warnings, :watch, :yes_i_know, :i_am_being_watched].each do |key|
         merged_args[key] = defaults[key] if merged_args[key].nil?
       end
 
@@ -254,8 +253,6 @@ class TLDR
     end
 
     def merge_dotfile_args args
-      return args if args[:no_dotfile]
-
       dotfile_args.merge(args)
     end
 

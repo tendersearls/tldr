@@ -20,12 +20,12 @@ class TLDR
           options[:parallel] = parallel
         end
 
-        opts.on CONFLAGS[:timer], "Abort the test run after timeout expires (Default: 'true', unless non-interactive shell or CI env var is set)" do |timer|
-          options[:timer] = timer
+        opts.on "#{CONFLAGS[:timeout]} [TIMEOUT]", Numeric, "Timeout (in seconds) before timer aborts the run (Default: 1.8)" do |timeout|
+          options[:timeout] = timeout || 1.8
         end
 
-        opts.on CONFLAGS[:timeout], Numeric, "Timeout (in seconds) before timer aborts the run (Default: '1.8')" do |timeout|
-          options[:timeout] = timeout
+        opts.on CONFLAGS[:no_timeout], "Disable the timer aborting the test after time expires (Timeout is automatically disabled for non-interactive shells with a CI env var set)" do
+          options[:timeout] = -1
         end
 
         opts.on "-n", "#{CONFLAGS[:names]} PATTERN", "One or more names or /patterns/ of tests to run (like: foo_test, /test_foo.*/, Foo#foo_test)" do |name|
