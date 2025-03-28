@@ -3,8 +3,7 @@ class TLDR
     fail_fast: "--fail-fast",
     seed: "--seed",
     parallel: "--[no-]parallel",
-    timeout: "--timeout",
-    no_timeout: "--no-timeout",
+    timeout: "--[no-]timeout",
     names: "--name",
     exclude_names: "--exclude-name",
     exclude_paths: "--exclude-path",
@@ -259,20 +258,7 @@ class TLDR
     def dotfile_args
       return {} unless File.exist?(".tldr.yml")
 
-      require "yaml"
-      @dotfile_args ||= YAML.load_file(".tldr.yml").transform_keys { |k| k.to_sym }.tap do |dotfile_args|
-        # Since we don't have shell expansion, we have to glob any paths ourselves
-        if dotfile_args.key?(:paths)
-          dotfile_args[:paths] = dotfile_args[:paths].flat_map { |path| Dir[path] }
-        end
-        # The argv parser normally does this:
-        if dotfile_args.key?(:reporter)
-          dotfile_args[:reporter] = Kernel.const_get(dotfile_args[:reporter])
-        end
-        if (invalid_args = dotfile_args.except(*CONFIG_ATTRIBUTES)).any?
-          raise Error, "Invalid keys in .tldr.yml file: #{invalid_args.keys.join(", ")}"
-        end
-      end
+      @dotfile_args ||= YamlParser.new.parse(".tldr.yml")
     end
   end
 end

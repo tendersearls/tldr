@@ -19,6 +19,7 @@ require_relative "tldr/strategizer"
 require_relative "tldr/value"
 require_relative "tldr/version"
 require_relative "tldr/watcher"
+require_relative "tldr/yaml_parser"
 
 class TLDR
   include Assertions
