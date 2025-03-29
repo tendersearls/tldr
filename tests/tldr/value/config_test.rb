@@ -22,6 +22,7 @@ class ConfigTest < Minitest::Test
   def test_non_cli_defaults
     config = TLDR::Config.new(cli_defaults: false)
 
+    assert_equal "", config.to_full_args
     assert_equal [], config.paths
     assert_equal [], config.helper_paths
     assert_equal [], config.load_paths
@@ -92,6 +93,19 @@ class ConfigTest < Minitest::Test
     refute_includes TLDR::Config.new(parallel: true).to_full_args, "--parallel"
     assert_includes TLDR::Config.new(parallel: false).to_full_args, "--no-parallel"
     refute_includes TLDR::Config.new(parallel: false, seed: 1).to_full_args, "--parallel"
+  end
+
+  def test_timeout_arg_printout
+    assert_equal "", TLDR::Config.new(timeout: 1.8).to_full_args
+    assert_equal "--timeout 1.7", TLDR::Config.new(timeout: 1.7).to_full_args
+    assert_equal "--no-timeout", TLDR::Config.new(timeout: -1).to_full_args
+  end
+
+  def test_config_path_arg_printout
+    assert_equal "--config loljk.yml", TLDR::Config.new(config_path: "loljk.yml").to_full_args
+    assert_equal "", TLDR::Config.new(config_path: nil).to_full_args
+    assert_equal "--no-config", TLDR::Config.new(config_path: nil, cli_defaults: true).to_full_args
+    assert_equal "", TLDR::Config.new(config_path: TLDR::Config::DEFAULT_YAML_PATH, cli_defaults: true).to_full_args
   end
 
   def test_cli_conversion_omits_helper_with_no_helper

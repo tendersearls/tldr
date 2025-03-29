@@ -20,7 +20,7 @@ class TLDR
           options[:parallel] = parallel
         end
 
-        opts.on "-t", "--[no-]timeout [TIMEOUT]", Numeric, "Timeout (in seconds) before timer aborts the run (Default: 1.8)" do |timeout|
+        opts.on "-t", "--[no-]timeout [TIMEOUT]", Numeric, "Timeout (in seconds) before timer aborts the run (Default: #{Config::DEFAULT_TIMEOUT})" do |timeout|
           options[:timeout] = if timeout == false
             # --no-timeout
             -1
@@ -79,8 +79,8 @@ class TLDR
           options[:base_path] = path
         end
 
-        opts.on CONFLAGS[:no_dotfile], "Disable loading .tldr.yml dotfile" do
-          options[:no_dotfile] = true
+        opts.on "-c", CONFLAGS[:config_path], "The YAML configuration file to load (Default: '.tldr.yml')" do |config_path|
+          options[:config_path] = config_path
         end
 
         opts.on CONFLAGS[:no_emoji], "Disable emoji in the output" do
@@ -117,6 +117,11 @@ class TLDR
       end.parse!(args)
 
       options[:paths] = args if args.any?
+      options[:config_path] = case options[:config_path]
+      when nil then Config::DEFAULT_YAML_PATH
+      when false then nil
+      else options[:config_path]
+      end
 
       Config.new(**options)
     end

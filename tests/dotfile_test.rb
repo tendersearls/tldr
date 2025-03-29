@@ -16,12 +16,12 @@ class DotfileTest < Minitest::Test
     MSG
   end
 
-  def test_no_dotfile_doesnt_load_those_settings
-    result = TLDRunner.run_command("bundle exec tldr --seed 1 --no-prepend --no-dotfile --base-path example/c")
+  def test_no_config_path_doesnt_load_those_settings
+    result = TLDRunner.run_command("bundle exec tldr --seed 1 --no-prepend --base-path example/c --no-config")
 
     assert_empty result.stderr
     assert_includes result.stdout, <<~MSG
-      Command: bundle exec tldr --seed 1 --no-prepend --base-path "example/c" --no-dotfile
+      Command: bundle exec tldr --seed 1 --no-prepend --base-path "example/c" --no-config
     MSG
     assert_includes result.stdout, "0 test methods"
   end

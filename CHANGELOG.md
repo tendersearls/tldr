@@ -1,6 +1,8 @@
 ## unreleased
 
-* **BREAKING** change the `--no-dotfile` flag and `no_dotfile` YAML option to `--no-config` and `no_config`, respectively
+* **BREAKING** change the `--no-dotfile` flag and has been replaced by a
+`--[no-]config PATH` flag. To skip loading the YAML file, use `--no-config`.
+To set the file, use `--config FILE` option
 
 ## [0.10.1]
 

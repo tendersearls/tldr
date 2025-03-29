@@ -21,7 +21,7 @@ class TLDR
           end
           if dotfile_args.key?(:timeout)
             dotfile_args[:timeout] = case dotfile_args[:timeout]
-            when true then 1.8
+            when true then Config::DEFAULT_TIMEOUT
             when false then -1
             when String then Float(dotfile_args[:timeout])
             else dotfile_args[:timeout]

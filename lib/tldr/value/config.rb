@@ -14,7 +14,7 @@ class TLDR
     load_paths: "--load-path",
     reporter: "--reporter",
     base_path: "--base-path",
-    no_dotfile: "--no-dotfile",
+    config_path: "--[no-]config",
     no_emoji: "--no-emoji",
     verbose: "--verbose",
     print_interrupted_test_backtraces: "--print-interrupted-test-backtraces",
@@ -30,7 +30,7 @@ class TLDR
   CONFIG_ATTRIBUTES = [
     :fail_fast, :seed, :parallel, :timeout, :no_timeout, :names, :exclude_names,
     :exclude_paths, :helper_paths, :no_helper, :prepend_paths, :no_prepend,
-    :load_paths, :reporter, :base_path, :no_dotfile, :no_emoji, :verbose,
+    :load_paths, :reporter, :base_path, :config_path, :no_emoji, :verbose,
     :print_interrupted_test_backtraces, :warnings, :watch, :yes_i_know,
     :i_am_being_watched, :paths,
     # Internal properties
@@ -42,7 +42,7 @@ class TLDR
       original_base_path = Dir.pwd
       unless args[:config_intended_for_merge_only]
         change_working_directory_because_i_am_bad_and_i_should_feel_bad!(args[:base_path])
-        args = merge_dotfile_args(args) unless args[:no_dotfile]
+        args = merge_dotfile_args(args) unless args[:config_path].nil?
       end
       args = undefault_parallel_if_seed_set(args)
       unless args[:config_intended_for_merge_only]
@@ -56,14 +56,14 @@ class TLDR
     # These are for internal tracking and resolved at initialization-time
     undef_method :config_intended_for_merge_only=, :seed_set_intentionally=,
       # These must be set when the Config is first initialized
-      :cli_defaults=, :no_dotfile=, :base_path=
+      :cli_defaults=, :config_path=, :base_path=
 
     def self.build_defaults cli_defaults: true
       common = {
         fail_fast: false,
         seed: rand(10_000),
         parallel: true,
-        timeout: (ENV["CI"] && !$stderr.tty?) ? -1 : 1.8,
+        timeout: (ENV["CI"] && !$stderr.tty?) ? -1 : Config::DEFAULT_TIMEOUT,
         names: [],
         exclude_names: [],
         exclude_paths: [],
@@ -71,7 +71,6 @@ class TLDR
         no_prepend: false,
         reporter: Reporters::Default,
         base_path: nil,
-        no_dotfile: false,
         no_emoji: false,
         verbose: false,
         print_interrupted_test_backtraces: false,
@@ -86,6 +85,7 @@ class TLDR
           helper_paths: ["test/helper.rb"],
           prepend_paths: [MOST_RECENTLY_MODIFIED_TAG],
           load_paths: ["lib", "test"],
+          config_path: nil,
           paths: Dir["test/**/*_test.rb", "test/**/test_*.rb"]
         )
       else
@@ -93,6 +93,7 @@ class TLDR
           helper_paths: [],
           prepend_paths: [],
           load_paths: [],
+          config_path: Config::DEFAULT_YAML_PATH, # ArgvParser#parse will set this default and if it sets nil that is intentionally blank b/c --no-config
           paths: []
         )
       end
@@ -115,12 +116,12 @@ class TLDR
       end
 
       # Booleans
-      [:fail_fast, :parallel, :no_helper, :no_prepend, :no_dotfile, :no_emoji, :verbose, :print_interrupted_test_backtraces, :warnings, :watch, :yes_i_know, :i_am_being_watched].each do |key|
+      [:fail_fast, :parallel, :no_helper, :no_prepend, :no_emoji, :verbose, :print_interrupted_test_backtraces, :warnings, :watch, :yes_i_know, :i_am_being_watched].each do |key|
         merged_args[key] = defaults[key] if merged_args[key].nil?
       end
 
       # Values
-      [:seed, :timeout, :reporter, :base_path].each do |key|
+      [:seed, :timeout, :reporter, :base_path, :config_path].each do |key|
         merged_args[key] ||= defaults[key]
       end
 
@@ -180,7 +181,7 @@ class TLDR
 
     def to_cli_argv options = CONFLAGS.keys, exclude_dotfile_matches:
       defaults = Config.build_defaults(cli_defaults: true)
-      defaults = defaults.merge(dotfile_args) if exclude_dotfile_matches
+      defaults = defaults.merge(dotfile_args(config_path)) if exclude_dotfile_matches
       options.map { |key|
         flag = CONFLAGS[key]
 
@@ -203,6 +204,20 @@ class TLDR
             "--parallel"
           end
           next val
+        elsif key == :timeout
+          if self[:timeout] < 0
+            next "--no-timeout"
+          elsif self[:timeout] != Config::DEFAULT_TIMEOUT
+            next "--timeout #{self[:timeout]}"
+          else
+            next
+          end
+        elsif key == :config_path
+          case self[:config_path]
+          when nil then next "--no-config"
+          when Config::DEFAULT_YAML_PATH then next
+          else next "--config #{self[:config_path]}"
+          end
         elsif key == :warnings && defaults[:warnings] != self[:warnings]
           next warnings ? "--warnings" : "--no-warnings"
         end
@@ -252,13 +267,16 @@ class TLDR
     end
 
     def merge_dotfile_args args
-      dotfile_args.merge(args)
+      dotfile_args(args[:config_path]).merge(args)
     end
 
-    def dotfile_args
-      return {} unless File.exist?(".tldr.yml")
+    def dotfile_args config_path
+      return {} unless File.exist?(config_path)
 
-      @dotfile_args ||= YamlParser.new.parse(".tldr.yml")
+      @dotfile_args ||= YamlParser.new.parse(config_path)
     end
   end
+
+  Config::DEFAULT_YAML_PATH = ".tldr.yml"
+  Config::DEFAULT_TIMEOUT = 1.8
 end

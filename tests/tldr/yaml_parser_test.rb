@@ -37,7 +37,7 @@ class YamlParserTest < Minitest::Test
 
   def test_yaml_file_translating_timeout_values
     with_temp_file "foo.yml", "timeout: true" do |yaml_path|
-      assert_equal({timeout: 1.8}, @subject.parse(yaml_path))
+      assert_equal({timeout: TLDR::Config::DEFAULT_TIMEOUT}, @subject.parse(yaml_path))
     end
 
     with_temp_file "foo.yml", "timeout: false" do |yaml_path|

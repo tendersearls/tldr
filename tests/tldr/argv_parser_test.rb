@@ -52,12 +52,12 @@ class ArgvParserTest < Minitest::Test
   end
 
   def test_timeout_arg_specifically
-    assert_equal 1.8, TLDR::ArgvParser.new.parse([]).timeout
+    assert_equal TLDR::Config::DEFAULT_TIMEOUT, TLDR::ArgvParser.new.parse([]).timeout
     assert_equal 1.6, TLDR::ArgvParser.new.parse(["--timeout", "1.6"]).timeout
     assert_equal(-1, TLDR::ArgvParser.new.parse(["--no-timeout"]).timeout)
     # last-in wins:
     assert_equal 1.4, TLDR::ArgvParser.new.parse(["--no-timeout", "--timeout", "1.4"]).timeout
     assert_equal(-1, TLDR::ArgvParser.new.parse(["--timeout", "1.4", "--no-timeout"]).timeout)
-    assert_equal(1.8, TLDR::ArgvParser.new.parse(["--no-timeout", "--timeout", "--seed", "42"]).timeout)
+    assert_equal(TLDR::Config::DEFAULT_TIMEOUT, TLDR::ArgvParser.new.parse(["--no-timeout", "--timeout", "--seed", "42"]).timeout)
   end
 end
