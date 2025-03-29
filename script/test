@@ -5,10 +5,10 @@ set -e
 bundle exec rake
 
 cd example/a
-bundle exec tldr | grep "😁😁"
+bundle exec tldr | grep "\n..\n"
 cd ../..
 
 cd example/b
-bundle exec ruby -Itest test/some_test.rb | grep "😁"
-bundle exec rake tldr | grep "😁"
+bundle exec ruby -Itest test/some_test.rb | grep "\n.\n"
+bundle exec rake tldr | grep "\n.\n"
 cd ../..
