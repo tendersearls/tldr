@@ -96,9 +96,8 @@ class ConfigTest < Minitest::Test
   end
 
   def test_timeout_arg_printout
-    assert_equal "", TLDR::Config.new(timeout: 1.8).to_full_args
+    assert_equal "--timeout", TLDR::Config.new(timeout: 1.8).to_full_args
     assert_equal "--timeout 1.7", TLDR::Config.new(timeout: 1.7).to_full_args
-    assert_equal "--no-timeout", TLDR::Config.new(timeout: -1).to_full_args
   end
 
   def test_config_path_arg_printout

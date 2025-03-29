@@ -63,7 +63,7 @@ class TLDR
         fail_fast: false,
         seed: rand(10_000),
         parallel: true,
-        timeout: (ENV["CI"] && !$stderr.tty?) ? -1 : Config::DEFAULT_TIMEOUT,
+        timeout: -1,
         names: [],
         exclude_names: [],
         exclude_paths: [],
@@ -206,7 +206,9 @@ class TLDR
           next val
         elsif key == :timeout
           if self[:timeout] < 0
-            next "--no-timeout"
+            next
+          elsif self[:timeout] == Config::DEFAULT_TIMEOUT
+            next "--timeout"
           elsif self[:timeout] != Config::DEFAULT_TIMEOUT
             next "--timeout #{self[:timeout]}"
           else

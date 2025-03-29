@@ -1,8 +1,13 @@
 ## unreleased
 
+* **BREAKING** you know how the whole point of TLDR is that it aborts your test
+run after 1.8s? Yeah, well, it doesn't anymore. Use `--timeout` to enable it
 * **BREAKING** change the `--no-dotfile` flag and has been replaced by a
 `--[no-]config PATH` flag. To skip loading the YAML file, use `--no-config`.
 To set the file, use `--config FILE` option
+* Added `--[no-]timeout TIMEOUT` flag and `timeout` YAML option. To enable the
+TLDR Classic™ default of 1.8s, specify `--timeout` from the CLI or `timeout: true`
+in YAML. To specify a custom timeout, flag `--timeout 42` or `timeout: 42` in YAML
 
 ## [0.10.1]
 
