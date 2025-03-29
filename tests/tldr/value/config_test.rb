@@ -162,8 +162,8 @@ class ConfigTest < Minitest::Test
   end
 
   def test_merging_configs_basic
-    config = TLDR::Config.new(no_emoji: true, prepend_paths: ["a.rb:1"], paths: ["a.rb"])
-    other = TLDR::Config.new(no_emoji: false, seed: 1, prepend_paths: ["a.rb:2"], config_intended_for_merge_only: true)
+    config = TLDR::Config.new(emoji: true, prepend_paths: ["a.rb:1"], paths: ["a.rb"])
+    other = TLDR::Config.new(emoji: false, seed: 1, prepend_paths: ["a.rb:2"], config_intended_for_merge_only: true)
 
     result = config.merge(other)
 
@@ -176,6 +176,6 @@ class ConfigTest < Minitest::Test
     # Basic merging happens
     assert_equal ["a.rb"], result.paths
     assert_equal ["a.rb:2"], result.prepend_paths
-    refute result.no_emoji
+    refute result.emoji
   end
 end

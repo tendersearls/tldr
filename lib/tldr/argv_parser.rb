@@ -83,8 +83,8 @@ class TLDR
           options[:config_path] = config_path
         end
 
-        opts.on CONFLAGS[:no_emoji], "Disable emoji in the output" do
-          options[:no_emoji] = true
+        opts.on CONFLAGS[:emoji], "Enable emoji output (Default: false)" do |emoji|
+          options[:emoji] = emoji
         end
 
         opts.on "-v", CONFLAGS[:verbose], "Print stack traces for errors" do |verbose|

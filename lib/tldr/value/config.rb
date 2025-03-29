@@ -15,7 +15,7 @@ class TLDR
     reporter: "--reporter",
     base_path: "--base-path",
     config_path: "--[no-]config",
-    no_emoji: "--no-emoji",
+    emoji: "--[no-]emoji",
     verbose: "--verbose",
     print_interrupted_test_backtraces: "--print-interrupted-test-backtraces",
     warnings: "--[no-]warnings",
@@ -30,7 +30,7 @@ class TLDR
   CONFIG_ATTRIBUTES = [
     :fail_fast, :seed, :parallel, :timeout, :no_timeout, :names, :exclude_names,
     :exclude_paths, :helper_paths, :no_helper, :prepend_paths, :no_prepend,
-    :load_paths, :reporter, :base_path, :config_path, :no_emoji, :verbose,
+    :load_paths, :reporter, :base_path, :config_path, :emoji, :verbose,
     :print_interrupted_test_backtraces, :warnings, :watch, :yes_i_know,
     :i_am_being_watched, :paths,
     # Internal properties
@@ -71,7 +71,7 @@ class TLDR
         no_prepend: false,
         reporter: Reporters::Default,
         base_path: nil,
-        no_emoji: false,
+        emoji: false,
         verbose: false,
         print_interrupted_test_backtraces: false,
         warnings: true,
@@ -116,7 +116,7 @@ class TLDR
       end
 
       # Booleans
-      [:fail_fast, :parallel, :no_helper, :no_prepend, :no_emoji, :verbose, :print_interrupted_test_backtraces, :warnings, :watch, :yes_i_know, :i_am_being_watched].each do |key|
+      [:fail_fast, :parallel, :no_helper, :no_prepend, :emoji, :verbose, :print_interrupted_test_backtraces, :warnings, :watch, :yes_i_know, :i_am_being_watched].each do |key|
         merged_args[key] = defaults[key] if merged_args[key].nil?
       end
 
@@ -220,12 +220,18 @@ class TLDR
           when Config::DEFAULT_YAML_PATH then next
           else next "--config #{self[:config_path]}"
           end
-        elsif key == :warnings && defaults[:warnings] != self[:warnings]
-          next warnings ? "--warnings" : "--no-warnings"
+          # elsif key == :warnings && defaults[:warnings] != self[:warnings]
+          #   next warnings ? "--warnings" : "--no-warnings"
         end
 
         if defaults[key] == self[key] && (key != :seed || !seed_set_intentionally)
           next
+        elsif CONFLAGS[key]&.start_with?("--[no-]")
+          case self[key]
+          when false then CONFLAGS[key].gsub(/[\[\]]/, "")
+          when nil || true then CONFLAGS[key].gsub("[no-]", "")
+          else "#{CONFLAGS[key].gsub("[no-]", "")} #{stringify(key, self[key])}"
+          end
         elsif self[key].is_a?(Array)
           self[key].map { |value| [flag, stringify(key, value)] }
         elsif self[key].is_a?(TrueClass) || self[key].is_a?(FalseClass)

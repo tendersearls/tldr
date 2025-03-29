@@ -5,7 +5,7 @@ class SubSubclassTest < Minitest::Test
     result = TLDRunner.should_succeed "subsubclass.rb"
 
     assert_includes result.stdout, <<~MSG
-      😁😁
+      ..
     MSG
   end
 end
