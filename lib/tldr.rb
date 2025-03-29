@@ -1,6 +1,7 @@
 require "concurrent-ruby"
 
 require_relative "tldr/argv_parser"
+require_relative "tldr/argv_reconstructor"
 require_relative "tldr/assertions"
 require_relative "tldr/backtrace_filter"
 require_relative "tldr/class_util"

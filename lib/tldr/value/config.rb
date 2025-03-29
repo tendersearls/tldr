@@ -39,6 +39,8 @@ class TLDR
 
   Config = Struct.new(*CONFIG_ATTRIBUTES, keyword_init: true) do
     def initialize(**args)
+      @argv_reconstructor = ArgvReconstructor.new
+
       original_base_path = Dir.pwd
       unless args[:config_intended_for_merge_only]
         change_working_directory_because_i_am_bad_and_i_should_feel_bad!(args[:base_path])
@@ -152,109 +154,20 @@ class TLDR
     end
 
     def to_full_args exclude: [], ensure_args: [], exclude_dotfile_matches: false
-      argv = to_cli_argv(
-        CONFLAGS.keys - exclude - [
-          (:seed unless seed_set_intentionally),
-          :watch,
-          :i_am_being_watched
-        ],
-        exclude_dotfile_matches:
-      )
-
-      ensure_args.each do |arg|
-        argv << arg unless argv.include?(arg)
-      end
-
-      argv.join(" ")
+      @argv_reconstructor.reconstruct(self, exclude:, ensure_args:, exclude_dotfile_matches:)
     end
 
     def to_single_path_args path, exclude_dotfile_matches: false
-      argv = to_cli_argv(CONFLAGS.keys - [
-        :seed, :parallel, :names, :fail_fast, :paths, :prepend_paths,
-        :no_prepend, :exclude_paths, :watch, :i_am_being_watched
-      ], exclude_dotfile_matches:)
+      @argv_reconstructor.reconstruct_single_path_args(self, path, exclude_dotfile_matches:)
+    end
 
-      (argv + [stringify(:paths, path)]).join(" ")
+    def dotfile_args config_path
+      return {} unless File.exist?(config_path)
+
+      @dotfile_args ||= YamlParser.new.parse(config_path)
     end
 
     private
-
-    def to_cli_argv options = CONFLAGS.keys, exclude_dotfile_matches:
-      defaults = Config.build_defaults(cli_defaults: true)
-      defaults = defaults.merge(dotfile_args(config_path)) if exclude_dotfile_matches
-      options.map { |key|
-        flag = CONFLAGS[key]
-
-        # Special cases
-        if key == :prepend_paths
-          if prepend_paths.map { |s| stringify(key, s) }.sort == paths.map { |s| stringify(:paths, s) }.sort
-            # Don't print prepended tests if they're the same as the test paths
-            next
-          elsif no_prepend
-            # Don't print prepended tests if they're disabled
-            next
-          end
-        elsif key == :helper_paths && no_helper
-          # Don't print the helper if it's disabled
-          next
-        elsif key == :parallel
-          val = if !seed_set_intentionally && !parallel
-            "--no-parallel"
-          elsif !seed.nil? && seed_set_intentionally && parallel
-            "--parallel"
-          end
-          next val
-        elsif key == :timeout
-          if self[:timeout] < 0
-            next
-          elsif self[:timeout] == Config::DEFAULT_TIMEOUT
-            next "--timeout"
-          elsif self[:timeout] != Config::DEFAULT_TIMEOUT
-            next "--timeout #{self[:timeout]}"
-          else
-            next
-          end
-        elsif key == :config_path
-          case self[:config_path]
-          when nil then next "--no-config"
-          when Config::DEFAULT_YAML_PATH then next
-          else next "--config #{self[:config_path]}"
-          end
-          # elsif key == :warnings && defaults[:warnings] != self[:warnings]
-          #   next warnings ? "--warnings" : "--no-warnings"
-        end
-
-        if defaults[key] == self[key] && (key != :seed || !seed_set_intentionally)
-          next
-        elsif CONFLAGS[key]&.start_with?("--[no-]")
-          case self[key]
-          when false then CONFLAGS[key].gsub(/[\[\]]/, "")
-          when nil || true then CONFLAGS[key].gsub("[no-]", "")
-          else "#{CONFLAGS[key].gsub("[no-]", "")} #{stringify(key, self[key])}"
-          end
-        elsif self[key].is_a?(Array)
-          self[key].map { |value| [flag, stringify(key, value)] }
-        elsif self[key].is_a?(TrueClass) || self[key].is_a?(FalseClass)
-          flag if self[key]
-        elsif self[key].is_a?(Class)
-          [flag, self[key].name]
-        elsif !self[key].nil?
-          [flag, stringify(key, self[key])]
-        end
-      }.flatten.compact
-    end
-
-    def stringify key, val
-      if PATH_FLAGS.include?(key) && val.start_with?(Dir.pwd)
-        val = val[Dir.pwd.length + 1..]
-      end
-
-      if val.nil? || val.is_a?(Integer)
-        val
-      else
-        "\"#{val}\""
-      end
-    end
 
     def most_recently_modified_test_file tests
       return if tests.empty?
@@ -276,12 +189,6 @@ class TLDR
 
     def merge_dotfile_args args
       dotfile_args(args[:config_path]).merge(args)
-    end
-
-    def dotfile_args config_path
-      return {} unless File.exist?(config_path)
-
-      @dotfile_args ||= YamlParser.new.parse(config_path)
     end
   end
 
