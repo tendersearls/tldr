@@ -16,8 +16,9 @@ class TLDR
       reporter.before_suite(plan.tests)
 
       time_bomb = Thread.new {
+        next if config.timeout < 0
+
         explode = proc do
-          next if ENV["CI"] && !$stderr.tty?
           next if @run_aborted.true?
           @run_aborted.make_true
           @wip.each(&:capture_backtrace_at_exit)
@@ -25,7 +26,8 @@ class TLDR
           exit!(3)
         end
 
-        sleep(1.8)
+        sleep(config.timeout)
+
         # Don't hard-kill the runner if user is debugging, it'll
         # screw up their terminal slash be a bad time
         if IRB.CurrentContext

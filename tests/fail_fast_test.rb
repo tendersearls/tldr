@@ -2,7 +2,7 @@ require_relative "test_helper"
 
 class FailFastTest < Minitest::Test
   def test_fails_fast
-    result = TLDRunner.should_fail "fail_fast.rb", "--seed 9 --fail-fast"
+    result = TLDRunner.should_fail "fail_fast.rb", "--seed 9 --fail-fast --emoji"
 
     assert_includes result.stdout, "😁"
     assert_includes result.stdout, "😡"

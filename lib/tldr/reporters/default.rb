@@ -3,7 +3,7 @@ class TLDR
     class Default < Base
       def initialize config, out = $stdout, err = $stderr
         super
-        @icons = @config.no_emoji ? IconProvider::Base.new : IconProvider::Emoji.new
+        @icons = @config.emoji ? IconProvider::Emoji.new : IconProvider::Base.new
       end
 
       def before_suite tests
@@ -11,9 +11,9 @@ class TLDR
         @suite_start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC, :microsecond)
         @out.print <<~MSG
           Command: #{tldr_command} #{@config.to_full_args}
-          #{@icons.seed} #{CONFLAGS[:seed]} #{@config.seed}
+          #{@icons.rpad(:seed)}#{CONFLAGS[:seed]} #{@config.seed}
 
-          #{@icons.run} Running:
+          #{@icons.rpad(:run)}Running:
 
         MSG
       end
@@ -39,22 +39,22 @@ class TLDR
         @err.print "\n\n"
 
         if @config.yes_i_know
-          @err.print "🚨 TLDR after completing #{test_results.size} of #{planned_tests.size} tests! Print full summary by omitting --yes-i-know"
+          @err.print "#{@icons.rpad(:alarm)}TLDR after completing #{test_results.size} of #{planned_tests.size} tests! Print full summary by omitting --yes-i-know"
         else
           wrap_in_horizontal_rule do
             @err.print [
               "too long; didn't run!",
-              "#{@icons.run} Completed #{test_results.size} of #{planned_tests.size} tests (#{((test_results.size.to_f / planned_tests.size) * 100).round}%) before running out of time.",
+              "#{@icons.rpad(:run)}Completed #{test_results.size} of #{planned_tests.size} tests (#{((test_results.size.to_f / planned_tests.size) * 100).round}%) before running out of time.",
               (<<~WIP.chomp if wip_tests.any?),
-                #{@icons.wip} #{plural(wip_tests.size, "test was", "tests were")} cancelled in progress:
+                #{@icons.rpad(:wip)}#{plural(wip_tests.size, "test was", "tests were")} cancelled in progress:
                 #{wip_tests.map { |wip_test| "  #{time_diff(wip_test.start_time, stop_time)}ms - #{describe(wip_test.test)}#{print_wip_backtrace(wip_test, indent: "    ") if @config.print_interrupted_test_backtraces}" }.join("\n")}
               WIP
               (<<~SLOW.chomp if test_results.any?),
-                #{@icons.slow} Your #{[10, test_results.size].min} slowest completed tests:
+                #{@icons.rpad(:slow)}Your #{[10, test_results.size].min} slowest completed tests:
                 #{test_results.sort_by(&:runtime).last(10).reverse.map { |result| "  #{result.runtime}ms - #{describe(result.test)}" }.join("\n")}
               SLOW
               describe_tests_that_didnt_finish(planned_tests, test_results),
-              "🙈 Suppress this summary with --yes-i-know"
+              "#{@icons.rpad(:not_run)}Suppress this summary with --yes-i-know"
             ].compact.join("\n\n")
           end
         end
@@ -69,8 +69,8 @@ class TLDR
         wrap_in_horizontal_rule do
           @err.print [
             "Failing fast after #{describe(last_result.test, last_result.relevant_location)} #{last_result.error? ? "errored" : "failed"}.",
-            ("#{@icons.wip} #{plural(wip_tests.size, "test was", "tests were")} cancelled in progress." if wip_tests.any?),
-            ("#{@icons.not_run} #{plural(unrun_tests.size, "test was", "tests were")} not run at all." if unrun_tests.any?),
+            ("#{@icons.rpad(:wip)}#{plural(wip_tests.size, "test was", "tests were")} cancelled in progress." if wip_tests.any?),
+            ("#{@icons.rpad(:not_run)} #{plural(unrun_tests.size, "test was", "tests were")} not run at all." if unrun_tests.any?),
             describe_tests_that_didnt_finish(planned_tests, test_results)
           ].compact.join("\n\n")
         end
@@ -165,7 +165,7 @@ class TLDR
           ("--comment \"Also include #{plural(failed.size, "test")} that failed:\"" if failed_locators.any?)
         ].compact + failed_locators
         <<~MSG
-          #{@icons.rock_on} Run the #{plural(unrun.size, "test")} that didn't finish:
+          #{@icons.rpad(:rock_on)}Run the #{plural(unrun.size, "test")} that didn't finish:
             #{tldr_command} #{@config.to_full_args(exclude: [:paths], exclude_dotfile_matches: true)} #{suggested_locators.join(" \\\n    ")}
         MSG
       end

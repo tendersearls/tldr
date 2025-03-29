@@ -1,4 +1,4 @@
-require_relative "test_helper"
+require_relative "../test_helper"
 
 class AssertionsTest < AssertionTestCase
   class Asserty
@@ -99,23 +99,23 @@ class AssertionsTest < AssertionTestCase
     end
   end
 
-  def test_assert_include?
-    @subject.assert_include? "foo", "food"
+  def test_assert_includes
+    @subject.assert_includes "food", "foo"
     should_fail "Expected \"drink\" to include \"foo\"" do
-      @subject.assert_include? "foo", "drink"
+      @subject.assert_includes "drink", "foo"
     end
     should_fail(/Expected #<Object:0x.*> \(Object\) to respond to :include?/) do
-      @subject.assert_include? "stuff", Object.new
+      @subject.assert_includes Object.new, "stuff"
     end
   end
 
-  def test_refute_include?
-    @subject.refute_include? "foo", "drink"
+  def test_refute_includes
+    @subject.refute_includes "drink", "foo"
     should_fail "Expected \"food\" to not include \"foo\"" do
-      @subject.refute_include? "foo", "food"
+      @subject.refute_includes "food", "foo"
     end
     should_fail(/Expected #<Object:0x.*> \(Object\) to respond to :include?/) do
-      @subject.refute_include? "stuff", Object.new
+      @subject.refute_includes Object.new, "stuff"
     end
   end
 
@@ -382,11 +382,6 @@ class AssertionsTest < AssertionTestCase
         throw :baz
       end
     end
-  end
-
-  def test_doesnt_define_minitest_compatibility_methods_by_default
-    refute_respond_to @subject, :assert_includes
-    refute_respond_to @subject, :assert_send
   end
 
   def test_doesnt_call_message_procs_on_success

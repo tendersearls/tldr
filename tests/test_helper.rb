@@ -1,6 +1,7 @@
 $LOAD_PATH.unshift(File.expand_path("../lib", __dir__))
 require "tldr"
 require "open3"
+require "tmpdir"
 
 require "minitest/autorun"
 
@@ -11,6 +12,14 @@ class Minitest::Test
   protected
 
   private
+
+  def with_temp_file(name, contents, &blk)
+    Dir.mktmpdir do |dir|
+      path = File.join(dir, name)
+      File.write(path, contents)
+      yield File.absolute_path(path)
+    end
+  end
 
   def assert_includes_all haystack, needles
     unless needles.all? { |needle| haystack.include?(needle) }
@@ -48,8 +57,8 @@ end
 module TLDRunner
   Result = Struct.new(:stdout, :stderr, :exit_code, :success?, keyword_init: true)
 
-  def self.should_succeed files, options = nil, ensure_time_bomb: false
-    run(files, options, ensure_time_bomb: ensure_time_bomb).tap do |result|
+  def self.should_succeed files, options = nil
+    run(files, options).tap do |result|
       if !result.success?
         raise <<~MSG
           Ran #{files.inspect} and expected success, but exited code #{result.exit_code}
@@ -64,8 +73,8 @@ module TLDRunner
     end
   end
 
-  def self.should_fail files, options = nil, ensure_time_bomb: false
-    run(files, options, ensure_time_bomb: ensure_time_bomb).tap do |result|
+  def self.should_fail files, options = nil
+    run(files, options).tap do |result|
       if result.success?
         raise <<~MSG
           Ran #{files.inspect} and expected failure, but exited code #{result.exit_code}
@@ -80,11 +89,11 @@ module TLDRunner
     end
   end
 
-  def self.run files, options, ensure_time_bomb: false
+  def self.run files, options
     files = Array(files).map { |file| File.expand_path("fixture/#{file}", __dir__) }
 
     stdout, stderr, status = Open3.capture3 <<~CMD
-      #{"unset CI;" if ensure_time_bomb} bundle exec tldr #{files.join(" ")} #{options}
+      bundle exec tldr #{files.join(" ")} #{options}
     CMD
 
     Result.new(

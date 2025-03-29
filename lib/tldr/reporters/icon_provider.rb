@@ -47,6 +47,15 @@ module IconProvider
     def seed
       ""
     end
+
+    def rpad(icon_name)
+      icon = send(icon_name)
+      if icon.nil? || icon.size == 0
+        icon
+      else
+        "#{icon} "
+      end
+    end
   end
 
   class Emoji < Base

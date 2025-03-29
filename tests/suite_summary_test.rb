@@ -11,7 +11,7 @@ class SuiteSummaryTest < Minitest::Test
   end
 
   def test_verbose_summary_too_slow
-    result = TLDRunner.should_fail "suite_summary_too_slow.rb", "--print-interrupted-test-backtraces", ensure_time_bomb: true
+    result = TLDRunner.should_fail "suite_summary_too_slow.rb", "--timeout --print-interrupted-test-backtraces"
 
     assert_match(/Finished in \d+ms./, result.stdout)
     assert_includes result.stdout, <<~MSG.chomp
@@ -19,7 +19,7 @@ class SuiteSummaryTest < Minitest::Test
     MSG
 
     assert_includes scrub_time(normalise_abs_paths(result.stderr)), <<~MSG.chomp
-      🙅 1 test was cancelled in progress:
+      1 test was cancelled in progress:
         XXXms - T2#test_2_1 [tests/fixture/suite_summary_too_slow.rb:8]
           Backtrace at the point of cancellation:
           /path/to/tldr/tests/fixture/suite_summary_too_slow.rb:9:in #{(TLDR::RubyUtil.version >= "3.4") ? "'Kernel#sleep'" : "`sleep'"}

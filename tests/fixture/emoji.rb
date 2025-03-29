@@ -1,4 +1,4 @@
-class NoEmoji < TLDR
+class Emoji < TLDR
   def test_pass
   end
 

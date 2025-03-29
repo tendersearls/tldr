@@ -6,16 +6,16 @@ class RakeTaskTest < Minitest::Test
 
     assert_empty result.stderr
     assert result.success?
+
     assert_includes result.stdout, <<~MSG
       neat!
       Command: bundle exec tldr --seed 1
-      🌱 --seed 1
+      --seed 1
 
-      🏃 Running:
+      Running:
 
-      😁
+      .
     MSG
-    assert 1, result.stdout.scan("😁").size
   end
 
   def test_running_custom_rake_task
@@ -24,13 +24,12 @@ class RakeTaskTest < Minitest::Test
     assert_includes result.stdout, <<~MSG
       cool!
       Command: bundle exec tldr --seed 1 --helper "safe/helper.rb" --load-path "lib" --load-path "safe" "safe/big_test.rb"
-      🌱 --seed 1
+      --seed 1
 
-      🏃 Running:
+      Running:
 
-      😁
+      .
     MSG
-    assert 1, result.stdout.scan("😁").size
   end
 
   def test_running_custom_base_path
@@ -39,11 +38,11 @@ class RakeTaskTest < Minitest::Test
     assert_includes result.stdout, <<~MSG
       neat!
       Command: bundle exec tldr --seed 1 --base-path "../b"
-      🌱 --seed 1
+      --seed 1
 
-      🏃 Running:
+      Running:
 
-      😁
+      .
     MSG
   end
 
@@ -55,11 +54,11 @@ class RakeTaskTest < Minitest::Test
     assert_includes result.stdout, <<~MSG
       👓
       Command: bundle exec tldr --seed 1 --helper "spec/spec_helper.rb" "spec/math_spec.rb"
-      🌱 --seed 1
+      --seed 1
 
-      🏃 Running:
+      Running:
 
-      😁
+      .
     MSG
   end
 end

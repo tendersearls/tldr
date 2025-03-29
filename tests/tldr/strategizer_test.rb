@@ -1,4 +1,4 @@
-require_relative "test_helper"
+require_relative "../test_helper"
 
 class TLDR
   class StrategizerTest < Minitest::Test
@@ -148,7 +148,7 @@ class TLDR
         TestGroup.new([[TA, nil], [TB, :test_2]])
       ]
 
-      result = @subject.strategize(some_tests, [], unsafe_groups, Config.new(prepend_paths: ["tests/strategizer_test.rb:18"]))
+      result = @subject.strategize(some_tests, [], unsafe_groups, Config.new(prepend_paths: ["tests/tldr/strategizer_test.rb:18"]))
 
       assert_equal [Test.new(TB, :test_2)], result.prepend_sequential_tests
       assert_equal some_tests - [

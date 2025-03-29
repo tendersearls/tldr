@@ -9,7 +9,6 @@
 
 require "pp"
 require "super_diff"
-require_relative "assertions/minitest_compatibility"
 
 class TLDR
   module Assertions
@@ -109,7 +108,7 @@ class TLDR
       refute_in_delta expected, actual, expected * epsilon, msg
     end
 
-    def assert_include? expected, actual, message = nil
+    def assert_includes actual, expected, message = nil
       message = Assertions.msg(message) {
         "Expected #{Assertions.h(actual)} to include #{Assertions.h(expected)}"
       }
@@ -117,7 +116,7 @@ class TLDR
       assert actual.include?(expected), message
     end
 
-    def refute_include? expected, actual, message = nil
+    def refute_includes actual, expected, message = nil
       message = Assertions.msg(message) {
         "Expected #{Assertions.h(actual)} to not include #{Assertions.h(expected)}"
       }
