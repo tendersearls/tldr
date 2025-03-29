@@ -79,7 +79,7 @@ class TLDR
           options[:base_path] = path
         end
 
-        opts.on "-c", CONFLAGS[:config_path], "The YAML configuration file to load (Default: '.tldr.yml')" do |config_path|
+        opts.on "-c", "#{CONFLAGS[:config_path]} PATH", String, "The YAML configuration file to load (Default: '.tldr.yml')" do |config_path|
           options[:config_path] = config_path
         end
 

@@ -50,4 +50,13 @@ class DotfileTest < Minitest::Test
       Command: bundle exec tldr --fail-fast --seed 5 --name "test_stuff" --exclude-name "test_b_2" --exclude-path "nada" --helper "test_helper.rb" --prepend "nope" --load-path "foo" --base-path "example/d" --verbose "b.rb"
     MSG
   end
+
+  def test_a_custom_dotfile_path
+    result = TLDRunner.run_command("BUNDLE_GEMFILE=\"example/a/Gemfile\" bundle exec tldr --seed 1 --base-path example/a --config config/TldrFile")
+
+    assert_empty result.stderr
+    assert_includes result.stdout, <<~MSG
+      Command: bundle exec tldr --seed 1 --base-path "example/a" --config config/TldrFile "test/test_subtract.rb"
+    MSG
+  end
 end

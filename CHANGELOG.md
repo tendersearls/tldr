@@ -7,7 +7,8 @@ run after 1.8s? Yeah, well, it doesn't anymore. Use `--timeout` to enable it
 To set the file, use `--config FILE` option
 * Add `--[no-]timeout TIMEOUT` flag and `timeout` YAML option. To enable the
 TLDR Classic™ default of 1.8s, specify `--timeout` from the CLI or `timeout: true`
-in YAML. To specify a custom timeout, flag `--timeout 42` or `timeout: 42` in YAML
+in YAML. To specify a custom timeout of 42.3 seconds, flag `--timeout 42.3` or
+`timeout: 42.3` in YAML
 
 ## [0.10.1]
 
