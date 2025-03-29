@@ -4,6 +4,9 @@
 run after 1.8s? Yeah, well, it doesn't anymore. Use `--timeout` to enable it
 * **BREAKING** replace the `--no-dotfile` flag and has been replaced by a
 `--[no-]config PATH` flag. To skip loading the YAML file, use `--no-config`.
+* **BREAKING** Remove `assert_include?` and `refute_include?` in favor of
+Minitest-compatible `assert_includes` and `refute_includes`.
+* **BREAKING** Rename `TLDR::Assertions::MinitestCompatibility` to `TLDR::MinitestCompatibility`
 To set the file, use `--config FILE` option
 * Add `--[no-]timeout TIMEOUT` flag and `timeout` YAML option. To enable the
 TLDR Classic™ default of 1.8s, specify `--timeout` from the CLI or `timeout: true`
