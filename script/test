@@ -5,10 +5,10 @@ set -e
 bundle exec rake
 
 cd example/a
-bundle exec tldr | grep "\n..\n"
+bundle exec tldr | ruby -e 'exit(ARGF.read =~ /\n..\n/ ? 0 : 1)'
 cd ../..
 
 cd example/b
-bundle exec ruby -Itest test/some_test.rb | grep "\n.\n"
-bundle exec rake tldr | grep "\n.\n"
+bundle exec ruby -Itest test/some_test.rb | ruby -e 'exit(ARGF.read =~ /\n.\n/ ? 0 : 1)'
+bundle exec rake tldr | ruby -e 'exit(ARGF.read =~ /\n.\n/ ? 0 : 1)'
 cd ../..
