@@ -107,12 +107,14 @@ class TLDR
           options[:yes_i_know] = true
         end
 
-        opts.on CONFLAGS[:i_am_being_watched], "[INTERNAL] Signals to tldr it is being invoked under --watch mode" do
-          options[:i_am_being_watched] = true
-        end
+        unless ARGV.include?("--help") || ARGV.include?("--h")
+          opts.on CONFLAGS[:i_am_being_watched], "[INTERNAL] Signals to tldr it is being invoked under --watch mode" do
+            options[:i_am_being_watched] = true
+          end
 
-        opts.on "--comment COMMENT", String, "[INTERNAL] No-op; used for multi-line execution instructions" do
-          # See "--comment" in lib/tldr/reporters/default.rb for an example of how this is used internally
+          opts.on "--comment COMMENT", String, "[INTERNAL] No-op; used for multi-line execution instructions" do
+            # See "--comment" in lib/tldr/reporters/default.rb for an example of how this is used internally
+          end
         end
       end.parse!(args)
 
