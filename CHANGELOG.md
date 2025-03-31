@@ -13,6 +13,8 @@ Minitest-compatible `assert_includes` and `refute_includes`.
 TLDR Classic™ default of 1.8s, specify `--timeout` from the CLI or `timeout: true`
 in YAML. To specify a custom timeout of 42.3 seconds, flag `--timeout 42.3` or
 `timeout: 42.3` in YAML
+* Add `require "tldr/autorun"`, which adds an `at_exit` hook so that tests can be
+run from the command line (still supports CLI args and YAML options) by running `ruby path/to/test.rb` (see [its test](/tests/autorun_test.rb))
 
 ## [0.10.1]
 
