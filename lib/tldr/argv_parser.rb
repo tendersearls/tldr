@@ -12,7 +12,7 @@ class TLDR
           options[:fail_fast] = fail_fast
         end
 
-        opts.on "-s", "#{CONFLAGS[:seed]} SEED", Integer, "Seed for randomization" do |seed|
+        opts.on "-s", "#{CONFLAGS[:seed]} SEED", Integer, "Random seed for test order (setting --seed disables parallelization by default)" do |seed|
           options[:seed] = seed
         end
 
