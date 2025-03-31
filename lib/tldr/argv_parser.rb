@@ -26,7 +26,7 @@ class TLDR
             -1
           elsif timeout.nil?
             # --timeout
-            1.8
+            Config::DEFAULT_TIMEOUT
           else
             # --timeout 42.3
             timeout
@@ -103,7 +103,7 @@ class TLDR
           options[:watch] = true
         end
 
-        opts.on CONFLAGS[:yes_i_know], "Suppress TLDR report when suite runs over 1.8s" do
+        opts.on CONFLAGS[:yes_i_know], "Suppress TLDR report when suite runs beyond any configured --timeout" do
           options[:yes_i_know] = true
         end
 
