@@ -1,9 +1,10 @@
 class TLDR
   CONFLAGS = {
-    fail_fast: "--fail-fast",
-    seed: "--seed",
-    parallel: "--[no-]parallel",
     timeout: "--[no-]timeout",
+    watch: "--watch",
+    fail_fast: "--fail-fast",
+    parallel: "--[no-]parallel",
+    seed: "--seed",
     names: "--name",
     exclude_names: "--exclude-name",
     exclude_paths: "--exclude-path",
@@ -12,15 +13,14 @@ class TLDR
     prepend_paths: "--prepend",
     no_prepend: "--no-prepend",
     load_paths: "--load-path",
-    reporter: "--reporter",
     base_path: "--base-path",
     config_path: "--[no-]config",
+    reporter: "--reporter",
     emoji: "--[no-]emoji",
-    verbose: "--verbose",
-    print_interrupted_test_backtraces: "--print-interrupted-test-backtraces",
     warnings: "--[no-]warnings",
-    watch: "--watch",
+    verbose: "--verbose",
     yes_i_know: "--yes-i-know",
+    print_interrupted_test_backtraces: "--print-interrupted-test-backtraces",
     i_am_being_watched: "--i-am-being-watched",
     paths: nil
   }.freeze
@@ -28,10 +28,10 @@ class TLDR
   PATH_FLAGS = [:paths, :helper_paths, :load_paths, :prepend_paths, :exclude_paths].freeze
   MOST_RECENTLY_MODIFIED_TAG = "MOST_RECENTLY_MODIFIED".freeze
   CONFIG_ATTRIBUTES = [
-    :fail_fast, :seed, :parallel, :timeout, :no_timeout, :names, :exclude_names,
+    :timeout, :watch, :fail_fast, :parallel, :seed, :names, :exclude_names,
     :exclude_paths, :helper_paths, :no_helper, :prepend_paths, :no_prepend,
-    :load_paths, :reporter, :base_path, :config_path, :emoji, :verbose,
-    :print_interrupted_test_backtraces, :warnings, :watch, :yes_i_know,
+    :load_paths, :base_path, :config_path, :reporter, :emoji, :warnings,
+    :verbose, :yes_i_know, :print_interrupted_test_backtraces,
     :i_am_being_watched, :paths,
     # Internal properties
     :config_intended_for_merge_only, :seed_set_intentionally, :cli_defaults
@@ -62,23 +62,23 @@ class TLDR
 
     def self.build_defaults cli_defaults: true
       common = {
-        fail_fast: false,
-        seed: rand(10_000),
-        parallel: true,
         timeout: -1,
+        watch: false,
+        fail_fast: false,
+        parallel: true,
+        seed: rand(10_000),
         names: [],
         exclude_names: [],
         exclude_paths: [],
         no_helper: false,
         no_prepend: false,
-        reporter: Reporters::Default,
         base_path: nil,
+        reporter: Reporters::Default,
         emoji: false,
-        verbose: false,
-        print_interrupted_test_backtraces: false,
         warnings: true,
-        watch: false,
+        verbose: false,
         yes_i_know: false,
+        print_interrupted_test_backtraces: false,
         i_am_being_watched: false
       }
 
@@ -103,8 +103,8 @@ class TLDR
 
     def undefault_parallel_if_seed_set args
       args.merge(
-        seed_set_intentionally: !args[:seed].nil?,
-        parallel: (args[:parallel].nil? ? args[:seed].nil? : args[:parallel])
+        parallel: (args[:parallel].nil? ? args[:seed].nil? : args[:parallel]),
+        seed_set_intentionally: !args[:seed].nil?
       )
     end
 
@@ -118,12 +118,12 @@ class TLDR
       end
 
       # Booleans
-      [:fail_fast, :parallel, :no_helper, :no_prepend, :emoji, :verbose, :print_interrupted_test_backtraces, :warnings, :watch, :yes_i_know, :i_am_being_watched].each do |key|
+      [:watch, :fail_fast, :parallel, :no_helper, :no_prepend, :emoji, :warnings, :verbose, :yes_i_know, :print_interrupted_test_backtraces, :i_am_being_watched].each do |key|
         merged_args[key] = defaults[key] if merged_args[key].nil?
       end
 
       # Values
-      [:seed, :timeout, :reporter, :base_path, :config_path].each do |key|
+      [:timeout, :seed, :base_path, :config_path, :reporter].each do |key|
         merged_args[key] ||= defaults[key]
       end
 

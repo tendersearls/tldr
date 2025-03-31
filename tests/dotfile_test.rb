@@ -31,7 +31,7 @@ class DotfileTest < Minitest::Test
 
     refute result.success?
     assert_includes result.stdout, <<~MSG
-      Command: bundle exec tldr --fail-fast --seed 42 --parallel --name "/test_*/" --name "test_it" --exclude-name "test_b_1" --exclude-path "c.rb:4" --helper "test_helper.rb" --prepend "a.rb:3" --load-path "app" --load-path "lib" --base-path "example/d" --verbose "b.rb"
+      Command: bundle exec tldr --fail-fast --parallel --seed 42 --name "/test_*/" --name "test_it" --exclude-name "test_b_1" --exclude-path "c.rb:4" --helper "test_helper.rb" --prepend "a.rb:3" --load-path "app" --load-path "lib" --base-path "example/d" --verbose "b.rb"
     MSG
     assert_includes result.stderr, <<~MSG
       1) BTest#test_b_2 [b.rb:7] errored:
