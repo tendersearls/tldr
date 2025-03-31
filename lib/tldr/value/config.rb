@@ -73,7 +73,7 @@ class TLDR
         no_helper: false,
         no_prepend: false,
         base_path: nil,
-        reporter: Reporters::Default,
+        reporter: "TLDR::Reporters::Default",
         emoji: false,
         warnings: true,
         verbose: false,

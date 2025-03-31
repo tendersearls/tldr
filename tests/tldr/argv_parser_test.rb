@@ -26,7 +26,7 @@ class ArgvParserTest < Minitest::Test
     assert_equal result.timeout, 1.4
     assert result.no_helper
     assert result.verbose
-    assert_equal TLDR::Reporters::Base, result.reporter
+    assert_equal "TLDR::Reporters::Base", result.reporter
     assert_equal ["spec/spec_helper.rb"], result.helper_paths
     assert_equal ["lib", "vendor", "spec", "app"], result.load_paths
     refute result.parallel
@@ -43,7 +43,7 @@ class ArgvParserTest < Minitest::Test
     refute result.no_helper
     refute result.verbose
     refute result.print_interrupted_test_backtraces
-    assert_equal TLDR::Reporters::Default, result.reporter
+    assert_equal "TLDR::Reporters::Default", result.reporter
     assert_equal ["test/helper.rb"], result.helper_paths
     assert_equal ["lib", "test"], result.load_paths
     assert result.parallel

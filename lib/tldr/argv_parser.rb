@@ -84,7 +84,7 @@ class TLDR
         end
 
         opts.on "-r", "#{CONFLAGS[:reporter]} REPORTER", String, "Set a custom reporter class (Default: \"TLDR::Reporters::Default\")" do |reporter|
-          options[:reporter] = Kernel.const_get(reporter)
+          options[:reporter] = reporter
         end
 
         opts.on CONFLAGS[:emoji], "Enable emoji output for the default reporter (Default: false)" do |emoji|

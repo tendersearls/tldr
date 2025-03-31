@@ -11,14 +11,6 @@ class TLDR
           if dotfile_args.key?(:paths)
             dotfile_args[:paths] = dotfile_args[:paths].flat_map { |path| Dir[path] }
           end
-          # The argv parser normally does this:
-          if dotfile_args.key?(:reporter)
-            begin
-              dotfile_args[:reporter] = Kernel.const_get(dotfile_args[:reporter])
-            rescue
-              raise Error, "Unknown reporter '#{dotfile_args[:reporter]}' specified in #{File.basename(path)} file"
-            end
-          end
           if dotfile_args.key?(:timeout)
             dotfile_args[:timeout] = case dotfile_args[:timeout]
             when true then Config::DEFAULT_TIMEOUT

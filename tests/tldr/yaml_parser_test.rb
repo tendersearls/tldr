@@ -24,14 +24,7 @@ class YamlParserTest < Minitest::Test
 
   def test_reporter_lookup
     with_temp_file "foo.yml", "reporter: YamlParserTest::FauxReporter" do |yaml_path|
-      assert_equal({reporter: FauxReporter}, @subject.parse(yaml_path))
-    end
-
-    with_temp_file "foo.yml", "reporter: UnknownReporter" do |yaml_path|
-      e = assert_raises(TLDR::Error) do
-        @subject.parse(yaml_path)
-      end
-      assert_equal "Unknown reporter 'UnknownReporter' specified in foo.yml file", e.message
+      assert_equal({reporter: "YamlParserTest::FauxReporter"}, @subject.parse(yaml_path))
     end
   end
 
