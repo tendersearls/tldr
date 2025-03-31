@@ -15,6 +15,7 @@ in YAML. To specify a custom timeout of 42.3 seconds, flag `--timeout 42.3` or
 `timeout: 42.3` in YAML
 * Add `require "tldr/autorun"`, which adds an `at_exit` hook so that tests can be
 run from the command line (still supports CLI args and YAML options) by running `ruby path/to/test.rb` (see [its test](/tests/autorun_test.rb))
+* Fix custom reporters by looking them up only after helpers have a chance to run. [#15](https://github.com/tendersearls/tldr/issues/15)
 
 ## [0.10.1]
 
