@@ -29,4 +29,5 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "super_diff", "~> 0.10"
   spec.add_dependency "concurrent-ruby", "~> 1.2"
+  spec.add_dependency "irb", "~> 1.10"
 end
