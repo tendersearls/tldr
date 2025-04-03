@@ -1,4 +1,4 @@
-# TLDR - Ruby tests for people who prioritize fast feedback
+# TLDR - Testing for rubyists who want fast feedback
 
 TLDR is a suspiciously-delightful testing framework for Ruby.
 
