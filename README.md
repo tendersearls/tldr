@@ -18,9 +18,9 @@ We hope you'll give it a try!
 
 ## Getting started
 
-You can either read the rest of this README and learn about TLDR passively, or you can just clone this [TLDR demo repo](https://github/searls/tldr_demo) and work through its README as you play with its tests and run them with various options.
+You can either read the rest of this README and learn about TLDR passively, or you can just clone this [TLDR demo repo](https://github.com/searls/tldr_demo) and work through its README as you play with its tests and run them with various options.
 
-**JUST IN CASE YOU'RE ALREADY SKIMMING THIS**, I said stop reading and [clone this interactive repo](https://github/searls/tldr_demo) if you're a hands-on learner.
+**JUST IN CASE YOU'RE ALREADY SKIMMING THIS**, I said stop reading and [clone this interactive repo](https://github.com/searls/tldr_demo) if you're a hands-on learner.
 
 ### Install
 
