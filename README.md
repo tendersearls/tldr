@@ -4,13 +4,13 @@ TLDR is a suspiciously-delightful testing framework for Ruby.
 
 As a test library, TLDR is largely [API-compatible with Minitest](#minitest-compatibility). As a test runner, TLDR boasts a few features RSpec's CLI still doesn't have.
 
-The library, command line interface, and every decision in-between was prioritized to maximize productivity by promote fast feedback loops. Some highlights:
+The library, command line interface, and every decision in-between was prioritized to maximize productivity to promote fast feedback loops. Some highlights:
 
-* Numerous ways to run specific tests: by path (`foo_test.rb`), line number (`foo_test.rb:13`), name (`--name test_foo`), or regex pattern (`-n /_foo_/`)
+* Numerous ways to run specific tests: path (`foo_test.rb`), line number (`foo_test.rb:13`), name (`--name test_foo`), or regex pattern (`-n /_foo/`)
 * Parallel test execution by default, as well as [controls for serial execution of thread-unsafe tests](#parallel-by-default-is-nice-in-theory-but-half-my-tests-are-failing-wat)
 * Continuously run [after every file change](#running-tests-continuously-with---watch) with `--watch`
 * An optional timer to [enforce your tests never get slow](#enforcing-a-testing---timeout) with `--timeout`
-* A `--fail-fast` flag that aborts the run as soon as a failure is encountered
+* A `--fail-fast` flag that aborts the run [as soon as a failure is encountered](#failing-fast-and-first)
 * Running your most-recently-edited test before all the others (see `--prepend`)
 * Delightful diffs when assertions fail, care of [super_diff](https://github.com/splitwise/super_diff)
 
@@ -67,9 +67,9 @@ Usage: tldr [options] some_tests/**/*.rb some/path.rb:13 ...
 
 ### Setting defaults in .tldr.yml
 
-The `tldr` CLI will look for a `.tldr.yml` that can set the same set of options supported by the CLI file in the root of your project. You can specify a custom YAML location with `--config some/path.yml` if you need to.
+The `tldr` CLI will look for a `.tldr.yml` file in the root of your project that can set all the same options supported by the CLI. You can specify a custom YAML location with `--config some/path.yml` if you want it to live someplace else.
 
-Any options found in the dotfile will override TLDR's defaults, but can still be overridden by the `tldr` CLI or a `TLDR::Config` object passed to [TLDR::Run.at_exit!](#running-tests-without-the-cli).
+Any options found in the dotfile will override TLDR's defaults, but can still be overridden by the `tldr` CLI or a `TLDR::Config` object when running tests programmatically.
 
 Here's an [example project](/example/c) that specifies a `.tldr.yml` file as well as some [internal tests](/tests/dotfile_test.rb) demonstrating its behavior.
 
@@ -77,7 +77,7 @@ Here's an [example project](/example/c) that specifies a `.tldr.yml` file as wel
 
 If you've ever seen a [Minitest](https://github.com/minitest/minitest?tab=readme-ov-file#synopsis-) test, then you already know how to write TLDR tests. Rather than document how to write tests, this section just highlights the ways TLDR tests differ from Minitest tests.
 
-First, instead of inheriting from `Minitest::Test`, your test classes must subclass `TLDR` instead:
+First, instead of inheriting from `Minitest::Test`, TLDR test classes should descend from (wait for it) the `TLDR` base class:
 
 ```ruby
 class MyTest < TLDR
@@ -87,7 +87,7 @@ class MyTest < TLDR
 end
 ```
 
-Second, if your tests depend on a test helper, so long as you name it `test/helper.rb`, it will automatically be required by TLDR, so you don't need to add `require "helper"` at the top of each test. If you want to name the helper something else, you can do so with the `--helper` option:
+Second, if your tests depend on a test helper, it will be automatically loaded by TLDR _if_ you name it `test/helper.rb`. That means you don't need to add `require "helper"` to the top of every test. If you want to name the helper something else, you can do so with the `--helper` option:
 
 ```
 tldr --helper test/test_helper.rb
@@ -98,13 +98,13 @@ Third, TLDR offers fewer features:
 * No built-in mock library ([use mocktail](https://justin.searls.co/posts/a-real-world-mocktail-example-test/), maybe!)
 * No "spec" API
 * No benchmark tool
-* No test bisect script
+* No bisect script
 
-And that's it! You now know how to write TLDR tests.
+And that's it! You officially know how to write TLDR tests.
 
 ## Running your tests
 
-Because TLDR ships with a CLI, it offers a _lot_ of ways to run your tests.
+Because TLDR ships with a CLI, it offers a veritable _plethora_ of ways to run your tests.
 
 ### Running your tests
 
@@ -120,7 +120,7 @@ This assumes your tests are stored in `test/`. It will also add `lib/` to Ruby's
 
 TLDR ships with a minimal [rake task](lib/tldr/rake.rb) that simply shells out to the `tldr` CLI by default. If you want to run TLDR with Rake, you can configure the task by setting flags on an env var named `TLDR_OPTS` or in a [.tldr.yml file](#setting-defaults-in-tldryml).
 
-All your Rakefile needs is `require "tldr/rake` and you can run the task individually like this:
+All your Rakefile needs is `require "tldr/rake"` and you can run the task individually like this:
 
 ```
 $ rake tldr
@@ -138,9 +138,9 @@ require "tldr/rake"
 task default: ["tldr", "standard:fix"]
 ```
 
-One reason you'd want to invoke TLDR with Rake is because you have multiple test suites that you want to be able to conveniently run separately ([this talk](https://blog.testdouble.com/talks/2014-05-25-breaking-up-with-your-test-suite/) discussed a few reasons why this can be useful).
+One situation where you'd want to invoke TLDR with Rake is when you have multiple test suites that you want to be able to easily run separately ([this talk](https://blog.testdouble.com/talks/2014-05-25-breaking-up-with-your-test-suite/) discussed a few reasons why this can be useful).
 
-To create a custom TLDR Rake task, you can instantiate `TLDR::Task` like this, which allows you to configure [TLDR::Config](/lib/tldr/value/config.rb) in code:
+To create a custom TLDR Rake task, you can instantiate `TLDR::Task` like this, which allows you to define its [TLDR::Config](/lib/tldr/value/config.rb) configuration in code:
 
 ```ruby
 require "tldr/rake"
