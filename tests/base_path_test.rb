@@ -7,11 +7,11 @@ class BasePathTest < Minitest::Test
     assert_empty result.stderr
     assert_includes result.stdout, <<~MSG
       Command: bundle exec tldr --seed 1 --no-prepend --base-path "example/a"
-      🌱 --seed 1
+      --seed 1
 
-      🏃 Running:
+      Running:
 
-      😁😁
+      ..
     MSG
   end
 end

@@ -9,23 +9,42 @@ class TLDR
       @run_aborted = Concurrent::AtomicBoolean.new(false)
     end
 
+    def instantiate_reporter config
+      begin
+        reporter_class = Kernel.const_get(config.reporter)
+      rescue NameError
+        raise Error, "Unknown reporter '#{config.reporter}' (are you sure it was loaded by your test or helper?)"
+      end
+      if reporter_class.is_a?(Class)
+        if reporter_class.instance_method(:initialize).parameters.any? { |type, _| [:req, :opt, :rest].include?(type) }
+          reporter_class.new(config)
+        else
+          reporter_class.new
+        end
+      else
+        raise Error, "Reporter '#{config.reporter}' expected to be a class, but was a #{reporter_class.class}"
+      end
+    end
+
     def run config, plan
       @wip.clear
       @results.clear
-      reporter = config.reporter.new(config)
-      reporter.before_suite(plan.tests)
+      reporter = instantiate_reporter(config)
+      reporter.before_suite(plan.tests) if reporter.respond_to?(:before_suite)
 
       time_bomb = Thread.new {
+        next if config.timeout < 0
+
         explode = proc do
-          next if ENV["CI"] && !$stderr.tty?
           next if @run_aborted.true?
           @run_aborted.make_true
           @wip.each(&:capture_backtrace_at_exit)
-          reporter.after_tldr(plan.tests, @wip.dup, @results.dup)
+          reporter.after_tldr(plan.tests, @wip.dup, @results.dup) if reporter.respond_to?(:after_tldr)
           exit!(3)
         end
 
-        sleep(1.8)
+        sleep(config.timeout)
+
         # Don't hard-kill the runner if user is debugging, it'll
         # screw up their terminal slash be a bad time
         if IRB.CurrentContext
@@ -42,7 +61,7 @@ class TLDR
       end
 
       unless @run_aborted.true?
-        reporter.after_suite(results)
+        reporter.after_suite(results) if reporter.respond_to?(:after_suite)
         exit(exit_code(results))
       end
     end
@@ -74,7 +93,7 @@ class TLDR
         next if @run_aborted.true?
         @results << result
         @wip.delete(wip_test)
-        reporter.after_test(result)
+        reporter.after_test(result) if reporter.respond_to?(:after_test)
         fail_fast(reporter, plan, result) if result.failing? && config.fail_fast
       end
     end
@@ -83,7 +102,7 @@ class TLDR
       unless @run_aborted.true?
         @run_aborted.make_true
         abort = proc do
-          reporter.after_fail_fast(plan.tests, @wip.dup, @results.dup, fast_failed_result)
+          reporter.after_fail_fast(plan.tests, @wip.dup, @results.dup, fast_failed_result) if reporter.respond_to?(:after_fail_fast)
           exit!(exit_code([fast_failed_result]))
         end
 

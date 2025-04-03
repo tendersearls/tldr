@@ -6,16 +6,16 @@ class ExitCodeTest < Minitest::Test
 
     assert_equal "", result.stderr
     assert_equal 0, result.exit_code
-    assert_includes result.stdout, "😁"
+    assert_includes result.stdout, "\n.\n"
     # Command shouldn't include --seed if it wasn't explicitly set
     assert_includes result.stdout, "Command: bundle exec tldr \"tests/fixture/success.rb\"\n"
-    assert_match(/🌱 --seed \d+/, result.stdout)
+    assert_match(/--seed \d+/, result.stdout)
   end
 
   def test_failure
     result = TLDRunner.should_fail "fail.rb"
 
-    assert_includes result.stdout, "😡"
+    assert_includes result.stdout, "F"
     assert_includes result.stderr, <<~MSG.chomp
       Failing tests:
 
@@ -31,7 +31,7 @@ class ExitCodeTest < Minitest::Test
   def test_error
     result = TLDRunner.should_fail "error.rb"
 
-    assert_includes result.stdout, "🤬"
+    assert_includes result.stdout, "E"
     assert_includes result.stderr, <<~MSG.chomp
       Failing tests:
 
@@ -53,6 +53,6 @@ class ExitCodeTest < Minitest::Test
         - SuccessTest#test_skips [tests/fixture/skip.rb:2]
     MSG
     assert_equal 0, result.exit_code
-    assert_includes result.stdout, "🫥"
+    assert_includes result.stdout, "S"
   end
 end

@@ -1,4 +1,4 @@
-require_relative "test_helper"
+require_relative "../../test_helper"
 
 class ConfigTest < Minitest::Test
   def test_pre_defaults
@@ -22,6 +22,7 @@ class ConfigTest < Minitest::Test
   def test_non_cli_defaults
     config = TLDR::Config.new(cli_defaults: false)
 
+    assert_equal "", config.to_full_args
     assert_equal [], config.paths
     assert_equal [], config.helper_paths
     assert_equal [], config.load_paths
@@ -63,15 +64,15 @@ class ConfigTest < Minitest::Test
     )
 
     assert_equal <<~MSG.chomp, config.to_full_args
-      --seed 42 --verbose --print-interrupted-test-backtraces --reporter TLDR::Reporters::Base --helper "test_helper.rb" --load-path "app" --load-path "lib" --parallel --name "/test_*/" --name "test_it" --fail-fast --prepend "a.rb:3" --exclude-path "c.rb:4" --exclude-name "test_b_1" --no-warnings --yes-i-know "a.rb:3" "b.rb"
+      --fail-fast --parallel --seed 42 --name "/test_*/" --name "test_it" --exclude-name "test_b_1" --exclude-path "c.rb:4" --helper "test_helper.rb" --prepend "a.rb:3" --load-path "app" --load-path "lib" --reporter TLDR::Reporters::Base --no-warnings --verbose --yes-i-know --print-interrupted-test-backtraces "a.rb:3" "b.rb"
     MSG
 
     assert_equal <<~MSG.chomp, config.to_single_path_args("lol.rb")
-      --verbose --print-interrupted-test-backtraces --reporter TLDR::Reporters::Base --helper "test_helper.rb" --load-path "app" --load-path "lib" --exclude-name "test_b_1" --no-warnings --yes-i-know "lol.rb"
+      --exclude-name "test_b_1" --helper "test_helper.rb" --load-path "app" --load-path "lib" --reporter TLDR::Reporters::Base --no-warnings --verbose --yes-i-know --print-interrupted-test-backtraces "lol.rb"
     MSG
 
     assert_equal <<~MSG.chomp, config.to_full_args(ensure_args: ["--i-am-being-watched"])
-      --seed 42 --verbose --print-interrupted-test-backtraces --reporter TLDR::Reporters::Base --helper "test_helper.rb" --load-path "app" --load-path "lib" --parallel --name "/test_*/" --name "test_it" --fail-fast --prepend "a.rb:3" --exclude-path "c.rb:4" --exclude-name "test_b_1" --no-warnings --yes-i-know "a.rb:3" "b.rb" --i-am-being-watched
+      --fail-fast --parallel --seed 42 --name "/test_*/" --name "test_it" --exclude-name "test_b_1" --exclude-path "c.rb:4" --helper "test_helper.rb" --prepend "a.rb:3" --load-path "app" --load-path "lib" --reporter TLDR::Reporters::Base --no-warnings --verbose --yes-i-know --print-interrupted-test-backtraces "a.rb:3" "b.rb" --i-am-being-watched
     MSG
   end
 
@@ -92,6 +93,18 @@ class ConfigTest < Minitest::Test
     refute_includes TLDR::Config.new(parallel: true).to_full_args, "--parallel"
     assert_includes TLDR::Config.new(parallel: false).to_full_args, "--no-parallel"
     refute_includes TLDR::Config.new(parallel: false, seed: 1).to_full_args, "--parallel"
+  end
+
+  def test_timeout_arg_printout
+    assert_equal "--timeout", TLDR::Config.new(timeout: 1.8).to_full_args
+    assert_equal "--timeout 1.7", TLDR::Config.new(timeout: 1.7).to_full_args
+  end
+
+  def test_config_path_arg_printout
+    assert_equal "--config loljk.yml", TLDR::Config.new(config_path: "loljk.yml").to_full_args
+    assert_equal "", TLDR::Config.new(config_path: nil).to_full_args
+    assert_equal "--no-config", TLDR::Config.new(config_path: nil, cli_defaults: true).to_full_args
+    assert_equal "", TLDR::Config.new(config_path: TLDR::Config::DEFAULT_YAML_PATH, cli_defaults: true).to_full_args
   end
 
   def test_cli_conversion_omits_helper_with_no_helper
@@ -117,7 +130,7 @@ class ConfigTest < Minitest::Test
     )
 
     assert_equal <<~MSG.chomp, config.to_full_args
-      --seed 1 --helper "test_helper.rb" --load-path "app" --load-path "/lol/ok/lib" --prepend "foo.rb" --exclude-path "bar.rb" "baz.rb"
+      --seed 1 --exclude-path "bar.rb" --helper "test_helper.rb" --prepend "foo.rb" --load-path "app" --load-path "/lol/ok/lib" "baz.rb"
     MSG
 
     assert_equal <<~MSG.chomp, config.to_single_path_args("#{Dir.pwd}/baz.rb")
@@ -149,8 +162,8 @@ class ConfigTest < Minitest::Test
   end
 
   def test_merging_configs_basic
-    config = TLDR::Config.new(no_emoji: true, prepend_paths: ["a.rb:1"], paths: ["a.rb"])
-    other = TLDR::Config.new(no_emoji: false, seed: 1, prepend_paths: ["a.rb:2"], config_intended_for_merge_only: true)
+    config = TLDR::Config.new(emoji: true, prepend_paths: ["a.rb:1"], paths: ["a.rb"])
+    other = TLDR::Config.new(emoji: false, seed: 1, prepend_paths: ["a.rb:2"], config_intended_for_merge_only: true)
 
     result = config.merge(other)
 
@@ -163,6 +176,6 @@ class ConfigTest < Minitest::Test
     # Basic merging happens
     assert_equal ["a.rb"], result.paths
     assert_equal ["a.rb:2"], result.prepend_paths
-    refute result.no_emoji
+    refute result.emoji
   end
 end

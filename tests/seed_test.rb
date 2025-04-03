@@ -11,7 +11,7 @@ class SeedTest < Minitest::Test
     MSG
     assert_equal 0, result.exit_code
     assert_includes result.stdout, "--seed 1"
-    assert_includes result.stdout, "🫥😁"
+    assert_includes result.stdout, "S."
   end
 
   def test_order_2
@@ -24,6 +24,6 @@ class SeedTest < Minitest::Test
     MSG
     assert_equal 0, result.exit_code
     assert_includes result.stdout, "--seed 2"
-    assert_includes result.stdout, "😁🫥"
+    assert_includes result.stdout, ".S"
   end
 end

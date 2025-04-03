@@ -1,6 +1,6 @@
 seed: 42
 verbose: true
-reporter: TLDR::Reporters::Default
+reporter: "TLDR::Reporters::Default"
 helper_paths: ["test_helper.rb"]
 load_paths: ["app", "lib"]
 parallel: true

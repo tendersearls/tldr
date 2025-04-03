@@ -6,13 +6,13 @@ class AtExitDriverTest < Minitest::Test
 
     assert_includes result.stdout, <<~MSG
       Command: bundle exec tldr --seed 5 --exclude-name "test_y"
-      🌱 --seed 5
+      --seed 5
 
-      🏃 Running:
+      Running:
 
       X
-      😁Z
-      😁
+      .Z
+      .
     MSG
   end
 
@@ -22,11 +22,11 @@ class AtExitDriverTest < Minitest::Test
     # tldr command wins
     assert_equal result.stdout.scan("Command: bundle exec tldr").size, 1
     assert_includes result.stdout, <<~MSG
-      🏃 Running:
+      Running:
 
       Y
-      😁Z
-      😁
+      .Z
+      .
     MSG
   end
 end

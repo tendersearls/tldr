@@ -5,8 +5,8 @@ class HooksTest < Minitest::Test
     result = TLDRunner.should_succeed "hooks.rb", "--no-parallel -n test_1,test_2"
 
     assert_includes result.stdout, <<~MSG
-      A(B)C😁
-      A(B)C😁
+      A(B)C.
+      A(B)C.
     MSG
   end
 
