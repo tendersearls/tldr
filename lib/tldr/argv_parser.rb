@@ -5,10 +5,11 @@ class TLDR
     PATTERN_FRIENDLY_SPLITTER = /,(?=(?:[^\/]*\/[^\/]*\/)*[^\/]*$)/
 
     def parse args, options = {cli_defaults: true}
+      og_args = args.dup
       OptionParser.new do |opts|
         opts.banner = "Usage: tldr [options] some_tests/**/*.rb some/path.rb:13 ..."
 
-        opts.on "-t", "--[no-]timeout [TIMEOUT]", Numeric, "Timeout (in seconds) before timer aborts the run (Default: #{Config::DEFAULT_TIMEOUT})" do |timeout|
+        opts.on "-t", "--[no-]timeout [TIMEOUT]", "Timeout (in seconds) before timer aborts the run (Default: #{Config::DEFAULT_TIMEOUT})" do |timeout|
           options[:timeout] = if timeout == false
             # --no-timeout
             -1
@@ -17,7 +18,9 @@ class TLDR
             Config::DEFAULT_TIMEOUT
           else
             # --timeout 42.3
-            timeout
+            handle_unparsable_optional_value(og_args, "timeout", timeout) do
+              Float(timeout)
+            end
           end
         end
 
@@ -126,6 +129,31 @@ class TLDR
       end
 
       Config.new(**options)
+    end
+
+    private
+
+    def handle_unparsable_optional_value(og_args, option_name, value, &blk)
+      yield
+    rescue ArgumentError
+      args = og_args.dup
+      if (option_index = args.index("--#{option_name}"))
+        args.insert(option_index + 1, "--")
+        warn <<~MSG
+          TLDR exited in error!
+
+          We couldn't parse #{value.inspect} as a valid #{option_name} value
+
+          Did you mean to set --#{option_name} as the last option and without an explicit value?
+
+          If so, you need to append ' -- ' before any paths, like:
+
+            tldr #{args.join(" ")}
+        MSG
+        exit 1
+      else
+        raise
+      end
     end
   end
 end
