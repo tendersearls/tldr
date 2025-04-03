@@ -1,5 +1,7 @@
 ## unreleased
 
+## [1.0.0]
+
 * **BREAKING** you know how the whole point of TLDR is that it aborts your test
 run after 1.8s? Yeah, well, it doesn't anymore. Use `--timeout` to enable it
 * **BREAKING** replace the `--no-dotfile` flag and has been replaced by a

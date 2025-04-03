@@ -1,3 +1,3 @@
 class TLDR
-  VERSION = "0.10.1"
+  VERSION = "1.0.0"
 end
