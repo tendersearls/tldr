@@ -10,7 +10,7 @@ class TLDR
 
     # Test exact match starting line condition first to save us a potential re-parsing to look up end_line
     def covers_line? l
-      line == l || (l >= line && l <= end_line)
+      line == l || l.between?(line, end_line)
     end
 
     def group?
