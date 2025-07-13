@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    tldr (1.0.0)
+    tldr (1.1.0)
       concurrent-ruby (~> 1.2)
       irb (~> 1.10)
       super_diff (~> 0.10)
@@ -94,10 +94,7 @@ GEM
     unicode-emoji (4.0.4)
 
 PLATFORMS
-  arm64-darwin-22
   arm64-darwin-23
-  arm64-darwin-24
-  x86_64-linux
 
 DEPENDENCIES
   m
