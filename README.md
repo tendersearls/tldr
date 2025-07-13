@@ -61,6 +61,8 @@ Usage: tldr [options] some_tests/**/*.rb some/path.rb:13 ...
         --[no-]warnings              Print Ruby warnings (Default: true)
     -v, --verbose                    Print stack traces for errors
         --yes-i-know                 Suppress TLDR report when suite runs beyond any configured --timeout
+        --exit-0-on-timeout          Exit with status code 0 when suite times out instead of 3
+        --exit-2-on-failure          Exit with status code 2 (normally for errors) for both failures and errors
         --print-interrupted-test-backtraces
                                      Print stack traces of tests interrupted after a timeout
 ```
@@ -257,6 +259,35 @@ timeout: 0.01
 ```
 
 And if you're running with the timeout enabled this way, you can still disable it for any given test run by adding the `--no-timeout` flag.
+
+#### Consider timeouts as a success with exit code 0
+
+By default, when TLDR times out it exits with status code 3 to indicate the test suite was aborted. However, if you know that your full test suite is slower than whatever duration you consider to be "fast enough for fast feedback", you can use the `--exit-0-on-timeout` flag and simply use the timeout to enforce whatever feedback loop budget you set with `--timeout`.
+
+For example:
+
+```
+# Get feedback within 400ms but don't consider a timeout a failure
+tldr --timeout 0.4 --exit-0-on-timeout
+```
+
+This is particularly useful for:
+- [Claude Code hooks](https://docs.anthropic.com/en/docs/claude-code/hooks) where you want fast feedback without failing the command
+- [Git pre-commit hooks](https://git-scm.com/docs/githooks#_pre_commit) where you want quick test results without blocking commits
+- Development workflows where timeouts are informational rather than failures
+- Any situation where you want a time budget without hard failures
+
+## Using TLDR as a Claude Code hook
+
+In AI agent-based coding workflows, it's common to [configure hooks](https://docs.anthropic.com/en/docs/claude-code/hooks) that will block the agent from proceeding whenever tests or linters fail. With Claude Code specifically, a hook will only block if it exits with status code 2. As a result, you can use `--exit-2-on-failure` so that assertion failures will block the agent from continuing.
+
+So you might configure a Claude Code hook with a 250ms budget by setting timeouts to exit code 0 and failures to exit code 2:
+
+```
+# Get feedback within 250ms, don't block the agent on timeouts, but do block it on assertion failures
+tldr --timeout 0.25 --exit-0-on-timeout --exit-2-on-failure
+```
+
 
 ## Questions you might be asking
 

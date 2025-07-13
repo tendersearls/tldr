@@ -40,7 +40,13 @@ class TLDR
           @run_aborted.make_true
           @wip.each(&:capture_backtrace_at_exit)
           reporter.after_tldr(plan.tests, @wip.dup, @results.dup) if reporter.respond_to?(:after_tldr)
-          exit!(3)
+
+          # If there are failures/errors, use their exit code regardless of exit_0_on_timeout
+          if @results.any? { |result| result.error? || result.failure? }
+            exit!(exit_code(@results, config))
+          else
+            exit!(config.exit_0_on_timeout ? 0 : 3)
+          end
         end
 
         sleep(config.timeout)
@@ -62,7 +68,7 @@ class TLDR
 
       unless @run_aborted.true?
         reporter.after_suite(results) if reporter.respond_to?(:after_suite)
-        exit(exit_code(results))
+        exit(exit_code(results, config))
       end
     end
 
@@ -119,11 +125,11 @@ class TLDR
       ((Process.clock_gettime(Process::CLOCK_MONOTONIC, :microsecond) - start) / 1000.0).round
     end
 
-    def exit_code results
+    def exit_code results, config
       if results.any? { |result| result.error? }
         2
       elsif results.any? { |result| result.failure? }
-        1
+        config.exit_2_on_failure ? 2 : 1
       else
         0
       end

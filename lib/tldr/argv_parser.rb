@@ -106,6 +106,14 @@ class TLDR
           options[:yes_i_know] = true
         end
 
+        opts.on CONFLAGS[:exit_0_on_timeout], "Exit with status code 0 when suite times out instead of 3" do
+          options[:exit_0_on_timeout] = true
+        end
+
+        opts.on CONFLAGS[:exit_2_on_failure], "Exit with status code 2 (normally for errors) for both failures and errors" do
+          options[:exit_2_on_failure] = true
+        end
+
         opts.on CONFLAGS[:print_interrupted_test_backtraces], "Print stack traces of tests interrupted after a timeout" do |print_interrupted_test_backtraces|
           options[:print_interrupted_test_backtraces] = print_interrupted_test_backtraces
         end

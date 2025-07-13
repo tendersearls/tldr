@@ -22,6 +22,8 @@ class TLDR
     yes_i_know: "--yes-i-know",
     print_interrupted_test_backtraces: "--print-interrupted-test-backtraces",
     i_am_being_watched: "--i-am-being-watched",
+    exit_0_on_timeout: "--exit-0-on-timeout",
+    exit_2_on_failure: "--exit-2-on-failure",
     paths: nil
   }.freeze
 
@@ -32,7 +34,7 @@ class TLDR
     :exclude_paths, :helper_paths, :no_helper, :prepend_paths, :no_prepend,
     :load_paths, :base_path, :config_path, :reporter, :emoji, :warnings,
     :verbose, :yes_i_know, :print_interrupted_test_backtraces,
-    :i_am_being_watched, :paths,
+    :i_am_being_watched, :exit_0_on_timeout, :exit_2_on_failure, :paths,
     # Internal properties
     :config_intended_for_merge_only, :seed_set_intentionally, :cli_defaults
   ].freeze
@@ -79,7 +81,9 @@ class TLDR
         verbose: false,
         yes_i_know: false,
         print_interrupted_test_backtraces: false,
-        i_am_being_watched: false
+        i_am_being_watched: false,
+        exit_0_on_timeout: false,
+        exit_2_on_failure: false
       }
 
       if cli_defaults
@@ -118,7 +122,7 @@ class TLDR
       end
 
       # Booleans
-      [:watch, :fail_fast, :parallel, :no_helper, :no_prepend, :emoji, :warnings, :verbose, :yes_i_know, :print_interrupted_test_backtraces, :i_am_being_watched].each do |key|
+      [:watch, :fail_fast, :parallel, :no_helper, :no_prepend, :emoji, :warnings, :verbose, :yes_i_know, :print_interrupted_test_backtraces, :i_am_being_watched, :exit_0_on_timeout, :exit_2_on_failure].each do |key|
         merged_args[key] = defaults[key] if merged_args[key].nil?
       end
 

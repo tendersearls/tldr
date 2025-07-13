@@ -1,5 +1,10 @@
 ## unreleased
 
+## [1.1.0]
+
+* Add `--exit-0-on-timeout` to allow the suite timeout to be used more as a budget constraint (e.g. "I know my full suite is going to take 30 seconds to run but I want to constantly run as many as I can in 500ms to get fast feedback")
+* Add `--exit-2-on-failure` flag to exit with status 2 for test failures (not just errors), useful for Claude Code hooks which only block on exit code 2
+
 ## [1.0.0]
 
 * **BREAKING** you know how the whole point of TLDR is that it aborts your test
