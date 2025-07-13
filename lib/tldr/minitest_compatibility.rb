@@ -31,5 +31,18 @@ class TLDR
         s
       end
     end
+
+    def name
+    end
+
+    def self.included(base)
+      base.extend ClassMethods
+    end
+
+    module ClassMethods
+      def make_my_diffs_pretty!
+        # No-op, because they're already pretty thanks to super_diff!
+      end
+    end
   end
 end
