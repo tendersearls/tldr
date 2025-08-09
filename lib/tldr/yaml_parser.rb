@@ -4,7 +4,7 @@ class TLDR
   class YamlParser
     def parse path
       require "yaml"
-      YAML.load_file(path)
+      (YAML.load_file(path) || {})
         .transform_keys { |k| k.to_sym }
         .tap do |dotfile_args|
           # Since we don't have shell expansion, we have to glob any paths ourselves
