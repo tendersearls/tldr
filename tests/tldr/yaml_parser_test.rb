@@ -58,4 +58,10 @@ class YamlParserTest < Minitest::Test
       assert_equal "Invalid keys in .sure_jan.yml file: boyfriend", e.message
     end
   end
+
+  def test_empty_file
+    with_temp_file "foo.yml", "" do |yaml_path|
+      assert_equal({}, @subject.parse(yaml_path))
+    end
+  end
 end
