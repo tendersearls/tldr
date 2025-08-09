@@ -1,5 +1,9 @@
 ## unreleased
 
+## [1.1.1]
+
+* Allow empty config files [#21](https://github.com/tendersearls/tldr/pull/21)
+
 ## [1.1.0]
 
 * Add `--exit-0-on-timeout` to allow the suite timeout to be used more as a budget constraint (e.g. "I know my full suite is going to take 30 seconds to run but I want to constantly run as many as I can in 500ms to get fast feedback")
