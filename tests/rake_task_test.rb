@@ -61,4 +61,33 @@ class RakeTaskTest < Minitest::Test
       .
     MSG
   end
+
+  def test_running_multiples_rake_tasks_in_one_process
+    result = TLDRunner.run_command("cd example/c && TLDR_OPTS=\"--seed 1\" bundle exec rake tldr b_tests")
+
+    assert_includes result.stdout, <<~MSG
+      👓
+      Command: bundle exec tldr --seed 1 --helper "spec/spec_helper.rb" "spec/math_spec.rb"
+      🌱 --seed 1
+
+      🏃 Running:
+
+      😁
+
+      Finished in 0ms.
+
+      1 test class, 1 test method, 0 failures, 0 errors, 0 skips
+      neat!
+      Command: bundle exec tldr --seed 1 --base-path "../b"
+      🌱 --seed 1
+
+      🏃 Running:
+
+      😁
+
+      Finished in 0ms.
+
+      1 test class, 1 test method, 0 failures, 0 errors, 0 skips
+    MSG
+  end
 end
