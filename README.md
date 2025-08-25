@@ -300,7 +300,7 @@ The `tldr` gem was initially developed and released after we did a [lighthearted
 
 In the 18 months since, and to our utter surprise, TLDR did not immediately rise to the top of the charts and dominate the Ruby testing world.
 
-While we still contend the mandatory time limit was a Very Good Idea (even if your tests are necessarily slower than 1.8 seconds), we believe there is a very remote, almost certainly wrong possibility that it was slowing adoption of this otherwise very capable test runner. As a result, **as of 1.0.0, the 1.8s timeout is disabled by default, and can be re-enabled (and even set to a specific value) with the `--timeout` option.
+While we still contend the mandatory time limit was a Very Good Idea (even if your tests are necessarily slower than 1.8 seconds), we believe there is a very remote, almost certainly wrong possibility that it was slowing adoption of this otherwise very capable test runner. As a result, **as of 1.0.0, the 1.8s timeout is disabled by default**, and can be re-enabled (and even set to a specific value) with the `--timeout` option.
 
 ### Minitest compatibility
 
